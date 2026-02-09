@@ -105,17 +105,17 @@
             </objects>
             <point key="canvasLocation" x="2382.4427480916029" y="-75.352112676056336"/>
         </scene>
-        <!--News Detail-->
+        <!--News Details-->
         <scene sceneID="t5l-TK-Qnr">
             <objects>
-                <viewController id="Y6f-ZI-TBs" customClass="NewsDetailViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Y6f-ZI-TBs" customClass="NewsDetailsViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="boI-jM-45c">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="NKM-bP-vgq"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <navigationItem key="navigationItem" title="News Detail" id="Wsa-BR-7Bb"/>
+                    <navigationItem key="navigationItem" title="News Details" id="Wsa-BR-7Bb" userLabel="News Details"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OMy-Z2-rFA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

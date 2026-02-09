@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PreliminaryNewsCell: UICollectionViewCell {
+class PreliminaryNewsCell: UICollectionViewCell { //?? to file 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var headerLabel: UILabel!
     

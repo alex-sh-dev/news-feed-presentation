@@ -57,6 +57,7 @@
                                         <connections>
                                             <outlet property="headerLabel" destination="8Xr-iC-4Sx" id="gLZ-HI-zZ0"/>
                                             <outlet property="imageView" destination="RMg-Ow-bep" id="JIQ-Hz-llz"/>
+                                            <segue destination="dTW-xF-VE5" kind="show" id="fXX-eD-ccX"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -65,6 +66,9 @@
                                 <rect key="frame" x="0.0" y="59" width="82" height="35"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="News &gt;"/>
+                                <connections>
+                                    <segue destination="BDn-me-K7O" kind="show" id="NaC-Jw-pwQ"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="b8j-Sg-JtK"/>
@@ -84,6 +88,76 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qwj-Qd-V58" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="588.54961832061065" y="-75.352112676056336"/>
+        </scene>
+        <!--News Feed-->
+        <scene sceneID="2nN-Df-zyP">
+            <objects>
+                <viewController id="zWh-op-k4n" customClass="NewsFeedViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="suG-GD-2ns">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="UUz-Ew-idt"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="News Feed" id="JF2-AQ-B0G"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SFQ-lN-4Qu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2382.4427480916029" y="-75.352112676056336"/>
+        </scene>
+        <!--News Detail-->
+        <scene sceneID="t5l-TK-Qnr">
+            <objects>
+                <viewController id="Y6f-ZI-TBs" customClass="NewsDetailViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="boI-jM-45c">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="NKM-bP-vgq"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="News Detail" id="Wsa-BR-7Bb"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OMy-Z2-rFA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4173.2824427480919" y="-75.352112676056336"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="esC-aW-Utb">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="BDn-me-K7O" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="ifp-Id-wje"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="M9m-xX-x0D">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="zWh-op-k4n" kind="relationship" relationship="rootViewController" id="7wI-2D-Rsl"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NNN-Wd-yEZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1455.7251908396945" y="-75.352112676056336"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="1Hb-vm-Nml">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="dTW-xF-VE5" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="H9z-oj-yfp"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="unX-wu-iP8">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Y6f-ZI-TBs" kind="relationship" relationship="rootViewController" id="2jc-Kd-DCr"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AmW-Jd-xfR" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3246.5648854961833" y="-75.352112676056336"/>
         </scene>
     </scenes>
     <resources>

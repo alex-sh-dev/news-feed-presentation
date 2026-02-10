@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class NewsParser {
     
@@ -17,6 +18,7 @@ class NewsParser {
     
     private static var config: Config?
     var baseEndpoint: URL
+    let idsPub = PassthroughSubject<[UInt], Never>()
     
     private init() {
         guard let config = NewsParser.config else {
@@ -40,7 +42,7 @@ class NewsParser {
         
         
         URLSession.shared.dataTask(with: endpoint) {
-            (data, response, error) -> Void in
+            [unowned self] (data, response, error) -> Void in
             
             if error == nil && data != nil {
                 do {
@@ -50,11 +52,14 @@ class NewsParser {
                         return //??
                     }
                     
+                    var ids = [UInt]()
                     for newsItem in news {
-                        NewsStorage.shared.lock.with() {
+                        NewsStorage.shared.lock.with {
                             NewsStorage.shared.news[newsItem.id] = newsItem
                         }
+                        ids.append(newsItem.id)
                     }
+                    self.idsPub.send(ids)
                 } catch {
                     //publish error? //??
                     print(error) //??

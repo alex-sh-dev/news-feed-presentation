@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="gVv-yA-h8X" userLabel="newsFeedCollectionView">
-                                <rect key="frame" x="0.0" y="94" width="393" height="140"/>
+                                <rect key="frame" x="0.0" y="99.333333333333314" width="393" height="140"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="140" id="pq6-zC-uaL"/>
@@ -75,7 +75,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PI0-uZ-PET" userLabel="newsButton">
-                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="25" height="50"/>
                                                     <color key="tintColor" systemColor="systemRedColor"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain">
@@ -89,19 +89,21 @@
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="PI0-uZ-PET" firstAttribute="top" secondItem="fVc-3g-ctT" secondAttribute="top" id="9O2-vW-wgs"/>
-                                                <constraint firstAttribute="bottom" secondItem="PI0-uZ-PET" secondAttribute="bottom" id="XYq-ul-9B0"/>
-                                                <constraint firstItem="PI0-uZ-PET" firstAttribute="leading" secondItem="fVc-3g-ctT" secondAttribute="leading" id="jFe-Fn-5Vh"/>
-                                                <constraint firstAttribute="trailing" secondItem="PI0-uZ-PET" secondAttribute="trailing" id="r3L-R1-Vxw"/>
+                                                <constraint firstItem="PI0-uZ-PET" firstAttribute="top" secondItem="fVc-3g-ctT" secondAttribute="top" id="N5T-7L-FXm"/>
+                                                <constraint firstItem="PI0-uZ-PET" firstAttribute="leading" secondItem="fVc-3g-ctT" secondAttribute="leading" id="aJa-Y6-0E2"/>
+                                                <constraint firstItem="PI0-uZ-PET" firstAttribute="width" secondItem="fVc-3g-ctT" secondAttribute="width" multiplier="1:2" id="hbu-uB-myR"/>
+                                                <constraint firstItem="PI0-uZ-PET" firstAttribute="height" secondItem="fVc-3g-ctT" secondAttribute="height" id="uB2-mz-jZs"/>
                                             </constraints>
                                         </collectionViewCellContentView>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Y2-OP-IEi" userLabel="newsFeedButton">
-                                <rect key="frame" x="0.0" y="59" width="82" height="35"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="News &gt;"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Y2-OP-IEi" userLabel="newsFeedButton">
+                                <rect key="frame" x="0.0" y="59" width="102.33333333333333" height="40.333333333333343"/>
+                                <buttonConfiguration key="configuration" style="plain" image="greaterthan" catalog="system" imagePlacement="trailing" title="News" subtitle="">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="20" weight="medium"/>
+                                    <fontDescription key="titleFontDescription" style="UICTFontTextStyleTitle2"/>
+                                </buttonConfiguration>
                                 <connections>
                                     <segue destination="BDn-me-K7O" kind="show" id="NaC-Jw-pwQ"/>
                                 </connections>
@@ -166,6 +168,7 @@
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.right.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="greaterthan" catalog="system" width="128" height="108"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -47,7 +47,7 @@ class StartViewController: UIViewController {
         
         URLCache.shared = urlCache
         
-//        urlCache.removeAllCachedResponses()//??
+        urlCache.removeAllCachedResponses()//??
         
 //        newsFeedCollectionView.register(PreliminaryNewsCell.self, forCellWithReuseIdentifier: PreliminaryNewsCell.kIdentifier)
         

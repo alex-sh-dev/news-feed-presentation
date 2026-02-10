@@ -18,7 +18,7 @@ class NewsParser {
     
     private static var config: Config?
     var baseEndpoint: URL
-    let idsPub = PassthroughSubject<[UInt], Never>()
+    let idsPub = PassthroughSubject<[UInt], Never>() //?? rename?
     
     private init() {
         guard let config = NewsParser.config else {
@@ -34,7 +34,6 @@ class NewsParser {
     
     func sendRequest(page: UInt, count: UInt) {
         //?? page * count <= totalCount
-        //?? sequentially? DispatchQueue
         
         let endpoint = self.baseEndpoint
             .appending(path: String(page))

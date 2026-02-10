@@ -13,6 +13,20 @@ class PreliminaryNewsCell: UICollectionViewCell { //?? to sp file
     @IBOutlet weak var headerLabel: UILabel!
     
     static let kIdentifier = String(describing: PreliminaryNewsCell.self)
+    
+    override var isHighlighted: Bool {
+        didSet { //??
+            if isHighlighted {
+                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                    self.transform = self.transform.scaledBy(x: 0.9, y: 0.9)
+                }, completion: nil)
+            } else {
+                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                    self.transform = CGAffineTransform.identity.scaledBy(x: 1.0, y: 1.0)
+                }, completion: nil)
+            }
+        }
+    }
 }
 
 class NewsButtonCell: UICollectionViewCell {}
@@ -36,6 +50,8 @@ class StartViewController: UIViewController {
 //        urlCache.removeAllCachedResponses()//??
         
 //        newsFeedCollectionView.register(PreliminaryNewsCell.self, forCellWithReuseIdentifier: PreliminaryNewsCell.kIdentifier)
+        
+        self.newsFeedCollectionView.alwaysBounceHorizontal = true
         
         configureDataSource()
         configureLayout()

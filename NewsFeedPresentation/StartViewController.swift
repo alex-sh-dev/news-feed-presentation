@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import Combine
 
-class PreliminaryNewsCell: UICollectionViewCell { //?? to file 
+class PreliminaryNewsCell: UICollectionViewCell { //?? to sp file
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var headerLabel: UILabel!
     
@@ -23,11 +24,34 @@ private enum Section {
 class StartViewController: UIViewController {
     @IBOutlet weak var newsFeedCollectionView: UICollectionView! //?? rename? +preliminary
     private var dataSource: UICollectionViewDiffableDataSource<Section, UInt>!
+    private var idsSub: AnyCancellable? //?? how to cancel sub
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let urlCache = URLCache(memoryCapacity: 10 * 1024 * 1024, diskCapacity: 100 * 1024 * 1024, diskPath: "urlcache") //??
+        
+        URLCache.shared = urlCache
+        
+//        urlCache.removeAllCachedResponses()//??
+        
         configureDataSource()
         configureLayout()
+        
+        let endpoint = URL(string: "https://webapi.autodoc.ru/api/news")
+        NewsParser.setup(NewsParser.Config(baseEndpoint: endpoint!))//??
+        
+        idsSub = NewsParser.shared.idsPub.sink { ids in
+            //?? sort identifier if needed max = last
+            DispatchQueue.main.async {//??
+                var snapshot = self.dataSource.snapshot()
+                snapshot.appendItems(ids) //?? reload?
+                self.dataSource.apply(snapshot, animatingDifferences: false)
+            }
+        }
+        
+        //?? attempts
+        NewsParser.shared.sendRequest(page: 1, count: 15) //??
     }
     
     private func configureDataSource() {
@@ -38,17 +62,47 @@ class StartViewController: UIViewController {
                 fatalError() //??
             }
             
-            cell.backgroundColor = UIColor.lightGray
-            cell.headerLabel.text = "\(identifier)"
+            
+            var newsItem: NewsItem? //??
+            NewsStorage.shared.lock.with {
+                newsItem = NewsStorage.shared.news[identifier]
+            }
+            
+            if newsItem == nil { //??
+                return cell
+            }
+            
+            cell.headerLabel.text = newsItem!.title
+            
+            guard let url = newsItem!.titleImageUrl else {
+                return cell
+            }
+            
+            ImageCache.publicCache.load(url: url, item: newsItem!) { (fetchedItem, image, cached) in
+                if cached {
+                    cell.imageView.image = image
+                } else {
+                    if image != nil  {
+                        var updatedSnapshot = self.dataSource.snapshot()
+                        updatedSnapshot.reloadItems([fetchedItem.id])
+                        self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
+                    }
+                }
+            }
             
             return cell
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(Array(0..<10)) //?? hash specifi news with id
+        
+        NewsStorage.shared.lock.with {
+            let keys = [UInt](NewsStorage.shared.news.keys)
+            snapshot.appendItems(keys) //?? hash specifi news with id //?? keys sorted
+        }
+        
         dataSource.apply(snapshot, animatingDifferences: false)
-//        snapshot.reloadItems() //?? когда загрузится изображение
+//        snapshot.reloadItems() //??
 //        snapshot.deleteItems()
     }
     

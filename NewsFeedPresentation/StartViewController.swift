@@ -13,9 +13,9 @@ class PreliminaryNewsCell: UICollectionViewCell { //?? to sp file
     @IBOutlet weak var headerLabel: UILabel!
     
     static let kIdentifier = String(describing: PreliminaryNewsCell.self)
-    
-    //?? register kIdentifier (remove from storyboard)
 }
+
+class NewsButtonCell: UICollectionViewCell {}
 
 private enum Section {
     case main
@@ -35,6 +35,8 @@ class StartViewController: UIViewController {
         
 //        urlCache.removeAllCachedResponses()//??
         
+//        newsFeedCollectionView.register(PreliminaryNewsCell.self, forCellWithReuseIdentifier: PreliminaryNewsCell.kIdentifier)
+        
         configureDataSource()
         configureLayout()
         
@@ -51,17 +53,36 @@ class StartViewController: UIViewController {
         }
         
         //?? attempts
-        NewsParser.shared.sendRequest(page: 1, count: 15) //??
+        NewsParser.shared.sendRequest(page: 1, count: 10) //?? 10 for start?
+    }
+    
+    private func setDefaultImage(for imageView: UIImageView) {
+//        imageView.contentMode = .center
+//        let conf = UIImage.SymbolConfiguration(scale: .large)
+//        let image = UIImage(systemName: "photo", withConfiguration: conf) //??
+//        imageView.image = image //??
+        imageView.image = nil
+        imageView.backgroundColor = UIColor.lightGray //??
     }
     
     private func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<Section, UInt>(collectionView: self.newsFeedCollectionView) {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? in
             
+            
+            let count = collectionView.numberOfItems(inSection: 0)
+            if count - 1 == indexPath.row {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NewsButtonCell", for: indexPath) as? NewsButtonCell
+                
+                return cell
+            }
+            
+            
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PreliminaryNewsCell.kIdentifier, for: indexPath) as? PreliminaryNewsCell else {
                 fatalError() //??
             }
             
+          
             
             var newsItem: NewsItem? //??
             NewsStorage.shared.lock.with {
@@ -75,12 +96,16 @@ class StartViewController: UIViewController {
             cell.headerLabel.text = newsItem!.title
             
             guard let url = newsItem!.titleImageUrl else {
+                self.setDefaultImage(for: cell.imageView)
                 return cell
             }
+            
+            self.setDefaultImage(for: cell.imageView)//??
             
             ImageCache.publicCache.load(url: url, item: newsItem!) { (fetchedItem, image, cached) in
                 if cached {
                     cell.imageView.image = image
+                    cell.imageView.contentMode = .scaleAspectFill
                 } else {
                     if image != nil  {
                         var updatedSnapshot = self.dataSource.snapshot()
@@ -92,6 +117,8 @@ class StartViewController: UIViewController {
             
             return cell
         }
+        
+        //??use collectionView.dequeueConfiguredReusableCell(using: cellRegistration
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
         snapshot.appendSections([.main])
@@ -113,15 +140,18 @@ class StartViewController: UIViewController {
     private func createRowLayout() -> UICollectionViewLayout {
         
         let layout = UICollectionViewCompositionalLayout {
-            (sectionIndex: Int, layoutEnvironment:NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
+            (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
             
             let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
+
+            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 0)
             
-            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
-            
-            let containerGroup = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.33), heightDimension: .fractionalHeight(1.0)), subitems: [item]) //?? 0,33 оптимизация для альбомной ориентации
+            let size = layoutEnvironment.container.contentSize
+            let w = 1.7 * size.height //??
+            let containerGroup = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .absolute(w), heightDimension: .fractionalHeight(1.0)), subitems: [item]) //?? 0,33 оптимизация для альбомной ориентации //.fractionalWidth(0.48
             
             let section = NSCollectionLayoutSection(group: containerGroup)
+            
             section.orthogonalScrollingBehavior = .continuous //??
             
             return section

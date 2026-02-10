@@ -29,8 +29,8 @@ extension URLCache { //?? move to sp file
 }
 
 public class ImageCache {
-    public static let publicCache = ImageCache()
-    private var loadingResponses: [URL: [(NewsItem, UIImage?, Bool) -> Void]] = [:] //?? remove after use?
+    public static let publicCache = ImageCache() //?? -> shared
+    private var loadingResponses: [URL: [(NewsItem, UIImage?, Bool) -> Void]] = [:] //?? remove after use? //?? thread safe?
 
     private init() {}
 
@@ -61,9 +61,10 @@ public class ImageCache {
                 return
             }
             
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { //??
                 URLCache.storeImage(image, for: url)
             }
+            
             for block in blocks {
                 DispatchQueue.main.async {
                     block(item, image, false)

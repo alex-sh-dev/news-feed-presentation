@@ -11,6 +11,10 @@ struct NewsNode: Decodable {
     let news: [NewsItem]?
     let totalCount: UInt?
     
+    static var zero: NewsNode {
+        NewsNode(news: [], totalCount: 0)
+    }
+
     enum CodingKeys: String, CodingKey {
         case news
         case totalCount

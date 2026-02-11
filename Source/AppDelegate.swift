@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let endpoint = URL(string: Conf.kNewsEndpoint)
         NewsParser.setup(NewsParser.Config(baseEndpoint: endpoint!))
         
-        NewsParser.shared.sendRequest(page: 1, count: 15) //?? attempts
+        NewsParser.shared.requestData(count: 15)
         
         return true
     }

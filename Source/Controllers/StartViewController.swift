@@ -20,10 +20,21 @@ class StartViewController: UIViewController {
     }
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, UInt>!
-    private var idsSub: AnyCancellable? //?? how to cancel sub
+    private var newsUpdatedSubscriber: AnyCancellable!
     
     private struct Constants {
         static let kNewsItemCount = 10
+    }
+    
+    private func extractIdentifiers() -> [UInt] {
+        let storage = NewsStorage.shared
+        var identifiers: [UInt]!
+        storage.lock.with {
+            identifiers = Array(storage.news.keys.sorted(by: >)
+                .prefix(Constants.kNewsItemCount))
+        }
+        
+        return identifiers
     }
     
     override func viewDidLoad() {
@@ -32,18 +43,32 @@ class StartViewController: UIViewController {
         configureDataSource()
         configureLayout()
         
-        idsSub = NewsParser.shared.idsPub.sink { ids in
-            DispatchQueue.main.async {
-                var snapshot = self.dataSource.snapshot()
-                let identifiers = Array(ids.sorted(by: >).prefix(Constants.kNewsItemCount))
-                let oldIdentifiers = snapshot.itemIdentifiers
-                if oldIdentifiers.isEmpty {
-                    snapshot.appendItems(identifiers)
-                } else if identifiers.count != oldIdentifiers.count {
-                    snapshot.deleteAllItems()
+        newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink {
+            updated in
+            if !updated {
+                return
+            }
+            
+            let identifiers = self.extractIdentifiers()
+            if identifiers.isEmpty {
+                return
+            }
+            
+            var snapshot = self.dataSource.snapshot()
+            let oldIdentifiers = snapshot.itemIdentifiers
+            if oldIdentifiers.isEmpty {
+                if snapshot.numberOfSections == 0 {
                     snapshot.appendSections([.main])
-                    snapshot.appendItems(identifiers)
                 }
+                snapshot.appendItems(identifiers)
+                self.dataSource.apply(snapshot, animatingDifferences: false)
+            } else if identifiers.count != oldIdentifiers.count ||
+                        identifiers != oldIdentifiers {
+                snapshot.deleteAllItems()
+                snapshot.appendSections([.main])
+                snapshot.appendItems(identifiers)
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
         }
@@ -58,9 +83,9 @@ class StartViewController: UIViewController {
         self.dataSource = UICollectionViewDiffableDataSource<Section, UInt>(collectionView: self.previewNewsFeed) {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? in
             
-            if indexPath.row == Constants.kNewsItemCount - 1 {
+            if indexPath.row == collectionView.numberOfItems(inSection: 0) - 1 {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PreviewNewsSupplementaryCell.identifier, for: indexPath) as? PreviewNewsSupplementaryCell
-                
+
                 return cell
             }
             
@@ -104,6 +129,12 @@ class StartViewController: UIViewController {
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
         snapshot.appendSections([.main])
+        let identifiers = self.extractIdentifiers()
+        if identifiers.isEmpty {
+            NewsParser.shared.requestData(count: UInt(Constants.kNewsItemCount))
+        } else {
+            snapshot.appendItems(identifiers)
+        }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
     

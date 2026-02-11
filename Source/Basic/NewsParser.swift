@@ -19,7 +19,7 @@ class NewsParser {
     var baseEndpoint: URL
     
     private var cancellable = [String: AnyCancellable]()
-    let newsUpdatedPublisher = PassthroughSubject<Bool, Never>()
+    let newsUpdatedPublisher = PassthroughSubject<[UInt], Never>()
     
     private init() {
         guard let config = NewsParser.config else {
@@ -49,7 +49,7 @@ class NewsParser {
             .sink(receiveValue: {
                 [weak self] result in
                 guard let news = result.news, !news.isEmpty else {
-                    self?.newsUpdatedPublisher.send(false)
+                    self?.newsUpdatedPublisher.send([])
                     return
                 }
                 
@@ -60,7 +60,8 @@ class NewsParser {
                     }
                     ids.append(newsItem.id)
                 }
-                self?.newsUpdatedPublisher.send(true)
+
+                self?.newsUpdatedPublisher.send(ids)
                 self?.cancellable.removeValue(forKey: uuid)
             })
         self.cancellable[uuid] = cancellable

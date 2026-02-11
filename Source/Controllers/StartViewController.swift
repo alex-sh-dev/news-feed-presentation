@@ -46,8 +46,8 @@ class StartViewController: UIViewController {
         newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
             .receive(on: DispatchQueue.main)
             .sink {
-            updated in
-            if !updated {
+            ids in
+            if ids.isEmpty {
                 return
             }
             

@@ -1,5 +1,5 @@
 //
-//  NewsStructs.swift
+//  NewsStructures.swift
 //  NewsFeedPresentation
 //
 //  Created by dev on 2/10/26.

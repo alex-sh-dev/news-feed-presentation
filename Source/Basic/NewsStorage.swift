@@ -7,17 +7,6 @@
 
 import Foundation
 
-extension NSLock { //?? move to sp file
-    @discardableResult
-    func with<T>(_ block: () throws -> T) rethrows -> T {
-        lock()
-        defer {
-            unlock()
-        }
-        return try block()
-    }
-}
-
 class NewsStorage {
     static let shared = NewsStorage()
     

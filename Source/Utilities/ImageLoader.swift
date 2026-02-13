@@ -39,10 +39,10 @@ public class ImageLoader {
         
         URLSession.shared.dataTask(with: url) {
             (data, response, error) in
-            var loadCompletions: [LoadCompletionItemPair]?
-            self.lock.with { loadCompletions = self.loadingResponses[url] }
+            var existLoadCompletions: Bool = false
+            self.lock.with { existLoadCompletions = self.loadingResponses[url] != nil }
             guard let responseData = data, let image = UIImage(data: responseData),
-                  loadCompletions != nil, error == nil else {
+                  existLoadCompletions, error == nil else {
                 DispatchQueue.main.async {
                     completion(item, nil, false)
                 }
@@ -50,11 +50,15 @@ public class ImageLoader {
             }
             
             DispatchQueue.main.async {
-                URLCache.storeImage(image, for: url)
-                for (loadCompletion, savedItem) in loadCompletions! {
-                    loadCompletion(savedItem, image, false)
+                self.lock.with {
+                    if let loadCompletions = self.loadingResponses[url] {
+                        URLCache.storeImage(image, for: url)
+                        for (loadCompletion, savedItem) in loadCompletions {
+                            loadCompletion(savedItem, image, false)
+                        }
+                        self.loadingResponses.removeValue(forKey: url)
+                    }
                 }
-                self.lock.with { self.loadingResponses.removeValue(forKey: url) }
             }
         }.resume()
     }

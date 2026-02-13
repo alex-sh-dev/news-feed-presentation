@@ -96,7 +96,7 @@ class NewsFeedViewController: UIViewController {
                 }
                 
                 cell.titleLabel.text = newsItem!.title
-                cell.dateLabel.text = newsItem!.publishedDate?.formatted(date: .long, time: .omitted) //?? today and etc?
+                cell.dateLabel.text = newsItem!.publishedDate?.relativeDate()
                 cell.categoryLabel.text = newsItem!.categoryType //??
                 cell.descriptionLabel.text = newsItem!.description! //??
                 

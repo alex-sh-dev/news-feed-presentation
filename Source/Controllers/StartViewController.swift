@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  StartViewController.swift
 //  NewsFeedPresentation
 //
 //  Created by dev on 2/8/26.
@@ -51,7 +51,7 @@ class StartViewController: UIViewController {
                 return
             }
             
-            let identifiers = self.extractIdentifiers()
+            var identifiers = self.extractIdentifiers()
             if identifiers.isEmpty {
                 return
             }
@@ -62,12 +62,14 @@ class StartViewController: UIViewController {
                 if snapshot.numberOfSections == 0 {
                     snapshot.appendSections([.main])
                 }
+                identifiers.append(UInt.max)
                 snapshot.appendItems(identifiers)
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             } else if identifiers.count != oldIdentifiers.count ||
                         identifiers != oldIdentifiers {
                 snapshot.deleteAllItems()
                 snapshot.appendSections([.main])
+                identifiers.append(UInt.max)
                 snapshot.appendItems(identifiers)
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
@@ -80,10 +82,11 @@ class StartViewController: UIViewController {
     }
     
     private func configureDataSource() {
+        
         self.dataSource = UICollectionViewDiffableDataSource<Section, UInt>(collectionView: self.previewNewsFeed) {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? in
             
-            if indexPath.row == collectionView.numberOfItems(inSection: 0) - 1 {
+            if identifier == UInt.max {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PreviewNewsSupplementaryCell.identifier, for: indexPath) as? PreviewNewsSupplementaryCell
 
                 return cell
@@ -109,7 +112,7 @@ class StartViewController: UIViewController {
                 return cell
             }
             
-            ImageLoader.shared.load(url: url, item: newsItem!, beforeLoad: {
+            ImageLoader.shared.load(url: url, item: newsItem!, beforeLoad: { //?? newItem -> identifier? everywhere
                 self.setDefaultImage(for: cell.imageView)
             }) {
                 (fetchedItem, image, cached) in
@@ -126,13 +129,14 @@ class StartViewController: UIViewController {
             
             return cell
         }
-        
+
         var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
         snapshot.appendSections([.main])
-        let identifiers = self.extractIdentifiers()
+        var identifiers = self.extractIdentifiers()
         if identifiers.isEmpty {
             NewsParser.shared.requestData(count: UInt(Constants.kNewsItemCount))
         } else {
+            identifiers.append(UInt.max) //?? so ok? show everywhere 
             snapshot.appendItems(identifiers)
         }
         dataSource.apply(snapshot, animatingDifferences: false)

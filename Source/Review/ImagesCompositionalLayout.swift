@@ -1,44 +1,44 @@
 //
-//  PreviewNewsCompositionalLayout.swift
+//  ImagesCompositionalLayout.swift
 //  NewsFeedPresentation
 //
-//  Created by dev on 2/11/26.
+//  Created by dev on 2/12/26.
 //
 
 import UIKit
 
-class PreviewNewsCompositionalLayout: UICollectionViewCompositionalLayout {
-    
+class ImagesCompositionalLayout: UICollectionViewCompositionalLayout {
     private struct Constants {
         static let kItemFracWidth = 1.0
         static let kItemFracHeight = 1.0
-        static let kItemContInsetsLead = 5.0
-        static let kGroupWidthFactor = 1.7
+        static let kGroupFracWidth = 0.96
+        static let kDefGroupFracWidth = 1.0
         static let kGroupFracHeight = 1.0
+        //?? spacing, 99 for next image
     }
     
     override init(sectionProvider: @escaping UICollectionViewCompositionalLayoutSectionProvider) {
         super.init(sectionProvider: sectionProvider)
     }
-
-    convenience init() {
-        self.init() {
+    
+    convenience init(groupSpacingAssigner: @escaping () -> Bool) {
+        self.init {
             (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
+            
+            let useGroupSpacing = groupSpacingAssigner()
             
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(Constants.kItemFracWidth), heightDimension: .fractionalHeight(Constants.kItemFracHeight))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            var itemContInsets = NSDirectionalEdgeInsets.zero
-            itemContInsets.leading = Constants.kItemContInsetsLead
-            item.contentInsets = itemContInsets
             
-            let size = layoutEnvironment.container.contentSize
-            let w = Constants.kGroupWidthFactor * size.height //??
+            let groupWidth = useGroupSpacing ? Constants.kGroupFracWidth : Constants.kDefGroupFracWidth
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(groupWidth), heightDimension: .fractionalHeight(Constants.kGroupFracHeight))
             
-            let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(w), heightDimension: .fractionalHeight(Constants.kGroupFracHeight))
             let containerGroup = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             
             let section = NSCollectionLayoutSection(group: containerGroup)
-            section.orthogonalScrollingBehavior = .continuous
+            section.orthogonalScrollingBehavior = .groupPaging
+            
+            section.interGroupSpacing =  useGroupSpacing ? 6 : 0 //?? to constants
             
             return section
         }

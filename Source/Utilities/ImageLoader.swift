@@ -12,8 +12,9 @@ public class ImageLoader {
     
     typealias AnyItem = Any
     typealias LoadCompletion = (_ item: AnyItem, _ image: UIImage?, _ cached: Bool) -> Void
+    typealias LoadCompletionItemPair = (LoadCompletion, AnyItem)
 
-    private var loadingResponses: [URL: LoadCompletion] = [:]
+    private var loadingResponses: [URL: [LoadCompletionItemPair]] = [:]
     private let lock = NSLock()
 
     private init() {}
@@ -25,16 +26,23 @@ public class ImageLoader {
             return
         }
         
-        self.lock.with { self.loadingResponses[url] = completion }
+        self.lock.with {
+            if loadingResponses[url] != nil {
+                loadingResponses[url]?.append((completion, item))
+                return
+            } else {
+                loadingResponses[url] = [(completion, item)]
+            }
+        }
         
         beforeLoad()
         
         URLSession.shared.dataTask(with: url) {
             (data, response, error) in
-            var loadCompletion: LoadCompletion?
-            self.lock.with { loadCompletion = self.loadingResponses[url] }
+            var loadCompletions: [LoadCompletionItemPair]?
+            self.lock.with { loadCompletions = self.loadingResponses[url] }
             guard let responseData = data, let image = UIImage(data: responseData),
-                  loadCompletion != nil, error == nil else {
+                  loadCompletions != nil, error == nil else {
                 DispatchQueue.main.async {
                     completion(item, nil, false)
                 }
@@ -43,7 +51,9 @@ public class ImageLoader {
             
             DispatchQueue.main.async {
                 URLCache.storeImage(image, for: url)
-                loadCompletion!(item, image, false)
+                for (loadCompletion, savedItem) in loadCompletions! {
+                    loadCompletion(savedItem, image, false)
+                }
                 self.lock.with { self.loadingResponses.removeValue(forKey: url) }
             }
         }.resume()

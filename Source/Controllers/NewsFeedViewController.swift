@@ -11,6 +11,8 @@ import Combine
 class NewsFeedViewController: UIViewController {
     @IBOutlet weak var newsFeed: UICollectionView!
     
+    var startIdentifier: UInt = 0
+    
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
     }
@@ -153,7 +155,16 @@ class NewsFeedViewController: UIViewController {
             snapshot.appendItems(section.value, toSection: section.key)
         }
         
-        dataSource.apply(snapshot, animatingDifferences: false)
+        self.dataSource.apply(snapshot, animatingDifferences: false)
+        
+        DispatchQueue.main.async {
+            let dssnapshot = self.dataSource.snapshot()
+            if self.startIdentifier > 0,
+                let sectionIndex = dssnapshot.indexOfSection(self.startIdentifier) {
+                self.newsFeed.scrollToItem(at: IndexPath(row: 0, section: sectionIndex),
+                                           at: .top, animated: false)
+            }
+        }
     }
     
     private func configureLayout() {

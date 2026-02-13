@@ -76,6 +76,18 @@ class StartViewController: UIViewController {
         }
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let newsFeedVC = segue.destination.children.first as? NewsFeedViewController else {
+            return
+        }
+        
+        guard let previewItem = sender as? PreviewNewsItemCell else {
+            return
+        }
+        
+        newsFeedVC.startIdentifier = previewItem.identifier
+    }
+    
     private func setDefaultImage(for imageView: UIImageView) {
         imageView.image = nil
         imageView.backgroundColor = UIColor.lightGray
@@ -105,6 +117,7 @@ class StartViewController: UIViewController {
                 return cell
             }
             
+            cell.identifier = newsItem?.id ?? 0
             cell.headerLabel.text = newsItem!.title
             
             guard let url = newsItem!.titleImageUrl else {

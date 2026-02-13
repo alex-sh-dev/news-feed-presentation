@@ -71,7 +71,7 @@ class NewsItemImagesCell: UICollectionViewCell {
             DispatchQueue.main.async {
                 self.imageUrlMap = nil //??
                 var snapshot = self.dataSource.snapshot()
-                snapshot.deleteAllItems()
+                snapshot.deleteAllItems() //?? so ok?
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
             

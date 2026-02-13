@@ -287,10 +287,19 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="qaz-36-r7f" userLabel="activityIndicator">
+                                <rect key="frame" x="186.66666666666666" y="822" width="20" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="2BN-dl-zyE"/>
+                                    <constraint firstAttribute="height" constant="20" id="6t3-K9-AHD"/>
+                                </constraints>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="UUz-Ew-idt"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="UUz-Ew-idt" firstAttribute="bottom" secondItem="qaz-36-r7f" secondAttribute="bottom" id="8XE-Jp-V3Z"/>
+                            <constraint firstItem="qaz-36-r7f" firstAttribute="centerX" secondItem="suG-GD-2ns" secondAttribute="centerX" id="baF-sa-bHV"/>
                             <constraint firstItem="Lob-xS-Obq" firstAttribute="top" secondItem="UUz-Ew-idt" secondAttribute="top" id="gmU-MC-jFf"/>
                             <constraint firstItem="Lob-xS-Obq" firstAttribute="trailing" secondItem="UUz-Ew-idt" secondAttribute="trailing" id="n0a-EP-ISk"/>
                             <constraint firstItem="Lob-xS-Obq" firstAttribute="leading" secondItem="UUz-Ew-idt" secondAttribute="leading" id="u9s-V6-d0l"/>
@@ -305,6 +314,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="activityIndicator" destination="qaz-36-r7f" id="EIP-74-r1Q"/>
                         <outlet property="newsFeed" destination="Lob-xS-Obq" id="zev-8y-yZ7"/>
                     </connections>
                 </viewController>

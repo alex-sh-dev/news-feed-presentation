@@ -34,6 +34,7 @@ class NewsParser {
     }
     
     func requestData(page: UInt = 1, count: UInt) {
+        easyLog("page = \(page); count = \(count)")
         let endpoint = self.baseEndpoint
             .appending(path: String(page))
             .appending(path: String(count))
@@ -60,7 +61,7 @@ class NewsParser {
                     }
                     ids.append(newsItem.id)
                 }
-
+                easyLog("data received")
                 self?.newsUpdatedPublisher.send(ids)
                 self?.cancellable.removeValue(forKey: uuid)
             })

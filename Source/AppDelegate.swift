@@ -12,7 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private struct Conf {
         static let kMemoryCapacityMb = 10 * 1024 * 1024
-        static let kDiskCapacityMb = 100 * 1024 * 1024
+        static let kDiskCapacityMb = 200 * 1024 * 1024
         static let kDiskPath = "urlcache"
         static let kNewsEndpoint = "https://webapi.autodoc.ru/api/news"
     }
@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let urlCache = URLCache(memoryCapacity: Conf.kMemoryCapacityMb, diskCapacity: Conf.kDiskCapacityMb , diskPath: Conf.kDiskPath)
         URLCache.shared = urlCache
         
-        urlCache.removeAllCachedResponses()//??
+//        urlCache.removeAllCachedResponses()//??
         
         let endpoint = URL(string: Conf.kNewsEndpoint)
         NewsParser.setup(NewsParser.Config(baseEndpoint: endpoint!))

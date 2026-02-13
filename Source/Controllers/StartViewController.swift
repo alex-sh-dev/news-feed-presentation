@@ -46,34 +46,34 @@ class StartViewController: UIViewController {
         newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
             .receive(on: DispatchQueue.main)
             .sink {
-            ids in
-            if ids.isEmpty {
-                return
-            }
-            
-            var identifiers = self.extractIdentifiers()
-            if identifiers.isEmpty {
-                return
-            }
-            
-            var snapshot = self.dataSource.snapshot()
-            let oldIdentifiers = snapshot.itemIdentifiers
-            if oldIdentifiers.isEmpty {
-                if snapshot.numberOfSections == 0 {
-                    snapshot.appendSections([.main])
+                ids in
+                if ids.isEmpty {
+                    return
                 }
-                identifiers.append(UInt.max)
-                snapshot.appendItems(identifiers)
-                self.dataSource.apply(snapshot, animatingDifferences: false)
-            } else if identifiers.count != oldIdentifiers.count ||
-                        identifiers != oldIdentifiers {
-                snapshot.deleteAllItems()
-                snapshot.appendSections([.main])
-                identifiers.append(UInt.max)
-                snapshot.appendItems(identifiers)
-                self.dataSource.apply(snapshot, animatingDifferences: false)
+                
+                var identifiers = self.extractIdentifiers()
+                if identifiers.isEmpty {
+                    return
+                }
+                
+                var snapshot = self.dataSource.snapshot()
+                let oldIdentifiers = snapshot.itemIdentifiers
+                if oldIdentifiers.isEmpty {
+                    if snapshot.numberOfSections == 0 {
+                        snapshot.appendSections([.main])
+                    }
+                    identifiers.append(UInt.max)
+                    snapshot.appendItems(identifiers)
+                    self.dataSource.apply(snapshot, animatingDifferences: false)
+                } else if identifiers.count != oldIdentifiers.count ||
+                            identifiers != oldIdentifiers {
+                    snapshot.deleteAllItems() //?? so ok?
+                    snapshot.appendSections([.main])
+                    identifiers.append(UInt.max)
+                    snapshot.appendItems(identifiers)
+                    self.dataSource.apply(snapshot, animatingDifferences: false)
+                }
             }
-        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

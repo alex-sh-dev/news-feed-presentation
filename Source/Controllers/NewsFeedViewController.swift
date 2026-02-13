@@ -10,7 +10,12 @@ import Combine
 
 class NewsFeedViewController: UIViewController {
     @IBOutlet weak var newsFeed: UICollectionView!
-    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView! {
+        didSet {
+            self.activityIndicator.isHidden = true
+        }
+    }
+
     var startIdentifier: UInt = 0
     
     @IBAction func closeTapped(_ sender: Any) {
@@ -35,48 +40,67 @@ class NewsFeedViewController: UIViewController {
         newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
             .receive(on: DispatchQueue.main)
             .sink {
-            ids in
-//            if ids.isEmpty {
-//                return
-//            }
-//
-//            let identifiers = self.extractIdentifiers()
-//            if identifiers.isEmpty {
-//                return
-//            }
-//
-//            var snapshot = self.dataSource.snapshot()
-//            let oldIdentifiers = snapshot.itemIdentifiers
-//            if oldIdentifiers.isEmpty {
-//                if snapshot.numberOfSections == 0 {
-//                    snapshot.appendSections([.main])
-//                }
-//                snapshot.appendItems(identifiers)
-//                self.dataSource.apply(snapshot, animatingDifferences: false)
-//            } else if identifiers.count != oldIdentifiers.count ||
-//                        identifiers != oldIdentifiers {
-//                snapshot.deleteAllItems()
-//                snapshot.appendSections([.main])
-//                snapshot.appendItems(identifiers)
-//                self.dataSource.apply(snapshot, animatingDifferences: false)
-//            }
+                ids in
+                
+                self.activityIndicator.stopAnimating() //?? to sp func ? everywhere
+                self.activityIndicator.isHidden = true
+                
+                if ids.isEmpty {
+                    return
+                }
+                
+                var snapshot = self.dataSource.snapshot()
+                let identifiers = snapshot.sectionIdentifiers
+                
+                let newIdentifiers = Set(ids).subtracting(Set(identifiers))
+                
+                if newIdentifiers.isEmpty {
+                    return
+                }
+
+                //?? common code
+                
+                let storage = NewsStorage.shared
+                var sections: [UInt: [String]]! = [:]
+                storage.lock.with {
+                    for newIdfr in newIdentifiers { //??
+                        guard let newsItem = storage.news[newIdfr] else {
+                            continue
+                        }
+                        
+                        var idfrs: [String] = []
+                        idfrs.append(String(newIdfr) + "*")
+                        if newsItem.titleImageUrl != nil {
+                            idfrs.append(String(newIdfr) + "+")
+                        }
+                        sections[newIdfr] = idfrs
+                    }
+                }
+                
+                if sections.isEmpty {
+                    return
+                }
+                
+                snapshot.appendSections(Array(sections.keys.sorted(by: >)))
+                for section in sections {
+                    snapshot.appendItems(section.value, toSection: section.key)
+                }
+
+                self.dataSource.apply(snapshot, animatingDifferences: true)
         }
     }
-    
-//    private func extractIdentifiers() -> [UInt] { //??
-//        let storage = NewsStorage.shared
-//        var identifiers: [UInt]!
-//        storage.lock.with {
-//            identifiers = Array(storage.news.keys.sorted(by: >)
-//                .prefix(15)) //??
-//        }
-//
-//        return identifiers
-//    }
     
     private func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<UInt, String>(collectionView: self.newsFeed) {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: String) -> UICollectionViewCell? in
+            
+            if indexPath.section == collectionView.numberOfSections - 1 && identifier.contains("*") { //??
+                let total = collectionView.numberOfSections
+                let page = UInt((total + 5) / 5) //?? to conts
+                NewsParser.shared.requestData(page: page, count: 5)
+                self.activityIndicator.isHidden = false
+                self.activityIndicator.startAnimating()
+            }
             
             if identifier.contains("*") {
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsItemCell.identifier, for: indexPath) as? NewsItemCell else {
@@ -147,8 +171,7 @@ class NewsFeedViewController: UIViewController {
             }
         }
         
-        let theSections = Array(sections.keys.sorted(by: >)
-            .prefix(15)) //??
+        let theSections = Array(sections.keys.sorted(by: >)) //?? all?
   
         snapshot.appendSections(theSections)
         for section in sections {

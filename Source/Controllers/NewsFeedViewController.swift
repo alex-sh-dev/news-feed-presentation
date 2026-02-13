@@ -97,8 +97,8 @@ class NewsFeedViewController: UIViewController {
                 
                 cell.titleLabel.text = newsItem!.title
                 cell.dateLabel.text = newsItem!.publishedDate?.relativeDate()
-                cell.categoryLabel.text = newsItem!.categoryType //??
-                cell.descriptionLabel.text = newsItem!.description! //??
+                cell.categoryLabel.text = newsItem!.categoryType
+                cell.descriptionLabel.text = newsItem!.description
                 
                 return cell
             } else if identifier.contains("+") {

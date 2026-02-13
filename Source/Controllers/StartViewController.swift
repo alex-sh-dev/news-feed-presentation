@@ -112,16 +112,16 @@ class StartViewController: UIViewController {
                 return cell
             }
             
-            ImageLoader.shared.load(url: url, item: newsItem!, beforeLoad: { //?? newItem -> identifier? everywhere
+            ImageLoader.shared.load(url: url, item: identifier, beforeLoad: {
                 self.setDefaultImage(for: cell.imageView)
             }) {
                 (fetchedItem, image, cached) in
                 if cached && image != nil {
                     cell.imageView.image = image
                 } else {
-                    if let item = fetchedItem as? NewsItem, image != nil {
+                    if let idfr = fetchedItem as? UInt, image != nil {
                         var updatedSnapshot = self.dataSource.snapshot()
-                        updatedSnapshot.reloadItems([item.id])
+                        updatedSnapshot.reloadItems([idfr])
                         self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
                     }
                 }

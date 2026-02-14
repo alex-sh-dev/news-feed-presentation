@@ -210,18 +210,34 @@
                                                         </mask>
                                                     </variation>
                                                 </label>
+                                                <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yhm-VO-z4f" userLabel="showInFullButton">
+                                                    <rect key="frame" x="0.0" y="239" width="146" height="35"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="35" id="5fu-pb-UhX"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Button"/>
+                                                    <buttonConfiguration key="configuration" style="plain" title="Show in full...">
+                                                        <fontDescription key="titleFontDescription" type="boldSystem" pointSize="19"/>
+                                                        <color key="baseForegroundColor" systemColor="systemRedColor"/>
+                                                    </buttonConfiguration>
+                                                    <connections>
+                                                        <action selector="showInFullTapped:" destination="Wf0-MY-ut5" eventType="touchUpInside" id="Wqa-j8-Vvu"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="uFq-ei-fOr" secondAttribute="trailing" constant="8" id="1ni-EK-k3H"/>
                                                 <constraint firstItem="Vj7-7p-bXb" firstAttribute="leading" secondItem="Z0e-td-esC" secondAttribute="leading" constant="8" id="4KD-p7-Nyb"/>
                                                 <constraint firstAttribute="trailing" secondItem="g4x-Iw-XAO" secondAttribute="trailing" constant="8" id="4oi-T4-vOs"/>
+                                                <constraint firstItem="yhm-VO-z4f" firstAttribute="leading" secondItem="Z0e-td-esC" secondAttribute="leading" id="A8l-PV-6gX"/>
                                                 <constraint firstItem="uFq-ei-fOr" firstAttribute="leading" secondItem="Z0e-td-esC" secondAttribute="leading" constant="8" id="Aaa-4L-ePk"/>
                                                 <constraint firstItem="Ooh-i1-yvu" firstAttribute="leading" secondItem="Z0e-td-esC" secondAttribute="leading" constant="8" id="AtK-SH-euX"/>
                                                 <constraint firstItem="uFq-ei-fOr" firstAttribute="top" secondItem="Ooh-i1-yvu" secondAttribute="bottom" constant="12" id="MYS-pI-ubF"/>
+                                                <constraint firstAttribute="bottom" secondItem="yhm-VO-z4f" secondAttribute="bottom" constant="8" id="OJx-be-jth"/>
                                                 <constraint firstItem="Ooh-i1-yvu" firstAttribute="top" secondItem="Vj7-7p-bXb" secondAttribute="bottom" constant="8" id="Ogp-ho-Flo"/>
                                                 <constraint firstItem="g4x-Iw-XAO" firstAttribute="leading" secondItem="Z0e-td-esC" secondAttribute="leading" constant="8" id="dhx-IE-ZVc"/>
-                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="uFq-ei-fOr" secondAttribute="bottom" constant="8" id="eIr-c4-E8F"/>
                                                 <constraint firstAttribute="trailing" secondItem="Vj7-7p-bXb" secondAttribute="trailing" constant="8" id="fIN-2p-NPS"/>
+                                                <constraint firstItem="yhm-VO-z4f" firstAttribute="top" relation="greaterThanOrEqual" secondItem="uFq-ei-fOr" secondAttribute="bottom" constant="8" id="m05-kN-MPH"/>
                                                 <constraint firstItem="Vj7-7p-bXb" firstAttribute="top" secondItem="g4x-Iw-XAO" secondAttribute="bottom" constant="4" id="ogf-m4-oaZ"/>
                                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Ooh-i1-yvu" secondAttribute="trailing" constant="8" id="olc-kS-Pf9"/>
                                                 <constraint firstItem="g4x-Iw-XAO" firstAttribute="top" secondItem="Z0e-td-esC" secondAttribute="top" id="vKs-IV-Mtq"/>
@@ -232,6 +248,8 @@
                                             <outlet property="categoryLabel" destination="Ooh-i1-yvu" id="DIj-dE-8PJ"/>
                                             <outlet property="dateLabel" destination="Vj7-7p-bXb" id="e7p-bA-wg5"/>
                                             <outlet property="descriptionLabel" destination="uFq-ei-fOr" id="FOt-VB-dw3"/>
+                                            <outlet property="showInFullButton" destination="yhm-VO-z4f" id="pqy-Kd-y19"/>
+                                            <outlet property="showInFullHeightConstraint" destination="5fu-pb-UhX" id="es9-e3-GlV"/>
                                             <outlet property="titleLabel" destination="g4x-Iw-XAO" id="jvS-qO-mJX"/>
                                         </connections>
                                     </collectionViewCell>

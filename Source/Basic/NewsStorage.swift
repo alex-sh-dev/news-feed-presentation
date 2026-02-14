@@ -12,6 +12,7 @@ class NewsStorage {
     
     let lock = NSLock()
     var news = [UInt: NewsItem]()
+    var images = [UInt: [URL]]()
     
     private init() {}
 }

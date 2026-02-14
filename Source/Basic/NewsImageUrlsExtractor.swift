@@ -93,8 +93,9 @@ class NewsImageUrlsExtractor {
             do {
                 if let urls = try await extract(for: url!) {
                     NewsStorage.shared.lock.with {
-                        NewsStorage.shared.images[id!] = urls
+                        NewsStorage.shared.imageUrls[id!] = urls
                     }
+                    //?? event to reload?
                 }
             } catch {}
         }

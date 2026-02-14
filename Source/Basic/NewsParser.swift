@@ -60,6 +60,7 @@ class NewsParser {
                         NewsStorage.shared.news[newsItem.id] = newsItem
                     }
                     ids.append(newsItem.id)
+                    NewsImageUrlsExtractor.shared.addTask(for: newsItem.titleImageUrl, with: newsItem.id)
                 }
                 easyLog("data received")
                 self?.newsUpdatedPublisher.send(ids)

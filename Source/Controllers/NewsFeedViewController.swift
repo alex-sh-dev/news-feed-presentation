@@ -132,21 +132,21 @@ class NewsFeedViewController: UIViewController {
                 
                 //?? common code
                 
-                var newsItem: NewsItem?
+                var imageUrls: [URL] = []
+                let index = UInt(identifier.dropLast(1))!
                 NewsStorage.shared.lock.with {
-                    let index = UInt(identifier.dropLast(1))!
-                    newsItem = NewsStorage.shared.news[index]
+                    guard let newsItem = NewsStorage.shared.news[index],
+                          let url = newsItem.titleImageUrl else {
+                        fatalError("error") //??
+                    }
+                    
+                    imageUrls.append(url)
+                    if let additionalUrls = NewsStorage.shared.imageUrls[index] {
+                        imageUrls.append(contentsOf: additionalUrls)
+                    }
                 }
                 
-                if newsItem == nil {
-                    return cell
-                }
-                
-                guard let url = newsItem!.titleImageUrl else {
-                    fatalError("error") //??
-                }
-                
-                cell.imageUrls = [url] //??
+                cell.imageUrls = imageUrls //??
                 
                 //?? how to clear
                 

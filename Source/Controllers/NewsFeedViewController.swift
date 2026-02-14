@@ -29,6 +29,8 @@ class NewsFeedViewController: UIViewController {
     private var newsUpdatedSubscriber: AnyCancellable!
     private var imageUrlsUpdatedSubscriber: AnyCancellable!
     
+    private var newsTextRequester = FullNewsTextRequester()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -44,7 +46,7 @@ class NewsFeedViewController: UIViewController {
                 id in
                 
                 var snapshot = self.dataSource.snapshot()
-                let idfr = "\(id)+" //?? so ok? no 
+                let idfr = "\(id)+" //?? so ok? no
                 if snapshot.itemIdentifiers.contains(idfr) {
                     snapshot.reloadItems([idfr])
                 }
@@ -137,6 +139,29 @@ class NewsFeedViewController: UIViewController {
                 cell.dateLabel.text = newsItem!.publishedDate?.relativeDate()
                 cell.categoryLabel.text = newsItem!.categoryType
                 cell.descriptionLabel.text = newsItem!.description
+                
+                if let url = newsItem?.fullUrl { //?? so ok
+                    cell.hideShowInFullButton(false)
+                    cell.showInFullTappedHandler = {
+                        //?? activity indicator start
+                        //?? saved to storage
+                        //?? show or hide button
+                        //?? invalidateLayout если текст короткий 
+                        
+                        
+                        self.newsTextRequester.start(for: url, with: newsItem!.id!) {
+                            itemId, dataText in
+                            if let text = dataText, !text.isEmpty,
+                                let id = itemId as? UInt, id == newsItem!.id {
+                                cell.descriptionLabel.text = dataText //??
+                                cell.hideShowInFullButton(true)
+                                self.newsFeed.collectionViewLayout.invalidateLayout() //??
+                            }
+                        }
+                    }
+                } else {
+                    cell.hideShowInFullButton(true)
+                }
                 
                 return cell
             } else if identifier.contains("+") {

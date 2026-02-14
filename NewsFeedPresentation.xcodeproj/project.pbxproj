@@ -147,11 +147,11 @@
 		D7E5AF7C2F38689900B82167 = {
 			isa = PBXGroup;
 			children = (
-				D711C6112F40A032005D1971 /* Info.plist */,
 				D794E2742F3C1DFD0076DFAA /* Source */,
 				D7E5AF8E2F38689900B82167 /* Main.storyboard */,
 				D7E5AF912F38689A00B82167 /* Assets.xcassets */,
 				D7E5AF932F38689A00B82167 /* LaunchScreen.storyboard */,
+				D711C6112F40A032005D1971 /* Info.plist */,
 				D7E5AF862F38689900B82167 /* Products */,
 			);
 			sourceTree = "<group>";

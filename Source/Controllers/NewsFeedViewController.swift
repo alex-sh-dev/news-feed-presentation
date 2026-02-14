@@ -27,6 +27,7 @@ class NewsFeedViewController: UIViewController {
     private var dataSource: UICollectionViewDiffableDataSource<UInt, String>! //?? String -> hash?
         
     private var newsUpdatedSubscriber: AnyCancellable!
+    private var imageUrlsUpdatedSubscriber: AnyCancellable!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +37,19 @@ class NewsFeedViewController: UIViewController {
         
         configureDataSource()
         configureLayout()
+        
+        imageUrlsUpdatedSubscriber = NewsImageUrlsExtractor.shared.imageUrlsUpdatedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink {
+                id in
+                
+                var snapshot = self.dataSource.snapshot()
+                let idfr = "\(id)+" //?? so ok? no 
+                if snapshot.itemIdentifiers.contains(idfr) {
+                    snapshot.reloadItems([idfr])
+                }
+                self.dataSource.apply(snapshot, animatingDifferences: true)
+            }
         
         newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
             .receive(on: DispatchQueue.main)

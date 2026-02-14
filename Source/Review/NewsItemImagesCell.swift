@@ -19,7 +19,6 @@ class NewsItemImagesCell: UICollectionViewCell {
     
     @IBOutlet weak var imageCollection: UICollectionView! {
         didSet {
-            
             self.imageCollection.collectionViewLayout = ImagesCompositionalLayout {
                 let count = self.imageUrls?.count ?? 0 //?? может быть nil
                 return count > 1

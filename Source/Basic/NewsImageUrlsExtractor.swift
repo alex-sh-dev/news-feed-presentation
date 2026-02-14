@@ -11,6 +11,8 @@ import Combine
 class NewsImageUrlsExtractor {
     static let shared = NewsImageUrlsExtractor()
     
+    let imageUrlsUpdatedPublisher = PassthroughSubject<UInt, Never>()
+    
     private init() {}
     
     struct Consts {
@@ -95,7 +97,7 @@ class NewsImageUrlsExtractor {
                     NewsStorage.shared.lock.with {
                         NewsStorage.shared.imageUrls[id!] = urls
                     }
-                    //?? event to reload?
+                    self.imageUrlsUpdatedPublisher.send(id!)
                 }
             } catch {}
         }

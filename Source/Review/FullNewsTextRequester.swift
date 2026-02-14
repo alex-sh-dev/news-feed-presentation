@@ -16,11 +16,13 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
         static let kRequestDelaySec: TimeInterval = 0.5
     }
     
-    let newsTextReceived = PassthroughSubject<String?, Never>()
+    typealias ItemId = Any
+    let newsTextReceivedPublisher = PassthroughSubject<(ItemId, String?), Never>()
     
     private var webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 200, height: 300))
     private var timer: Timer?
     private var timerCount = 0
+    private var id: ItemId = 0
     
     override init() {
         super.init()
@@ -28,7 +30,8 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
         self.webView.navigationDelegate = self
     }
     
-    func start(for url: URL) {
+    func start(for url: URL, with id: ItemId) {
+        self.id = id
         let request = URLRequest(url: url)
         self.webView.load(request)
     }
@@ -37,6 +40,7 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
         if self.timer != nil {
             self.timer?.invalidate()
             self.timerCount = 0
+            self.newsTextReceivedPublisher.send((self.id, nil))
         }
         
         self.timer = Timer.scheduledTimer(withTimeInterval: Consts.kRequestDelaySec, repeats: true) {
@@ -44,14 +48,14 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
             
             self.webView.evaluateJavaScript(Consts.kNewsTextJSCode, completionHandler: { result, error in
                 if let dataText = result as? String, !dataText.isEmpty {
-                    self.newsTextReceived.send(dataText)
+                    self.newsTextReceivedPublisher.send((self.id, dataText))
                     timer.invalidate()
                     self.timerCount = 0
                 } else {
                     self.timerCount += 1
                 }
                 if self.timerCount > Consts.kAttemptCount {
-                    self.newsTextReceived.send(nil)
+                    self.newsTextReceivedPublisher.send((self.id, nil))
                     timer.invalidate()
                     self.timerCount = 0
                 }

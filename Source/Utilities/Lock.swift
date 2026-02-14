@@ -1,5 +1,5 @@
 //
-//  LockExtenstion.swift
+//  Lock.swift
 //  NewsFeedPresentation
 //
 //  Created by dev on 2/11/26.

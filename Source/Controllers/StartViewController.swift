@@ -134,7 +134,7 @@ class StartViewController: UIViewController {
                 return cell
             }
             
-            cell.identifier = newsItem!.id
+            cell.identifier = .value(newsItem!.id)
             cell.headerLabel.text = newsItem!.title
             
             guard let url = newsItem!.titleImageUrl else {

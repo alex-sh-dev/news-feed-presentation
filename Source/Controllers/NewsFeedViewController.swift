@@ -8,7 +8,43 @@
 import UIKit
 import Combine
 
+public enum NewsItemSection: Hashable {
+    case notValid
+    case value(UInt)
+    
+    var rawValue: UInt {
+        get {
+            switch self {
+            case .notValid:
+                return 0
+            case .value(let val):
+                return val
+            }
+        }
+    }
+}
+
 class NewsFeedViewController: UIViewController {
+    private enum NewsItemPartIdentifier: Hashable {
+        case main(UInt)
+        case image(UInt)
+        
+        var rawValue: UInt {
+            get {
+                switch self {
+                case .main(let val):
+                    return val
+                case .image(let val):
+                    return val
+                }
+            }
+        }
+    }
+    
+    private struct Constants {
+        static let kItemCountPerPage: UInt = 5
+    }
+    
     @IBOutlet weak var newsFeed: UICollectionView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView! {
         didSet {
@@ -16,7 +52,7 @@ class NewsFeedViewController: UIViewController {
         }
     }
 
-    var startIdentifier: UInt = 0
+    var startIdentifier: NewsItemSection = .notValid
     
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
@@ -24,23 +60,15 @@ class NewsFeedViewController: UIViewController {
     
     //?? общий класс с StartViewController
     
-    private var dataSource: UICollectionViewDiffableDataSource<UInt, String>! //?? String -> hash?
+    private var dataSource: UICollectionViewDiffableDataSource<NewsItemSection, NewsItemPartIdentifier>!
         
     private var newsUpdatedSubscriber: AnyCancellable!
     private var imageUrlsUpdatedSubscriber: AnyCancellable!
     
     private var newsTextRequester = FullNewsTextRequester()
     
-    //?? UInt (id) -> Hashable?
-    
     private var fullTextContents: [UInt: String]!
     private var showInFullPressed: Set<UInt> = [] //?? rename?
-    
-    
-    //?? deinit not called
-    
-    deinit {
-    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -75,7 +103,7 @@ class NewsFeedViewController: UIViewController {
                 id in
                 
                 var snapshot = self.dataSource.snapshot()
-                let idfr = "\(id)+" //?? so ok? no
+                let idfr = NewsItemPartIdentifier.image(id)
                 if snapshot.itemIdentifiers.contains(idfr) {
                     snapshot.reloadItems([idfr])
                 }
@@ -95,59 +123,54 @@ class NewsFeedViewController: UIViewController {
                 }
                 
                 var snapshot = self.dataSource.snapshot()
-                let identifiers = snapshot.sectionIdentifiers
+                let identifiers = snapshot.sectionIdentifiers.compactMap{ $0.rawValue }
                 
                 let newIdentifiers = Set(ids).subtracting(Set(identifiers))
                 
                 if newIdentifiers.isEmpty {
                     return
                 }
-
+                
                 //?? common code
                 
                 let storage = NewsStorage.shared
-                var sections: [UInt: [String]]! = [:]
                 storage.lock.with {
-                    for newIdfr in newIdentifiers { //??
-                        guard let newsItem = storage.news[newIdfr] else {
-                            continue
+                    let sections = Array(newIdentifiers)
+                        .sorted(by: >)
+                        .compactMap{ NewsItemSection.value($0) }
+                    snapshot.appendSections(sections)
+                    for section in sections {
+                        let id = section.rawValue
+                        var identifiers: [NewsItemPartIdentifier] = [.main(id)]
+                        if storage.news[id]?.titleImageUrl != nil {
+                            identifiers.append(.image(id))
                         }
-                        
-                        var idfrs: [String] = []
-                        idfrs.append(String(newIdfr) + "*")
-                        if newsItem.titleImageUrl != nil {
-                            idfrs.append(String(newIdfr) + "+")
-                        }
-                        sections[newIdfr] = idfrs
+                        snapshot.appendItems(identifiers, toSection: section)
                     }
                 }
                 
-                if sections.isEmpty {
-                    return
-                }
-                
-                snapshot.appendSections(Array(sections.keys.sorted(by: >)))
-                for section in sections {
-                    snapshot.appendItems(section.value, toSection: section.key)
-                }
-
                 self.dataSource.apply(snapshot, animatingDifferences: true)
-        }
+            }
+    }
+    
+    private func requestNewItems() {
+        let total = UInt(self.newsFeed.numberOfSections)
+        let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
+        NewsParser.shared.requestData(page: page, count: Constants.kItemCountPerPage)
+        self.activityIndicator.isHidden = false
+        self.activityIndicator.startAnimating()
     }
     
     private func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<UInt, String>(collectionView: self.newsFeed) {
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: String) -> UICollectionViewCell? in
+        self.dataSource = UICollectionViewDiffableDataSource<NewsItemSection, NewsItemPartIdentifier>(collectionView: self.newsFeed) {
+            (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
             
-            if indexPath.section == collectionView.numberOfSections - 1 && identifier.contains("*") { //??
-                let total = collectionView.numberOfSections
-                let page = UInt((total + 5) / 5) //?? to conts
-                NewsParser.shared.requestData(page: page, count: 5)
-                self.activityIndicator.isHidden = false
-                self.activityIndicator.startAnimating()
+            if indexPath.section == collectionView.numberOfSections - 1 {
+                self.requestNewItems()
             }
             
-            if identifier.contains("*") {
+            switch identifier {
+            case .main(let id):
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsItemCell.identifier, for: indexPath) as? NewsItemCell else {
                     fatalError("Error: couldn't create cell with identifier: '\(NewsItemCell.identifier)'")
                 }
@@ -156,8 +179,7 @@ class NewsFeedViewController: UIViewController {
                 
                 var newsItem: NewsItem?
                 NewsStorage.shared.lock.with {
-                    let index = UInt(identifier.dropLast(1))!
-                    newsItem = NewsStorage.shared.news[index]
+                    newsItem = NewsStorage.shared.news[id]
                 }
                 
                 if newsItem == nil {
@@ -214,7 +236,7 @@ class NewsFeedViewController: UIViewController {
                 }
                 
                 return cell
-            } else if identifier.contains("+") {
+            case .image(let id):
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsItemImagesCell.identifier, for: indexPath) as? NewsItemImagesCell else {
                     fatalError("Error: couldn't create cell with identifier: '\(NewsItemImagesCell.identifier)'")
                 }
@@ -222,15 +244,14 @@ class NewsFeedViewController: UIViewController {
                 //?? common code
                 
                 var imageUrls: [URL] = []
-                let index = UInt(identifier.dropLast(1))!
                 NewsStorage.shared.lock.with {
-                    guard let newsItem = NewsStorage.shared.news[index],
+                    guard let newsItem = NewsStorage.shared.news[id],
                           let url = newsItem.titleImageUrl else {
-                        fatalError("error") //??
+                        fatalError("Error: ") //?? вообще возможна такая ситуация?
                     }
                     
                     imageUrls.append(url)
-                    if let additionalUrls = NewsStorage.shared.imageUrls[index] {
+                    if let additionalUrls = NewsStorage.shared.imageUrls[id] {
                         imageUrls.append(contentsOf: additionalUrls)
                     }
                 }
@@ -241,38 +262,31 @@ class NewsFeedViewController: UIViewController {
                 
                 return cell
             }
-            
-            return nil //?? so ok? fatalError
         }
         
-        var snapshot = NSDiffableDataSourceSnapshot<UInt, String>()
+        var snapshot = NSDiffableDataSourceSnapshot<NewsItemSection, NewsItemPartIdentifier>()
         
         let storage = NewsStorage.shared
-        var sections: [UInt: [String]]! = [:]
         storage.lock.with {
-            for newsItem in storage.news {
-                var idfrs: [String] = []
-                idfrs.append(String(newsItem.key) + "*")
-                if newsItem.value.titleImageUrl != nil {
-                    idfrs.append(String(newsItem.key) + "+")
+            let sections = Array(storage.news.keys)
+                .sorted(by: >)
+                .compactMap{ NewsItemSection.value($0) }
+            snapshot.appendSections(sections)
+            for section in sections {
+                let id = section.rawValue
+                var identifiers: [NewsItemPartIdentifier] = [.main(id)]
+                if storage.news[id]?.titleImageUrl != nil {
+                    identifiers.append(.image(id))
                 }
-                sections[newsItem.key] = idfrs
+                snapshot.appendItems(identifiers, toSection: section)
             }
-        }
-        
-        let theSections = Array(sections.keys.sorted(by: >)) //?? all?
-  
-        snapshot.appendSections(theSections)
-        for section in sections {
-            snapshot.appendItems(section.value, toSection: section.key)
         }
         
         self.dataSource.apply(snapshot, animatingDifferences: false)
         
         DispatchQueue.main.async {
-            let dssnapshot = self.dataSource.snapshot()
-            if self.startIdentifier > 0,
-                let sectionIndex = dssnapshot.indexOfSection(self.startIdentifier) {
+            if self.startIdentifier != .notValid,
+                let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
                 self.newsFeed.scrollToItem(at: IndexPath(row: 0, section: sectionIndex),
                                            at: .top, animated: false)
             }

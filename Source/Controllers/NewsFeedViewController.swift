@@ -205,9 +205,7 @@ class NewsFeedViewController: UIViewController {
             
             switch identifier {
             case .main(let id):
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsItemCell.identifier, for: indexPath) as? NewsItemCell else {
-                    fatalError("Error: couldn't create cell with identifier: '\(NewsItemCell.identifier)'")
-                }
+                let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
                 
                 guard let newsItem = self.newsItem(at: id) else {
                     return cell
@@ -252,9 +250,7 @@ class NewsFeedViewController: UIViewController {
                 
                 return cell
             case .image(let id):
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsItemImagesCell.identifier, for: indexPath) as? NewsItemImagesCell else {
-                    fatalError("Error: couldn't create cell with identifier: '\(NewsItemImagesCell.identifier)'")
-                }
+                let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
                 
                 guard let newsItem = self.newsItem(at: id) else {
                     return cell

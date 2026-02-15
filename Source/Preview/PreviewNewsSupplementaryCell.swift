@@ -7,6 +7,4 @@
 
 import UIKit
 
-class PreviewNewsSupplementaryCell: UICollectionViewCell {
-    static let identifier = "PreviewNewsSupplementaryCellIdentifier"
-}
+class PreviewNewsSupplementaryCell: UICollectionViewCell {}

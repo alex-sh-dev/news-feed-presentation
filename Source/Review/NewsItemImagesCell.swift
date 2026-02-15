@@ -21,8 +21,6 @@ class NewsItemImagesCell: UICollectionViewCell {
         }
     }
     
-    static let identifier = "NewsItemImagesCellIdentifier"
-    
     private var imageUrlMap: [ImageIdentifier: URL] = [:]
     
     var imageUrls: [URL] = [] {
@@ -60,9 +58,7 @@ class NewsItemImagesCell: UICollectionViewCell {
             self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) {
                 (collectionView: UICollectionView, indexPath: IndexPath, identifier: ImageIdentifier) -> UICollectionViewCell? in
                 
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsItemImageCell.identifier, for: indexPath) as? NewsItemImageCell else {
-                    fatalError("Error: couldn't create cell with identifier: '\(NewsItemImageCell.identifier)'")
-                }
+                let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImageCell.self)
                 
                 guard let imageUrl = self.imageUrlMap[identifier] else {
                     return cell

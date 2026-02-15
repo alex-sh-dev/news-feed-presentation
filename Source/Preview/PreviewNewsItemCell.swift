@@ -13,8 +13,6 @@ class PreviewNewsItemCell: UICollectionViewCell {
     
     var itemIdentifier: NewsItemIdentifier = .notValid
     
-    static let identifier = "PreviewNewsItemCellIdentifier"
-    
     private struct Constants {
         static let kDefDuration = 0.2
         static let kMinTfScale = 0.9

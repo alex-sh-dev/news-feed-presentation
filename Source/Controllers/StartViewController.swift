@@ -116,14 +116,10 @@ class StartViewController: UIViewController {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemIdentifier) -> UICollectionViewCell? in
             
             if identifier == .supplementary {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PreviewNewsSupplementaryCell.identifier, for: indexPath) as? PreviewNewsSupplementaryCell
-
-                return cell
+                return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
             }
             
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PreviewNewsItemCell.identifier, for: indexPath) as? PreviewNewsItemCell else {
-                fatalError("Error: couldn't create cell with identifier: '\(PreviewNewsItemCell.identifier)'")
-            }
+            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsItemCell.self)
             
             var newsItem: NewsItem?
             NewsStorage.shared.lock.with {

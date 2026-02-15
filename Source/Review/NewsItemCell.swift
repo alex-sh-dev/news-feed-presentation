@@ -21,8 +21,6 @@ class NewsItemCell: UICollectionViewCell {
     
     private var savedHeightConstant: CGFloat = 0
     
-    static let identifier = "NewsItemCellIdentifier"
-    
     var showInFullTappedHandler: (() -> Void)? = nil
     
     @IBAction func showInFullTapped(_ sender: Any) {

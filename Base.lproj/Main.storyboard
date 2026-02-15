@@ -211,13 +211,13 @@
                                                     </variation>
                                                 </label>
                                                 <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yhm-VO-z4f" userLabel="showInFullButton">
-                                                    <rect key="frame" x="0.0" y="247" width="146" height="35"/>
+                                                    <rect key="frame" x="0.0" y="247" width="139.66666666666666" height="35"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="35" id="5fu-pb-UhX"/>
                                                     </constraints>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Show in full...">
-                                                        <fontDescription key="titleFontDescription" type="boldSystem" pointSize="19"/>
+                                                        <fontDescription key="titleFontDescription" type="system" weight="medium" pointSize="19"/>
                                                         <color key="baseForegroundColor" systemColor="systemRedColor"/>
                                                     </buttonConfiguration>
                                                     <connections>

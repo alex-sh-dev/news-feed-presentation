@@ -21,6 +21,7 @@ class NewsImageUrlsExtractor {
         static let kFileNameSeparator = "_"
         static let kFileNameMaxSplits = 2
         static let kMaxTaskCount = 30
+        static let kStartPoint = 1
     }
     
     private func extract(for url: URL) async throws -> [URL]? {
@@ -30,17 +31,23 @@ class NewsImageUrlsExtractor {
         }
 
         let fileName = url.deletingPathExtension().lastPathComponent
-        let cmps = fileName.split(separator: Consts.kFileNameSeparator, maxSplits: Consts.kFileNameMaxSplits).map { String($0) }
         
+        var cmps: [String] = fileName.components(separatedBy: Consts.kFileNameSeparator)
         if cmps.count < Consts.kFileNameMaxSplits {
             return nil
         }
         
-        let name = cmps.first
-        guard var number = UInt(cmps.last!) else {
+        guard var number = UInt(cmps.last!),
+              number <= Consts.kStartPoint  else {
             return nil
         }
         
+        cmps = Array(cmps.dropLast())
+        var name = cmps.first
+        if cmps.count > 1 {
+            name = cmps.joined(separator: Consts.kFileNameSeparator)
+        }
+
         number += 1
         let basePath = url.deletingLastPathComponent()
         

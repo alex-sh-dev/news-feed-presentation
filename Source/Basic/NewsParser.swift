@@ -13,6 +13,7 @@ class NewsParser {
     
     struct Config {
         let baseEndpoint: URL
+        let requestAttemptsCount = 3
     }
     
     private static var config: Config?
@@ -42,7 +43,7 @@ class NewsParser {
         let uuid = UUID().uuidString
         let cancellable = URLSession.shared.dataTaskPublisher(for: endpoint)
             .map { $0.data }
-            .retry(3)
+            .retry(NewsParser.config!.requestAttemptsCount)
             .decode(type: NewsNode.self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .replaceError(with: NewsNode.zero)

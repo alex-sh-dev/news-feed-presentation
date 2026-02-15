@@ -14,7 +14,8 @@ class ImagesCompositionalLayout: UICollectionViewCompositionalLayout {
         static let kGroupFracWidth = 0.96
         static let kDefGroupFracWidth = 1.0
         static let kGroupFracHeight = 1.0
-        //?? spacing, 99 for next image
+        static let kMultGroupsSpacing: CGFloat = 6
+        static let kOneGroupSpacing: CGFloat = 0
     }
     
     override init(sectionProvider: @escaping UICollectionViewCompositionalLayoutSectionProvider) {
@@ -38,7 +39,7 @@ class ImagesCompositionalLayout: UICollectionViewCompositionalLayout {
             let section = NSCollectionLayoutSection(group: containerGroup)
             section.orthogonalScrollingBehavior = .groupPaging
             
-            section.interGroupSpacing =  useGroupSpacing ? 6 : 0 //?? to constants
+            section.interGroupSpacing =  useGroupSpacing ? Constants.kMultGroupsSpacing : Constants.kOneGroupSpacing
             
             return section
         }

@@ -22,6 +22,7 @@ class NewsImageUrlsExtractor {
         static let kFileNameMaxSplits = 2
         static let kMaxTaskCount = 30
         static let kStartPoint = 1
+        static let kSendRequestDelayMs: UInt64 = 30
     }
     
     private func extract(for url: URL) async throws -> [URL]? {
@@ -92,7 +93,7 @@ class NewsImageUrlsExtractor {
                 break
             }
             
-            try await Task.sleep(nanoseconds: 30 * NSEC_PER_MSEC)
+            try await Task.sleep(nanoseconds: Consts.kSendRequestDelayMs * NSEC_PER_MSEC)
         }
         
         return resUrls

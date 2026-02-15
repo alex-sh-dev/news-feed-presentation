@@ -31,8 +31,37 @@ class NewsFeedViewController: UIViewController {
     
     private var newsTextRequester = FullNewsTextRequester()
     
+    //?? UInt (id) -> Hashable?
+    
+    private var fullTextContents: [UInt: String]!
+    private var showInFullPressed: Set<UInt> = [] //?? rename?
+    
+    
+    //?? deinit not called
+    
+    deinit {
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        if self.fullTextContents.isEmpty {
+            return
+        }
+        //?? to sp func
+        NewsStorage.shared.lock.with {
+            NewsStorage.shared.fullTextContents
+                .merge(self.fullTextContents) { (current, _) in current }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //?? to sp func
+        NewsStorage.shared.lock.with {
+            self.fullTextContents = NewsStorage.shared.fullTextContents
+        }
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
@@ -140,27 +169,48 @@ class NewsFeedViewController: UIViewController {
                 cell.categoryLabel.text = newsItem!.categoryType
                 cell.descriptionLabel.text = newsItem!.description
                 
-                if let url = newsItem?.fullUrl { //?? so ok
-                    cell.hideShowInFullButton(false)
-                    cell.showInFullTappedHandler = {
-                        //?? activity indicator start
-                        //?? saved to storage
-                        //?? show or hide button
-                        //?? invalidateLayout если текст короткий 
+                //?? activity indicator start
+                
+                if let newsItemId = newsItem?.id { //?? remake? //?? rename?
+                    if self.showInFullPressed.contains(newsItemId) {
+                        cell.descriptionLabel.text = self.fullTextContents[newsItemId]
+                        cell.hideShowInFullButton(true)
                         
+                    } else {
+                        if cell.showInFullButton.isHidden {
+                            cell.hideShowInFullButton(false)
+                        }
                         
-                        self.newsTextRequester.start(for: url, with: newsItem!.id!) {
-                            itemId, dataText in
-                            if let text = dataText, !text.isEmpty,
-                                let id = itemId as? UInt, id == newsItem!.id {
-                                cell.descriptionLabel.text = dataText //??
-                                cell.hideShowInFullButton(true)
-                                self.newsFeed.collectionViewLayout.invalidateLayout() //??
+                        if let url = newsItem?.fullUrl { //?? so ok
+                            cell.showInFullTappedHandler = {
+                                if let fullText = self.fullTextContents[newsItemId] {
+                                    self.showInFullPressed.insert(newsItemId)
+                                    cell.descriptionLabel.text = fullText //??
+                                    cell.hideShowInFullButton(true)
+                                    let ctx = UICollectionViewLayoutInvalidationContext()
+                                    ctx.invalidateItems(at: [indexPath])
+                                    self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx) //??
+                                } else {
+                                    self.newsTextRequester.start(for: url, with: newsItem!.id!) {
+                                        itemId, dataText in
+                                        if let text = dataText, !text.isEmpty,
+                                           let id = itemId as? UInt, id == newsItem!.id {
+                                            //?? common
+                                            self.fullTextContents[id] = text
+                                            self.showInFullPressed.insert(id)
+                                            cell.descriptionLabel.text = dataText //??
+                                            cell.hideShowInFullButton(true)
+                                            let ctx = UICollectionViewLayoutInvalidationContext()
+                                            ctx.invalidateItems(at: [indexPath])
+                                            self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx) //??
+                                        }
+                                    }
+                                }
                             }
+                        } else {
+                            cell.hideShowInFullButton(true)
                         }
                     }
-                } else {
-                    cell.hideShowInFullButton(true)
                 }
                 
                 return cell

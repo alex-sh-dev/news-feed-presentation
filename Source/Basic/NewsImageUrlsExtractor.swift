@@ -91,6 +91,8 @@ class NewsImageUrlsExtractor {
             if number > Consts.kMaxTaskCount {
                 break
             }
+            
+            try await Task.sleep(nanoseconds: 30 * NSEC_PER_MSEC)
         }
         
         return resUrls

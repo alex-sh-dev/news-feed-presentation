@@ -103,7 +103,7 @@ class StartViewController: UIViewController {
             return
         }
         
-        newsFeedVC.startIdentifier = previewItem.identifier
+        newsFeedVC.startIdentifier = previewItem.itemIdentifier
     }
     
     private func setDefaultImage(for imageView: UIImageView) {
@@ -134,7 +134,7 @@ class StartViewController: UIViewController {
                 return cell
             }
             
-            cell.identifier = .value(newsItem!.id)
+            cell.itemIdentifier = .value(newsItem!.id)
             cell.headerLabel.text = newsItem!.title
             
             guard let url = newsItem!.titleImageUrl else {

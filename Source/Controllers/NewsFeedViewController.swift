@@ -131,26 +131,29 @@ class NewsFeedViewController: UIViewController {
                     return
                 }
                 
-                //?? common code
-                
-                let storage = NewsStorage.shared
-                storage.lock.with {
-                    let sections = Array(newIdentifiers)
-                        .sorted(by: >)
-                        .compactMap{ NewsItemSection.value($0) }
-                    snapshot.appendSections(sections)
-                    for section in sections {
-                        let id = section.rawValue
-                        var identifiers: [NewsItemPartIdentifier] = [.main(id)]
-                        if storage.news[id]?.titleImageUrl != nil {
-                            identifiers.append(.image(id))
-                        }
-                        snapshot.appendItems(identifiers, toSection: section)
-                    }
-                }
-                
-                self.dataSource.apply(snapshot, animatingDifferences: true)
+                self.updateSnapshot(&snapshot, with: Array(newIdentifiers), animate: true)
             }
+    }
+    
+    private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemSection, NewsItemPartIdentifier>, with identifiers: [UInt], animate: Bool = false) {
+        let sections = identifiers
+            .sorted(by: >)
+            .compactMap{ NewsItemSection.value($0) }
+        snapshot.appendSections(sections)
+        
+        let storage = NewsStorage.shared
+        storage.lock.with {
+            for section in sections {
+                let id = section.rawValue
+                var identifiers: [NewsItemPartIdentifier] = [.main(id)]
+                if storage.news[id]?.titleImageUrl != nil {
+                    identifiers.append(.image(id))
+                }
+                snapshot.appendItems(identifiers, toSection: section)
+            }
+        }
+        
+        self.dataSource.apply(snapshot, animatingDifferences: animate)
     }
     
     private func requestNewItems() {
@@ -265,25 +268,13 @@ class NewsFeedViewController: UIViewController {
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<NewsItemSection, NewsItemPartIdentifier>()
-        
         let storage = NewsStorage.shared
+        var identifiers: [UInt]!
         storage.lock.with {
-            let sections = Array(storage.news.keys)
-                .sorted(by: >)
-                .compactMap{ NewsItemSection.value($0) }
-            snapshot.appendSections(sections)
-            for section in sections {
-                let id = section.rawValue
-                var identifiers: [NewsItemPartIdentifier] = [.main(id)]
-                if storage.news[id]?.titleImageUrl != nil {
-                    identifiers.append(.image(id))
-                }
-                snapshot.appendItems(identifiers, toSection: section)
-            }
+            identifiers = Array(storage.news.keys)
         }
         
-        self.dataSource.apply(snapshot, animatingDifferences: false)
-        
+        updateSnapshot(&snapshot, with: identifiers, animate: false)
         DispatchQueue.main.async {
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {

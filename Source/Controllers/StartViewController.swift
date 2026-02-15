@@ -8,30 +8,48 @@
 import UIKit
 import Combine
 
-private enum Section {
-    case main
-}
-
 class StartViewController: UIViewController {
+    private struct Constants {
+        static let kNewsItemCount = 10
+    }
+    
+    private enum Section {
+        case main
+    }
+    
+    private enum NewsItemIdentifier: Hashable {
+        case value(UInt)
+        case supplementary
+        
+        var rawValue: UInt {
+            get {
+                switch self {
+                case .supplementary:
+                    return UInt.max
+                case .value(let val):
+                    return val
+                }
+            }
+        }
+    }
+    
     @IBOutlet weak var previewNewsFeed: UICollectionView! {
         didSet {
             previewNewsFeed.alwaysBounceHorizontal = true
         }
     }
     
-    private var dataSource: UICollectionViewDiffableDataSource<Section, UInt>!
+    private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
     private var newsUpdatedSubscriber: AnyCancellable!
     
-    private struct Constants {
-        static let kNewsItemCount = 10
-    }
-    
-    private func extractIdentifiers() -> [UInt] {
+    private func extractIdentifiers() -> [NewsItemIdentifier] {
         let storage = NewsStorage.shared
-        var identifiers: [UInt]!
+        var identifiers: [NewsItemIdentifier]!
         storage.lock.with {
-            identifiers = Array(storage.news.keys.sorted(by: >)
+            identifiers = Array(storage.news.keys
+                .sorted(by: >)
                 .prefix(Constants.kNewsItemCount))
+                .compactMap{ NewsItemIdentifier.value($0) }
         }
         
         return identifiers
@@ -62,14 +80,14 @@ class StartViewController: UIViewController {
                     if snapshot.numberOfSections == 0 {
                         snapshot.appendSections([.main])
                     }
-                    identifiers.append(UInt.max)
+                    identifiers.append(.supplementary)
                     snapshot.appendItems(identifiers)
                     self.dataSource.apply(snapshot, animatingDifferences: false)
                 } else if identifiers.count != oldIdentifiers.count ||
                             identifiers != oldIdentifiers {
-                    snapshot.deleteAllItems() //?? so ok?
+                    snapshot.deleteAllItems()
                     snapshot.appendSections([.main])
-                    identifiers.append(UInt.max)
+                    identifiers.append(.supplementary)
                     snapshot.appendItems(identifiers)
                     self.dataSource.apply(snapshot, animatingDifferences: false)
                 }
@@ -94,11 +112,10 @@ class StartViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        
-        self.dataSource = UICollectionViewDiffableDataSource<Section, UInt>(collectionView: self.previewNewsFeed) {
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? in
+        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) {
+            (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemIdentifier) -> UICollectionViewCell? in
             
-            if identifier == UInt.max {
+            if identifier == .supplementary {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PreviewNewsSupplementaryCell.identifier, for: indexPath) as? PreviewNewsSupplementaryCell
 
                 return cell
@@ -110,14 +127,14 @@ class StartViewController: UIViewController {
             
             var newsItem: NewsItem?
             NewsStorage.shared.lock.with {
-                newsItem = NewsStorage.shared.news[identifier]
+                newsItem = NewsStorage.shared.news[identifier.rawValue]
             }
             
             if newsItem == nil {
                 return cell
             }
             
-            cell.identifier = newsItem?.id ?? 0
+            cell.identifier = newsItem!.id
             cell.headerLabel.text = newsItem!.title
             
             guard let url = newsItem!.titleImageUrl else {
@@ -132,7 +149,7 @@ class StartViewController: UIViewController {
                 if cached && image != nil {
                     cell.imageView.image = image
                 } else {
-                    if let idfr = fetchedItem as? UInt, image != nil {
+                    if let idfr = fetchedItem as? NewsItemIdentifier, image != nil {
                         var updatedSnapshot = self.dataSource.snapshot()
                         updatedSnapshot.reloadItems([idfr])
                         self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
@@ -143,13 +160,13 @@ class StartViewController: UIViewController {
             return cell
         }
 
-        var snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
+        var snapshot = NSDiffableDataSourceSnapshot<Section, NewsItemIdentifier>()
         snapshot.appendSections([.main])
         var identifiers = self.extractIdentifiers()
         if identifiers.isEmpty {
             NewsParser.shared.requestData(count: UInt(Constants.kNewsItemCount))
         } else {
-            identifiers.append(UInt.max) //?? so ok? show everywhere 
+            identifiers.append(.supplementary)
             snapshot.appendItems(identifiers)
         }
         dataSource.apply(snapshot, animatingDifferences: false)

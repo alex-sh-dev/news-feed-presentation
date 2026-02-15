@@ -11,8 +11,8 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private struct Conf {
-        static let kMemoryCapacityMb = 10 * 1024 * 1024
-        static let kDiskCapacityMb = 200 * 1024 * 1024
+        static let kMemoryCapacityMb = 40 * 1024 * 1024
+        static let kDiskCapacityMb = 500 * 1024 * 1024
         static let kDiskPath = "urlcache"
         static let kNewsEndpoint = "https://webapi.autodoc.ru/api/news"
     }

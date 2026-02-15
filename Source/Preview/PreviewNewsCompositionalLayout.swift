@@ -8,7 +8,6 @@
 import UIKit
 
 class PreviewNewsCompositionalLayout: UICollectionViewCompositionalLayout {
-    
     private struct Constants {
         static let kItemFracWidth = 1.0
         static let kItemFracHeight = 1.0
@@ -32,7 +31,7 @@ class PreviewNewsCompositionalLayout: UICollectionViewCompositionalLayout {
             item.contentInsets = itemContInsets
             
             let size = layoutEnvironment.container.contentSize
-            let w = Constants.kGroupWidthFactor * size.height //??
+            let w = Constants.kGroupWidthFactor * size.height
             
             let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(w), heightDimension: .fractionalHeight(Constants.kGroupFracHeight))
             let containerGroup = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])

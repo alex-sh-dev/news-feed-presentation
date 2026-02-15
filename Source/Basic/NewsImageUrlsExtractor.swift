@@ -59,6 +59,7 @@ class NewsImageUrlsExtractor {
             var request = URLRequest(url: newUrl)
             request.httpMethod = "HEAD"
             request.timeoutInterval = 1.0
+            request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
             
             let hasStausCode200 = try await withThrowingTaskGroup(of: (Data, URLResponse).self, returning: Bool.self) {
                 group in

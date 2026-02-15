@@ -187,14 +187,6 @@ class NewsFeedViewController: UIViewController {
         return newsItem
     }
     
-    private func fillDescription(for cell: NewsItemCell, with text: String, at indexPath: IndexPath) {
-        cell.descriptionLabel.text = text
-        cell.hideShowInFullButton(true)
-        let ctx = UICollectionViewLayoutInvalidationContext()
-        ctx.invalidateItems(at: [indexPath])
-        self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
-    }
-    
     private func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
@@ -229,10 +221,19 @@ class NewsFeedViewController: UIViewController {
                         return cell
                     }
                     
+                    let fillDescription: (String) -> Void = {
+                        text in
+                        cell.descriptionLabel.text = text
+                        cell.hideShowInFullButton(true)
+                        let ctx = UICollectionViewLayoutInvalidationContext()
+                        ctx.invalidateItems(at: [indexPath])
+                        self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
+                    }
+
                     cell.showInFullTappedHandler = {
                         if let fullText = self.fullTextContents[id] {
                             self.showInFullPressed.insert(id)
-                            self.fillDescription(for: cell, with: fullText, at: indexPath)
+                            fillDescription(fullText)
                         } else {
                             // TODO: add animating for Show in full button
                             self.newsTextRequester.start(for: fullUrl, with: id) {
@@ -241,7 +242,7 @@ class NewsFeedViewController: UIViewController {
                                    let itemId = fetchedId as? UInt, id == itemId {
                                     self.fullTextContents[id] = text
                                     self.showInFullPressed.insert(itemId)
-                                    self.fillDescription(for: cell, with: text, at: indexPath)
+                                    fillDescription(text)
                                 }
                             }
                         }

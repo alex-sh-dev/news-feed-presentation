@@ -13,6 +13,8 @@ class NewsImageUrlsExtractor {
     
     let imageUrlsUpdatedPublisher = PassthroughSubject<UInt, Never>()
     
+    private let operationQueue = AsyncOperationQueue()
+    
     private init() {}
     
     struct Consts {
@@ -91,9 +93,9 @@ class NewsImageUrlsExtractor {
             return
         }
         
-        Task() {
+        self.operationQueue.enqueue {
             do {
-                if let urls = try await extract(for: url!) {
+                if let urls = try await self.extract(for: url!) {
                     NewsStorage.shared.lock.with {
                         NewsStorage.shared.imageUrls[id!] = urls
                     }

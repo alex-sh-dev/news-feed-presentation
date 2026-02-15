@@ -56,11 +56,16 @@ class NewsParser {
                 
                 var ids = [UInt]()
                 for newsItem in news {
-                    NewsStorage.shared.lock.with {
-                        NewsStorage.shared.news[newsItem.id] = newsItem
+                    let storage = NewsStorage.shared
+                    var startExtractor = false
+                    storage.lock.with {
+                        storage.news[newsItem.id] = newsItem
+                        startExtractor = storage.imageUrls.index(forKey: newsItem.id) == nil
                     }
                     ids.append(newsItem.id)
-                    NewsImageUrlsExtractor.shared.addTask(for: newsItem.titleImageUrl, with: newsItem.id)
+                    if startExtractor {
+                        NewsImageUrlsExtractor.shared.addTask(for: newsItem.titleImageUrl, with: newsItem.id)
+                    }
                 }
                 easyLog("data received")
                 self?.newsUpdatedPublisher.send(ids)

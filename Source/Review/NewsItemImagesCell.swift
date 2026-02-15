@@ -7,31 +7,64 @@
 
 import UIKit
 
-private enum Section { //?? дубликат?
-    case main
-}
-
 class NewsItemImagesCell: UICollectionViewCell {
+    private enum Section {
+        case main
+    }
+    
+    private enum ImageIdentifier: Hashable {
+        case value(String)
+        
+        static var generated: ImageIdentifier {
+            let uuid = UUID().uuidString
+            return .value(uuid)
+        }
+    }
     
     static let identifier = "NewsItemImagesCellIdentifier"
     
-    private var dataSource: UICollectionViewDiffableDataSource<Section, String>!
+    private var imageUrlMap: [ImageIdentifier: URL] = [:]
+    
+    var imageUrls: [URL] = [] {
+        didSet {
+            DispatchQueue.main.async {
+                self.imageUrlMap.removeAll()
+                var snapshot = self.dataSource.snapshot()
+                snapshot.deleteAllItems()
+                self.dataSource.apply(snapshot, animatingDifferences: false)
+            }
+            
+            DispatchQueue.main.async {
+                var snapshot = self.dataSource.snapshot()
+                snapshot.appendSections([.main])
+                var identifiers: [ImageIdentifier] = []
+                for url in self.imageUrls {
+                    let uuid = ImageIdentifier.generated
+                    self.imageUrlMap[uuid] = url
+                    identifiers.append(uuid)
+                }
+                snapshot.appendItems(identifiers)
+                self.dataSource.apply(snapshot, animatingDifferences: false)
+            }
+        }
+    }
+    
+    private var dataSource: UICollectionViewDiffableDataSource<Section, ImageIdentifier>!
     
     @IBOutlet weak var imageCollection: UICollectionView! {
         didSet {
             self.imageCollection.collectionViewLayout = ImagesCompositionalLayout {
-                let count = self.imageUrls?.count ?? 0 //?? может быть nil
-                return count > 1
+                return self.imageUrls.count > 1
             }
             
-            self.dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: self.imageCollection) {
-                (collectionView: UICollectionView, indexPath: IndexPath, identifier: String) -> UICollectionViewCell? in
+            self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) {
+                (collectionView: UICollectionView, indexPath: IndexPath, identifier: ImageIdentifier) -> UICollectionViewCell? in
                 
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsItemImageCell.identifier, for: indexPath) as? NewsItemImageCell else {
                     fatalError("Error: couldn't create cell with identifier: '\(NewsItemImageCell.identifier)'")
                 }
                 
-                guard let imageUrl = self.imageUrlMap?[identifier] else {
+                guard let imageUrl = self.imageUrlMap[identifier] else {
                     return cell
                 }
                 
@@ -42,12 +75,12 @@ class NewsItemImagesCell: UICollectionViewCell {
                     if cached && image != nil {
                         cell.imageView.image = image
                     } else {
-                        if let item = fetchedItem as? String, image != nil {
-                            var updatedSnapshot = self.dataSource.snapshot()
-                            if updatedSnapshot.itemIdentifiers.contains(item) {
-                                updatedSnapshot.reloadItems([item])
+                        if let item = fetchedItem as? ImageIdentifier, image != nil {
+                            var snapshot = self.dataSource.snapshot()
+                            if snapshot.itemIdentifiers.contains(item) {
+                                snapshot.reloadItems([item])
                             }
-                            self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
+                            self.dataSource.apply(snapshot, animatingDifferences: true)
                         }
                     }
                 }
@@ -55,45 +88,13 @@ class NewsItemImagesCell: UICollectionViewCell {
                 return cell
             }
             
-            var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+            var snapshot = NSDiffableDataSourceSnapshot<Section, ImageIdentifier>()
             snapshot.appendSections([.main])
             dataSource.apply(snapshot, animatingDifferences: false)
         }
     }
     
-    private var imageUrlMap: [String: URL]? //?? rename
-    
-    var imageUrls: [URL]? { //?? rename
-        didSet {
-            //?? if nil
-            
-            DispatchQueue.main.async {
-                self.imageUrlMap = nil //??
-                var snapshot = self.dataSource.snapshot()
-                snapshot.deleteAllItems() //?? so ok?
-                self.dataSource.apply(snapshot, animatingDifferences: false)
-            }
-            
-            DispatchQueue.main.async {
-                var snapshot = self.dataSource.snapshot()
-                snapshot.appendSections([.main])
-                
-                //?? so ok?
-                
-                self.imageUrlMap = [:] //??
-                var identifiers: [String] = []
-                for url in self.imageUrls! {
-                    let uuid = UUID().uuidString
-                    self.imageUrlMap![uuid] = url
-                    identifiers.append(uuid)
-                }
-                snapshot.appendItems(identifiers)
-                self.dataSource.apply(snapshot, animatingDifferences: false)
-            }
-        }
-    }
-    
-    private func setDefaultImage(for imageView: UIImageView) { //?? дубликат
+    private func setDefaultImage(for imageView: UIImageView) {
         imageView.image = nil
         imageView.backgroundColor = UIColor.lightGray
     }

@@ -259,9 +259,7 @@ class NewsFeedViewController: UIViewController {
                     }
                 }
                 
-                cell.imageUrls = imageUrls //??
-                
-                //?? how to clear
+                cell.imageUrls = imageUrls
                 
                 return cell
             }

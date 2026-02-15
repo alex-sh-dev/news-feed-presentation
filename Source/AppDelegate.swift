@@ -22,12 +22,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let urlCache = URLCache(memoryCapacity: Conf.kMemoryCapacityMb, diskCapacity: Conf.kDiskCapacityMb , diskPath: Conf.kDiskPath)
         URLCache.shared = urlCache
         
-//        urlCache.removeAllCachedResponses()//??
+        // TODO: add cache clenup (Settings)
+        // urlCache.removeAllCachedResponses()
         
         let endpoint = URL(string: Conf.kNewsEndpoint)
         NewsParser.setup(NewsParser.Config(baseEndpoint: endpoint!))
-        
-        NewsParser.shared.requestData(count: 15)
         
         return true
     }

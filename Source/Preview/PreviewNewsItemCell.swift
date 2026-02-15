@@ -11,7 +11,7 @@ class PreviewNewsItemCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var headerLabel: UILabel!
     
-    var identifier: NewsItemSection = .notValid
+    var identifier: NewsItemIdentifier = .notValid
     
     static let identifier = "PreviewNewsItemCellIdentifier"
     

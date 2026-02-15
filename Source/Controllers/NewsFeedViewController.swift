@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-public enum NewsItemSection: Hashable {
+public enum NewsItemIdentifier: Hashable {
     case notValid
     case value(UInt)
     
@@ -52,15 +52,13 @@ class NewsFeedViewController: UIViewController {
         }
     }
 
-    var startIdentifier: NewsItemSection = .notValid
+    var startIdentifier: NewsItemIdentifier = .notValid
     
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
     }
     
-    //?? общий класс с StartViewController
-    
-    private var dataSource: UICollectionViewDiffableDataSource<NewsItemSection, NewsItemPartIdentifier>!
+    private var dataSource: UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>!
         
     private var newsUpdatedSubscriber: AnyCancellable!
     private var imageUrlsUpdatedSubscriber: AnyCancellable!
@@ -68,28 +66,46 @@ class NewsFeedViewController: UIViewController {
     private var newsTextRequester = FullNewsTextRequester()
     
     private var fullTextContents: [UInt: String]!
-    private var showInFullPressed: Set<UInt> = [] //?? rename?
+    private var showInFullPressed: Set<UInt> = []
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
+    private func saveFullTextContents() {
         if self.fullTextContents.isEmpty {
             return
         }
-        //?? to sp func
-        NewsStorage.shared.lock.with {
-            NewsStorage.shared.fullTextContents
+
+        let storage = NewsStorage.shared
+        storage.lock.with {
+            storage.fullTextContents
                 .merge(self.fullTextContents) { (current, _) in current }
         }
+    }
+    
+    private func restoreFullTextContents() {
+        let storage = NewsStorage.shared
+        storage.lock.with {
+            self.fullTextContents = storage.fullTextContents
+        }
+    }
+    
+    private func stopActivityIndicatorAnimating() {
+        self.activityIndicator.stopAnimating()
+        self.activityIndicator.isHidden = true
+    }
+    
+    private func startActivityIndicatorAnimating() {
+        self.activityIndicator.isHidden = false
+        self.activityIndicator.startAnimating()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        saveFullTextContents()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //?? to sp func
-        NewsStorage.shared.lock.with {
-            self.fullTextContents = NewsStorage.shared.fullTextContents
-        }
+        restoreFullTextContents()
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
@@ -115,8 +131,7 @@ class NewsFeedViewController: UIViewController {
             .sink {
                 ids in
                 
-                self.activityIndicator.stopAnimating() //?? to sp func ? everywhere
-                self.activityIndicator.isHidden = true
+                self.stopActivityIndicatorAnimating()
                 
                 if ids.isEmpty {
                     return
@@ -135,10 +150,10 @@ class NewsFeedViewController: UIViewController {
             }
     }
     
-    private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemSection, NewsItemPartIdentifier>, with identifiers: [UInt], animate: Bool = false) {
+    private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], animate: Bool = false) {
         let sections = identifiers
             .sorted(by: >)
-            .compactMap{ NewsItemSection.value($0) }
+            .compactMap{ NewsItemIdentifier.value($0) }
         snapshot.appendSections(sections)
         
         let storage = NewsStorage.shared
@@ -156,20 +171,36 @@ class NewsFeedViewController: UIViewController {
         self.dataSource.apply(snapshot, animatingDifferences: animate)
     }
     
-    private func requestNewItems() {
+    private func requestNewsParty() {
         let total = UInt(self.newsFeed.numberOfSections)
         let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
         NewsParser.shared.requestData(page: page, count: Constants.kItemCountPerPage)
-        self.activityIndicator.isHidden = false
-        self.activityIndicator.startAnimating()
+        startActivityIndicatorAnimating()
+    }
+    
+    private func newsItem(at id: UInt) -> NewsItem? {
+        var newsItem: NewsItem?
+        NewsStorage.shared.lock.with {
+            newsItem = NewsStorage.shared.news[id]
+        }
+    
+        return newsItem
+    }
+    
+    private func fillDescription(for cell: NewsItemCell, with text: String, at indexPath: IndexPath) {
+        cell.descriptionLabel.text = text
+        cell.hideShowInFullButton(true)
+        let ctx = UICollectionViewLayoutInvalidationContext()
+        ctx.invalidateItems(at: [indexPath])
+        self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
     }
     
     private func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<NewsItemSection, NewsItemPartIdentifier>(collectionView: self.newsFeed) {
+        self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
             
             if indexPath.section == collectionView.numberOfSections - 1 {
-                self.requestNewItems()
+                self.requestNewsParty()
             }
             
             switch identifier {
@@ -178,62 +209,43 @@ class NewsFeedViewController: UIViewController {
                     fatalError("Error: couldn't create cell with identifier: '\(NewsItemCell.identifier)'")
                 }
                 
-                //?? common code refactor
-                
-                var newsItem: NewsItem?
-                NewsStorage.shared.lock.with {
-                    newsItem = NewsStorage.shared.news[id]
-                }
-                
-                if newsItem == nil {
+                guard let newsItem = self.newsItem(at: id) else {
                     return cell
                 }
                 
-                cell.titleLabel.text = newsItem!.title
-                cell.dateLabel.text = newsItem!.publishedDate?.relativeDate()
-                cell.categoryLabel.text = newsItem!.categoryType
-                cell.descriptionLabel.text = newsItem!.description
+                cell.titleLabel.text = newsItem.title
+                cell.dateLabel.text = newsItem.publishedDate?.relativeDate()
+                cell.categoryLabel.text = newsItem.categoryType
+                cell.descriptionLabel.text = newsItem.description
                 
-                //?? activity indicator start
-                
-                if let newsItemId = newsItem?.id { //?? remake? //?? rename?
-                    if self.showInFullPressed.contains(newsItemId) {
-                        cell.descriptionLabel.text = self.fullTextContents[newsItemId]
+                if self.showInFullPressed.contains(id) {
+                    cell.descriptionLabel.text = self.fullTextContents[id]
+                    cell.hideShowInFullButton(true)
+                } else {
+                    if cell.showInFullButton.isHidden {
+                        cell.hideShowInFullButton(false)
+                    }
+                    
+                    guard let fullUrl = newsItem.fullUrl else {
                         cell.hideShowInFullButton(true)
-                        
-                    } else {
-                        if cell.showInFullButton.isHidden {
-                            cell.hideShowInFullButton(false)
-                        }
-                        
-                        if let url = newsItem?.fullUrl { //?? so ok
-                            cell.showInFullTappedHandler = {
-                                if let fullText = self.fullTextContents[newsItemId] {
-                                    self.showInFullPressed.insert(newsItemId)
-                                    cell.descriptionLabel.text = fullText //??
-                                    cell.hideShowInFullButton(true)
-                                    let ctx = UICollectionViewLayoutInvalidationContext()
-                                    ctx.invalidateItems(at: [indexPath])
-                                    self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx) //??
-                                } else {
-                                    self.newsTextRequester.start(for: url, with: newsItem!.id!) {
-                                        itemId, dataText in
-                                        if let text = dataText, !text.isEmpty,
-                                           let id = itemId as? UInt, id == newsItem!.id {
-                                            //?? common
-                                            self.fullTextContents[id] = text
-                                            self.showInFullPressed.insert(id)
-                                            cell.descriptionLabel.text = dataText //??
-                                            cell.hideShowInFullButton(true)
-                                            let ctx = UICollectionViewLayoutInvalidationContext()
-                                            ctx.invalidateItems(at: [indexPath])
-                                            self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx) //??
-                                        }
-                                    }
+                        return cell
+                    }
+                    
+                    cell.showInFullTappedHandler = {
+                        if let fullText = self.fullTextContents[id] {
+                            self.showInFullPressed.insert(id)
+                            self.fillDescription(for: cell, with: fullText, at: indexPath)
+                        } else {
+                            // TODO: add animating for Show in full button
+                            self.newsTextRequester.start(for: fullUrl, with: id) {
+                                fetchedId, dataText in
+                                if let text = dataText, !text.isEmpty,
+                                   let itemId = fetchedId as? UInt, id == itemId {
+                                    self.fullTextContents[id] = text
+                                    self.showInFullPressed.insert(itemId)
+                                    self.fillDescription(for: cell, with: text, at: indexPath)
                                 }
                             }
-                        } else {
-                            cell.hideShowInFullButton(true)
                         }
                     }
                 }
@@ -244,17 +256,18 @@ class NewsFeedViewController: UIViewController {
                     fatalError("Error: couldn't create cell with identifier: '\(NewsItemImagesCell.identifier)'")
                 }
                 
-                //?? common code
+                guard let newsItem = self.newsItem(at: id) else {
+                    return cell
+                }
                 
                 var imageUrls: [URL] = []
-                NewsStorage.shared.lock.with {
-                    guard let newsItem = NewsStorage.shared.news[id],
-                          let url = newsItem.titleImageUrl else {
-                        fatalError("Error: ") //?? вообще возможна такая ситуация?
+                let storage = NewsStorage.shared
+                storage.lock.with {
+                    if let url = newsItem.titleImageUrl {
+                        imageUrls.append(url)
                     }
-                    
-                    imageUrls.append(url)
-                    if let additionalUrls = NewsStorage.shared.imageUrls[id] {
+
+                    if let additionalUrls = storage.imageUrls[id] {
                         imageUrls.append(contentsOf: additionalUrls)
                     }
                 }
@@ -265,7 +278,7 @@ class NewsFeedViewController: UIViewController {
             }
         }
         
-        var snapshot = NSDiffableDataSourceSnapshot<NewsItemSection, NewsItemPartIdentifier>()
+        var snapshot = NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>()
         let storage = NewsStorage.shared
         var identifiers: [UInt]!
         storage.lock.with {

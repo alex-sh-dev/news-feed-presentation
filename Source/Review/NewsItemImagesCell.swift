@@ -25,14 +25,16 @@ class NewsItemImagesCell: UICollectionViewCell {
     
     var imageUrls: [URL] = [] {
         didSet {
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.imageUrlMap.removeAll()
                 var snapshot = self.dataSource.snapshot()
                 snapshot.deleteAllItems()
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
             
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 var snapshot = self.dataSource.snapshot()
                 snapshot.appendSections([.main])
                 var identifiers: [ImageIdentifier] = []
@@ -55,8 +57,10 @@ class NewsItemImagesCell: UICollectionViewCell {
                 return self.imageUrls.count > 1
             }
             
-            self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) {
+            self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) { [weak self]
                 (collectionView: UICollectionView, indexPath: IndexPath, identifier: ImageIdentifier) -> UICollectionViewCell? in
+                
+                guard let self = self else { return nil }
                 
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImageCell.self)
                 
@@ -66,8 +70,9 @@ class NewsItemImagesCell: UICollectionViewCell {
                 
                 ImageLoader.shared.load(url: imageUrl, item: identifier, beforeLoad: {
                     self.setDefaultImage(for: cell.imageView)
-                }) {
+                }) { [weak self]
                     (fetchedItem, image, cached) in
+                    guard let self = self else { return }
                     if cached && image != nil {
                         cell.imageView.image = image
                     } else {

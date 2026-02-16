@@ -44,9 +44,10 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
         }
         
         self.timer = Timer.scheduledTimer(withTimeInterval: Consts.kRequestDelaySec, repeats: true) {
-            timer in
-            
-            self.webView.evaluateJavaScript(Consts.kNewsTextJSCode, completionHandler: { result, error in
+            [weak self] timer in
+            self?.webView.evaluateJavaScript(Consts.kNewsTextJSCode, completionHandler: { [weak self]
+                result, error in
+                guard let self = self else { return }
                 let stopTimer: (String?) -> Void = {
                     text in
                     self.completionHandler?(self.id, text)

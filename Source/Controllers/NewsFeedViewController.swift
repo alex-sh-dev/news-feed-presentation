@@ -25,6 +25,11 @@ class NewsFeedViewController: UIViewController {
         }
     }
     
+    private enum ActivityIndicatorAction {
+        case start
+        case stop
+    }
+    
     private struct Constants {
         static let kItemCountPerPage: UInt = 5
     }
@@ -51,16 +56,6 @@ class NewsFeedViewController: UIViewController {
     
     private var dataSource: UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>!
     
-    private func stopActivityIndicatorAnimating() {
-        self.activityIndicator.stopAnimating()
-        self.activityIndicator.isHidden = true
-    }
-    
-    private func startActivityIndicatorAnimating() {
-        self.activityIndicator.isHidden = false
-        self.activityIndicator.startAnimating()
-    }
-    
     deinit {
         easyLog(String(describing: self))
     }
@@ -81,7 +76,7 @@ class NewsFeedViewController: UIViewController {
                 case .reloadImages(let id):
                     self.reloadItems([.image(id)], animate: true)
                 case .appendItems(let newIdentifiers, let newsParts):
-                    self.stopActivityIndicatorAnimating()
+                    self.actActivityIndicator(.stop)
                     var snapshot = self.dataSource.snapshot()
                     self.updateSnapshot(&snapshot, with: newIdentifiers, and:newsParts, animate: true)
                 case .fill(let identifiers, let newsParts):
@@ -89,6 +84,16 @@ class NewsFeedViewController: UIViewController {
                     self.updateSnapshot(&snapshot, with: identifiers, and: newsParts, animate: false)
                 }
             }
+    }
+    
+    private func actActivityIndicator(_ action: ActivityIndicatorAction) {
+        let start = action == .start
+        self.activityIndicator.isHidden = !start
+        if start {
+            self.activityIndicator.startAnimating()
+        } else {
+            self.activityIndicator.stopAnimating()
+        }
     }
     
     private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
@@ -124,7 +129,7 @@ class NewsFeedViewController: UIViewController {
         let total = UInt(self.newsFeed.numberOfSections)
         let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
         self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
-        startActivityIndicatorAnimating()
+        self.actActivityIndicator(.start)
     }
     
     private func configureDataSource() {

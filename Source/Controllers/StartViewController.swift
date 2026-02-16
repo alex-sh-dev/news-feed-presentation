@@ -11,6 +11,7 @@ import Combine
 class StartViewController: UIViewController {
     private struct Constants {
         static let kNewsItemCount = 10
+        static let kNewsItemReserve = 5
     }
     
     private enum Section {
@@ -160,7 +161,8 @@ class StartViewController: UIViewController {
         snapshot.appendSections([.main])
         var identifiers = self.extractIdentifiers()
         if identifiers.isEmpty {
-            NewsParser.shared.requestData(count: UInt(Constants.kNewsItemCount))
+            NewsParser.shared.requestData(
+                count: UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve))
         } else {
             identifiers.append(.supplementary)
             snapshot.appendItems(identifiers)

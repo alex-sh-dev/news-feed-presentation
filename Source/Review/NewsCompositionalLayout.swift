@@ -24,7 +24,10 @@ class NewsCompositionalLayout: UICollectionViewCompositionalLayout {
         self.init() {
             (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
             let size = layoutEnvironment.container.contentSize
-            let h = size.width / Constants.kSecItemHeightFactor
+            var h = size.width / Constants.kSecItemHeightFactor
+            if size.width > size.height {
+                h = size.height
+            }
             
             let firstItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(Constants.kItemFracWidth), heightDimension: .estimated(Constants.kFirstItemEstimHeightValue))
             let firstItem = NSCollectionLayoutItem(layoutSize: firstItemSize)

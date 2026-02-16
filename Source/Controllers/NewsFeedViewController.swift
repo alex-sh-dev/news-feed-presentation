@@ -43,6 +43,7 @@ class NewsFeedViewController: UIViewController {
     
     private struct Constants {
         static let kItemCountPerPage: UInt = 5
+        static let kScrollOffsetOnStart: CGFloat = 40
     }
     
     @IBOutlet weak var newsFeed: UICollectionView!
@@ -118,12 +119,7 @@ class NewsFeedViewController: UIViewController {
             .sink {
                 id in
                 
-                var snapshot = self.dataSource.snapshot()
-                let idfr = NewsItemPartIdentifier.image(id)
-                if snapshot.itemIdentifiers.contains(idfr) {
-                    snapshot.reloadItems([idfr])
-                }
-                self.dataSource.apply(snapshot, animatingDifferences: true)
+                self.reloadItems([.image(id)], animate: true)
             }
         
         newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
@@ -171,11 +167,49 @@ class NewsFeedViewController: UIViewController {
         self.dataSource.apply(snapshot, animatingDifferences: animate)
     }
     
+    private func reloadItems(_ identifiers: [NewsItemPartIdentifier], animate: Bool = false) {
+        var snapshot = self.dataSource.snapshot()
+        for idfr in identifiers {
+            if snapshot.itemIdentifiers.contains(idfr) {
+                snapshot.reloadItems([idfr])
+            }
+        }
+        self.dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
     private func requestNewsParty() {
         let total = UInt(self.newsFeed.numberOfSections)
         let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
         NewsParser.shared.requestData(page: page, count: Constants.kItemCountPerPage)
         startActivityIndicatorAnimating()
+    }
+    
+    private func requestText(forNewsItemWith id: UInt,
+                             completionHandler: @escaping (String, UInt) -> Void) {
+        if let fullText = self.fullTextContents[id] {
+            self.showInFullPressed.insert(id)
+            completionHandler(fullText, id)
+            return
+        }
+        
+        guard let newsItem = self.newsItem(at: id),
+              let url = newsItem.fullUrl else {
+            return
+        }
+        
+        self.newsTextRequester.start(for: url, with: id) {
+            fetchedId, dataText in
+            
+            guard let text = dataText, !text.isEmpty,
+                  let id = fetchedId as? UInt  else {
+                return
+            }
+            
+            self.fullTextContents[id] = dataText
+            self.showInFullPressed.insert(id)
+            
+            completionHandler(text, id)
+        }
     }
     
     private func newsItem(at id: UInt) -> NewsItem? {
@@ -216,7 +250,7 @@ class NewsFeedViewController: UIViewController {
                         cell.hideShowInFullButton(false)
                     }
                     
-                    guard let fullUrl = newsItem.fullUrl else {
+                    if newsItem.fullUrl == nil {
                         cell.hideShowInFullButton(true)
                         return cell
                     }
@@ -231,19 +265,11 @@ class NewsFeedViewController: UIViewController {
                     }
 
                     cell.showInFullTappedHandler = {
-                        if let fullText = self.fullTextContents[id] {
-                            self.showInFullPressed.insert(id)
-                            fillDescription(fullText)
-                        } else {
-                            // TODO: add animating for Show in full button
-                            self.newsTextRequester.start(for: fullUrl, with: id) {
-                                fetchedId, dataText in
-                                if let text = dataText, !text.isEmpty,
-                                   let itemId = fetchedId as? UInt, id == itemId {
-                                    self.fullTextContents[id] = text
-                                    self.showInFullPressed.insert(itemId)
-                                    fillDescription(text)
-                                }
+                        // TODO: add animating for Show in full button
+                        self.requestText(forNewsItemWith: id) {
+                            text, itemId in
+                            if id == itemId {
+                                fillDescription(text)
                             }
                         }
                     }
@@ -286,8 +312,20 @@ class NewsFeedViewController: UIViewController {
         DispatchQueue.main.async {
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
+                self.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
+                    _, id in
+                    self.reloadItems([.main(id)], animate: true)
+                }
+                
                 self.newsFeed.scrollToItem(at: IndexPath(row: 0, section: sectionIndex),
                                            at: .top, animated: false)
+                
+                
+                let offset = self.newsFeed.contentOffset
+                if offset.y > Constants.kScrollOffsetOnStart {
+                    let newOffset = CGPoint(x: offset.x, y: offset.y - Constants.kScrollOffsetOnStart)
+                    self.newsFeed.setContentOffset(newOffset, animated: false)
+                }
             }
         }
     }

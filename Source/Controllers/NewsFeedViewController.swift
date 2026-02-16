@@ -243,7 +243,6 @@ class NewsFeedViewController: UIViewController {
                 
                 if self.showInFullPressed.contains(id) {
                     cell.descriptionLabel.text = self.fullTextContents[id]
-                    collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
                     cell.hideShowInFullButton(true)
                 } else {
                     if cell.showInFullButton.isHidden {
@@ -312,13 +311,14 @@ class NewsFeedViewController: UIViewController {
         DispatchQueue.main.async {
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
+                let indexPath = IndexPath(row: 0, section: sectionIndex)
                 self.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
                     _, id in
                     self.reloadItems([.main(id)], animate: true)
+                    self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: true)
                 }
                 
-                self.newsFeed.scrollToItem(at: IndexPath(row: 0, section: sectionIndex),
-                                           at: .top, animated: false)
+                self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
             }
         }
     }

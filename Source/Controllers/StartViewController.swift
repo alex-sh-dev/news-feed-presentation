@@ -60,7 +60,7 @@ class StartViewController: UIViewController {
                 var snapshot = self.dataSource.snapshot()
                 var animate: Bool = true
                 switch action {
-                case .load:
+                case .fill:
                     animate = false
                 case .replaceAll:
                     snapshot.deleteAllItems()

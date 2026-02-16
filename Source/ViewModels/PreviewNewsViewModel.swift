@@ -10,7 +10,7 @@ import Combine
 
 class PreviewNewsViewModel: BaseNewsViewModel {
     enum IdentifiersAction {
-        case load
+        case fill
         case replaceAll
     }
     
@@ -33,7 +33,7 @@ class PreviewNewsViewModel: BaseNewsViewModel {
             let oldIdentifiers = self.identifiers
             self.identifiers = identifiers
             if oldIdentifiers.isEmpty {
-                self.identifiersActionPublisher.send(.load)
+                self.identifiersActionPublisher.send(.fill)
             } else if identifiers.count != oldIdentifiers.count ||
                         identifiers != oldIdentifiers {
                 self.identifiersActionPublisher.send(.replaceAll)

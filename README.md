@@ -36,3 +36,7 @@
 Улучшениям нет предела, но это выходит уже за рамки тестового задания, как мне кажется
 
 Так как у меня недостаточно опыта в дизайне, вдохновлялся вашим приложением и сайтом =)
+
+<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/7643353c-8e5c-45d4-ae00-474d7b87cdb3" /> 
+<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/bad5358f-4b75-4de9-a2a7-f31b9edcd705" /> 
+<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/dbd62a39-99e4-4fc7-8c89-d14398857b0d" />

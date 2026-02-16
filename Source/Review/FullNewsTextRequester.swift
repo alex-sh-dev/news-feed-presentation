@@ -38,7 +38,7 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if self.timer != nil {
-            self.timer?.invalidate()
+            self.timer!.invalidate()
             self.timerCount = 0
             self.completionHandler?(self.id, nil)
         }
@@ -47,17 +47,19 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
             timer in
             
             self.webView.evaluateJavaScript(Consts.kNewsTextJSCode, completionHandler: { result, error in
-                if let dataText = result as? String, !dataText.isEmpty {
-                    self.completionHandler?(self.id, dataText)
+                let stopTimer: (String?) -> Void = {
+                    text in
+                    self.completionHandler?(self.id, text)
                     timer.invalidate()
                     self.timerCount = 0
+                }
+                if let dataText = result as? String, !dataText.isEmpty {
+                    stopTimer(dataText)
                 } else {
                     self.timerCount += 1
                 }
                 if self.timerCount > Consts.kAttemptCount {
-                    self.completionHandler?(self.id, nil)
-                    timer.invalidate()
-                    self.timerCount = 0
+                    stopTimer(nil)
                 }
             })
         }

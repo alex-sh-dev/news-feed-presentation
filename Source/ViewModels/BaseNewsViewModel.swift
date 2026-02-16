@@ -32,7 +32,7 @@ class BaseNewsViewModel {
         return { _ in }
     }
     
-    public func newsItem(at id: UInt) -> NewsItem? {
+    func newsItem(at id: UInt) -> NewsItem? {
         var newsItem: NewsItem?
         NewsStorage.shared.lock.with {
             newsItem = NewsStorage.shared.news[id]
@@ -41,7 +41,7 @@ class BaseNewsViewModel {
         return newsItem
     }
 
-    public func requestItems(page: UInt = 1, count: UInt) {
+    func requestItems(page: UInt = 1, count: UInt) {
         if count > 0 {
             NewsParser.shared.requestData(page: page, count: count)
         }

@@ -8,13 +8,13 @@
 import Foundation
 import Combine
 
-enum IdentifiersAction {
-    case load
-    case replaceAll
-}
-
 class PreviewNewsViewModel: BaseNewsViewModel {
-    public let identifiersActionPublisher = PassthroughSubject<IdentifiersAction, Never>()
+    enum IdentifiersAction {
+        case load
+        case replaceAll
+    }
+    
+    final let identifiersActionPublisher = PassthroughSubject<IdentifiersAction, Never>()
     
     override func newsUpdatedSubscriberHandler() -> ([UInt]) -> Void {
         { [weak self] ids in

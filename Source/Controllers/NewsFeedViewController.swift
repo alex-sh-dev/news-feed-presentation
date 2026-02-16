@@ -38,38 +38,14 @@ class NewsFeedViewController: UIViewController {
 
     var startIdentifier: NewsItemIdentifier = .notValid
     
+    private var identifiersActionSubscriber: AnyCancellable!
+    private let newsViewModel: NewsFeedViewModel = NewsFeedViewModel()
+    
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
     }
     
     private var dataSource: UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>!
-        
-    private var newsUpdatedSubscriber: AnyCancellable!
-    private var imageUrlsUpdatedSubscriber: AnyCancellable!
-    
-    private var newsTextRequester = FullNewsTextRequester()
-    
-    private var fullTextContents: [UInt: String]!
-    private var showInFullPressed: Set<UInt> = []
-    
-    private func saveFullTextContents() {
-        if self.fullTextContents.isEmpty {
-            return
-        }
-
-        let storage = NewsStorage.shared
-        storage.lock.with {
-            storage.fullTextContents
-                .merge(self.fullTextContents) { (current, _) in current }
-        }
-    }
-    
-    private func restoreFullTextContents() {
-        let storage = NewsStorage.shared
-        storage.lock.with {
-            self.fullTextContents = storage.fullTextContents
-        }
-    }
     
     private func stopActivityIndicatorAnimating() {
         self.activityIndicator.stopAnimating()
@@ -81,15 +57,12 @@ class NewsFeedViewController: UIViewController {
         self.activityIndicator.startAnimating()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        saveFullTextContents()
+    deinit {
+        easyLog(String(describing: self))
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        restoreFullTextContents()
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
@@ -97,51 +70,38 @@ class NewsFeedViewController: UIViewController {
         configureDataSource()
         configureLayout()
         
-        imageUrlsUpdatedSubscriber = NewsImageUrlsExtractor.shared.imageUrlsUpdatedPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] id in
-                self?.reloadItems([.image(id)], animate: true)
-            }
-        
-        newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] ids in
+        identifiersActionSubscriber = self.newsViewModel.identifiersActionPublisher
+            .sink { [weak self] action in
                 guard let self = self else { return }
-                self.stopActivityIndicatorAnimating()
-                
-                if ids.isEmpty {
-                    return
+                switch action {
+                case .reloadImages(let id):
+                    self.reloadItems([.image(id)], animate: true)
+                case .appendItems(let newIdentifiers, let newsParts):
+                    self.stopActivityIndicatorAnimating()
+                    var snapshot = self.dataSource.snapshot()
+                    self.updateSnapshot(&snapshot, with: newIdentifiers, and:newsParts, animate: true)
+                case .fill(let identifiers, let newsParts):
+                    var snapshot = NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>()
+                    self.updateSnapshot(&snapshot, with: identifiers, and: newsParts, animate: false)
                 }
-                
-                var snapshot = self.dataSource.snapshot()
-                let identifiers = snapshot.sectionIdentifiers.compactMap{ $0.rawValue }
-                
-                let newIdentifiers = Set(ids).subtracting(Set(identifiers))
-                
-                if newIdentifiers.isEmpty {
-                    return
-                }
-                
-                self.updateSnapshot(&snapshot, with: Array(newIdentifiers), animate: true)
             }
+        self.newsViewModel.fillIdentifiersFromStorage()
     }
     
-    private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], animate: Bool = false) {
+    private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
+        
         let sections = identifiers
-            .sorted(by: >)
             .compactMap{ NewsItemIdentifier.value($0) }
         snapshot.appendSections(sections)
         
-        let storage = NewsStorage.shared
-        storage.lock.with {
-            for section in sections {
-                let id = section.rawValue
-                var identifiers: [NewsItemPartIdentifier] = [.main(id)]
-                if storage.news[id]?.titleImageUrl != nil {
-                    identifiers.append(.image(id))
-                }
-                snapshot.appendItems(identifiers, toSection: section)
+        for i in 0..<identifiers.count {
+            let id = identifiers[i]
+            let part = parts[i]
+            var partIdfrs: [NewsItemPartIdentifier] = [.main(id)]
+            if part == .textImage {
+                partIdfrs.append(.image(id))
             }
+            snapshot.appendItems(partIdfrs, toSection: .value(id))
         }
         
         self.dataSource.apply(snapshot, animatingDifferences: animate)
@@ -160,46 +120,8 @@ class NewsFeedViewController: UIViewController {
     private func requestNewsParty() {
         let total = UInt(self.newsFeed.numberOfSections)
         let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
-        NewsParser.shared.requestData(page: page, count: Constants.kItemCountPerPage)
+        self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
         startActivityIndicatorAnimating()
-    }
-    
-    private func requestText(forNewsItemWith id: UInt,
-                             completionHandler: @escaping (String, UInt) -> Void) {
-        if let fullText = self.fullTextContents[id] {
-            self.showInFullPressed.insert(id)
-            completionHandler(fullText, id)
-            return
-        }
-        
-        guard let newsItem = self.newsItem(at: id),
-              let url = newsItem.fullUrl else {
-            return
-        }
-        
-        self.newsTextRequester.start(for: url, with: id) { [weak self]
-            fetchedId, dataText in
-            guard let self = self else { return }
-            
-            guard let text = dataText, !text.isEmpty,
-                  let id = fetchedId as? UInt  else {
-                return
-            }
-            
-            self.fullTextContents[id] = dataText
-            self.showInFullPressed.insert(id)
-            
-            completionHandler(text, id)
-        }
-    }
-    
-    private func newsItem(at id: UInt) -> NewsItem? {
-        var newsItem: NewsItem?
-        NewsStorage.shared.lock.with {
-            newsItem = NewsStorage.shared.news[id]
-        }
-    
-        return newsItem
     }
     
     private func configureDataSource() {
@@ -212,11 +134,12 @@ class NewsFeedViewController: UIViewController {
                 self.requestNewsParty()
             }
             
+            let model = self.newsViewModel
             switch identifier {
             case .main(let id):
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
                 
-                guard let newsItem = self.newsItem(at: id) else {
+                guard let newsItem = model.newsItem(at: id) else {
                     return cell
                 }
                 
@@ -225,8 +148,8 @@ class NewsFeedViewController: UIViewController {
                 cell.categoryLabel.text = newsItem.categoryType
                 cell.descriptionLabel.text = newsItem.description
                 
-                if self.showInFullPressed.contains(id) {
-                    cell.descriptionLabel.text = self.fullTextContents[id]
+                if model.showInFullPressed.contains(id) {
+                    cell.descriptionLabel.text = model.fullTextContents[id]
                     cell.hideShowInFullButton(true)
                 } else {
                     if cell.showInFullButton.isHidden {
@@ -248,7 +171,7 @@ class NewsFeedViewController: UIViewController {
 
                     cell.showInFullTappedHandler = { [weak self] in
                         // TODO: add animating for Show in full button
-                        self?.requestText(forNewsItemWith: id) {
+                        self?.newsViewModel.requestText(forNewsItemWith: id) {
                             text, itemId in
                             if id == itemId {
                                 fillDescription(text)
@@ -260,43 +183,17 @@ class NewsFeedViewController: UIViewController {
                 return cell
             case .image(let id):
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
-                
-                guard let newsItem = self.newsItem(at: id) else {
-                    return cell
-                }
-                
-                var imageUrls: [URL] = []
-                let storage = NewsStorage.shared
-                storage.lock.with {
-                    if let url = newsItem.titleImageUrl {
-                        imageUrls.append(url)
-                    }
-
-                    if let additionalUrls = storage.imageUrls[id] {
-                        imageUrls.append(contentsOf: additionalUrls)
-                    }
-                }
-                
-                cell.imageUrls = imageUrls
-                
+                cell.imageUrls = model.imageUrls(for: id)
                 return cell
             }
         }
         
-        var snapshot = NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>()
-        let storage = NewsStorage.shared
-        var identifiers: [UInt]!
-        storage.lock.with {
-            identifiers = Array(storage.news.keys)
-        }
-        
-        updateSnapshot(&snapshot, with: identifiers, animate: false)
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
                 let indexPath = IndexPath(row: 0, section: sectionIndex)
-                self.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
+                self.newsViewModel.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
                     [weak self] _, id in
                     self?.reloadItems([.main(id)], animate: true)
                     self?.newsFeed.scrollToItem(at: indexPath, at: .top, animated: true)

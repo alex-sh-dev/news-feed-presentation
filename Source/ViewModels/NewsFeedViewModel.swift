@@ -44,7 +44,7 @@ class NewsFeedViewModel: BaseNewsViewModel {
         easyLog(String(describing: self))
     }
     
-    init() {
+    override init() {
         super.init()
         self.restoreFullTextContents()
     }

@@ -41,17 +41,19 @@ class StartViewController: UIViewController {
     }
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
-    private var identifiersActionSubscriber: AnyCancellable!
-    private var newsViewModel: PreviewNewsViewModel!
+    private var identifiersActionSubscriber: AnyCancellable! {
+        didSet {
+            let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
+            self.newsViewModel.requestItems(count: itemsCount)
+        }
+    }
+    private var newsViewModel = PreviewNewsViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureDataSource()
         configureLayout()
-        
-        let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
-        self.newsViewModel = PreviewNewsViewModel(requestItemsFor: itemsCount)
         
         identifiersActionSubscriber = self.newsViewModel.identifiersActionPublisher
             .sink { [weak self] action in

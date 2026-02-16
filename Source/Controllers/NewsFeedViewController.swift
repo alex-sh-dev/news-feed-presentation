@@ -38,7 +38,11 @@ class NewsFeedViewController: UIViewController {
 
     var startIdentifier: NewsItemIdentifier = .notValid
     
-    private var identifiersActionSubscriber: AnyCancellable!
+    private var identifiersActionSubscriber: AnyCancellable! {
+        didSet {
+            self.newsViewModel.fillIdentifiersFromStorage()
+        }
+    }
     private let newsViewModel: NewsFeedViewModel = NewsFeedViewModel()
     
     @IBAction func closeTapped(_ sender: Any) {
@@ -85,7 +89,6 @@ class NewsFeedViewController: UIViewController {
                     self.updateSnapshot(&snapshot, with: identifiers, and: newsParts, animate: false)
                 }
             }
-        self.newsViewModel.fillIdentifiersFromStorage()
     }
     
     private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {

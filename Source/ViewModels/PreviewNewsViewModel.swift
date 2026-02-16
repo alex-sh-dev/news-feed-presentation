@@ -14,6 +14,7 @@ class PreviewNewsViewModel: BaseNewsViewModel {
         case replaceAll
     }
     
+    private var requestItemsCount: Int = 0
     final let identifiersActionPublisher = PassthroughSubject<IdentifiersAction, Never>()
     
     override func newsUpdatedSubscriberHandler() -> ([UInt]) -> Void {
@@ -39,5 +40,10 @@ class PreviewNewsViewModel: BaseNewsViewModel {
                 self.identifiersActionPublisher.send(.replaceAll)
             }
         }
+    }
+    
+    override func requestItems(page: UInt = 1, count: UInt) {
+        self.requestItemsCount = Int(count)
+        super.requestItems(page: page, count: count)
     }
 }

@@ -10,13 +10,10 @@ import Combine
 
 class BaseNewsViewModel {
     private var newsUpdatedSubscriber: AnyCancellable!
-    private(set) var requestItemsCount: Int! = 0
     var identifiers: [UInt] = []
     
-    init(requestItemsFor count: UInt = 0) {
-        self.requestItemsCount = Int(count)
+    init() {
         self.bindToPublishers()
-        self.requestItems(count: count)
     }
     
     func bindToPublishers() {

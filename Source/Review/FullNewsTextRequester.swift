@@ -29,6 +29,10 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
         self.webView.navigationDelegate = self
     }
     
+    deinit {
+        easyLog(String(describing: self))
+    }
+    
     func start(for url: URL, with id: ItemId, completionHandler: @escaping ((ItemId, String?) -> Void)) {
         self.id = id
         self.completionHandler = completionHandler

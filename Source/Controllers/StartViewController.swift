@@ -64,11 +64,12 @@ class StartViewController: UIViewController {
         
         newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
             .receive(on: DispatchQueue.main)
-            .sink {
-                ids in
+            .sink { [weak self] ids in
                 if ids.isEmpty {
                     return
                 }
+                
+                guard let self = self else { return }
                 
                 var identifiers = self.extractIdentifiers()
                 if identifiers.isEmpty {
@@ -113,8 +114,9 @@ class StartViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) {
+        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) { [weak self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemIdentifier) -> UICollectionViewCell? in
+            guard let self = self else { return nil }
             
             if identifier == .supplementary {
                 return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
@@ -141,8 +143,9 @@ class StartViewController: UIViewController {
             
             ImageLoader.shared.load(url: url, item: identifier, beforeLoad: {
                 self.setDefaultImage(for: cell.imageView)
-            }) {
+            }) { [weak self]
                 (fetchedItem, image, cached) in
+                guard let self = self else { return }
                 if cached && image != nil {
                     cell.imageView.image = image
                 } else {

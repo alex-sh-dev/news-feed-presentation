@@ -17,3 +17,10 @@ extension UICollectionViewCell {
         return cell
     }
 }
+
+extension UICollectionViewCell {
+    func setDefaultImage(for imageView: UIImageView) {
+        imageView.image = nil
+        imageView.backgroundColor = UIColor.lightGray
+    }
+}

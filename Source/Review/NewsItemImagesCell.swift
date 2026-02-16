@@ -69,7 +69,7 @@ class NewsItemImagesCell: UICollectionViewCell {
                 }
                 
                 ImageLoader.shared.load(url: imageUrl, item: identifier, beforeLoad: {
-                    self.setDefaultImage(for: cell.imageView)
+                    cell.setDefaultImage()
                 }) { [weak self]
                     (fetchedItem, image, cached) in
                     guard let self = self else { return }
@@ -93,10 +93,5 @@ class NewsItemImagesCell: UICollectionViewCell {
             snapshot.appendSections([.main])
             dataSource.apply(snapshot, animatingDifferences: false)
         }
-    }
-    
-    private func setDefaultImage(for imageView: UIImageView) {
-        imageView.image = nil
-        imageView.backgroundColor = UIColor.lightGray
     }
 }

@@ -25,8 +25,7 @@ class PreviewNewsItemCell: UICollectionViewCell {
     }
     
     func setDefaultImage() {
-        self.imageView.image = nil
-        self.imageView.backgroundColor = UIColor.lightGray
+        setDefaultImage(for: self.imageView)
     }
     
     override var isHighlighted: Bool {

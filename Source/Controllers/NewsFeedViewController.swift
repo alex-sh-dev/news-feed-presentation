@@ -43,7 +43,6 @@ class NewsFeedViewController: UIViewController {
     
     private struct Constants {
         static let kItemCountPerPage: UInt = 5
-        static let kScrollOffsetOnStart: CGFloat = 40
     }
     
     @IBOutlet weak var newsFeed: UICollectionView!
@@ -244,6 +243,7 @@ class NewsFeedViewController: UIViewController {
                 
                 if self.showInFullPressed.contains(id) {
                     cell.descriptionLabel.text = self.fullTextContents[id]
+                    collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
                     cell.hideShowInFullButton(true)
                 } else {
                     if cell.showInFullButton.isHidden {
@@ -319,13 +319,6 @@ class NewsFeedViewController: UIViewController {
                 
                 self.newsFeed.scrollToItem(at: IndexPath(row: 0, section: sectionIndex),
                                            at: .top, animated: false)
-                
-                
-                let offset = self.newsFeed.contentOffset
-                if offset.y > Constants.kScrollOffsetOnStart {
-                    let newOffset = CGPoint(x: offset.x, y: offset.y - Constants.kScrollOffsetOnStart)
-                    self.newsFeed.setContentOffset(newOffset, animated: false)
-                }
             }
         }
     }

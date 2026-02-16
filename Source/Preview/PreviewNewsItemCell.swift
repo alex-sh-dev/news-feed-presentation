@@ -24,6 +24,11 @@ class PreviewNewsItemCell: UICollectionViewCell {
                        options: .curveEaseOut, animations: animations, completion: nil)
     }
     
+    func setDefaultImage() {
+        self.imageView.image = nil
+        self.imageView.backgroundColor = UIColor.lightGray
+    }
+    
     override var isHighlighted: Bool {
         didSet {
             if isHighlighted {

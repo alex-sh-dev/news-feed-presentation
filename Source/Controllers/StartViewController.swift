@@ -93,11 +93,6 @@ class StartViewController: UIViewController {
             .prefix(Constants.kNewsItemCount)
             .compactMap{ NewsItemIdentifier.value($0) }
     }
-
-    private func setDefaultImage(for imageView: UIImageView) {
-        imageView.image = nil
-        imageView.backgroundColor = UIColor.lightGray
-    }
     
     private func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) { [weak self]
@@ -118,12 +113,12 @@ class StartViewController: UIViewController {
             cell.headerLabel.text = newsItem.title
             
             guard let url = newsItem.titleImageUrl else {
-                self.setDefaultImage(for: cell.imageView)
+                cell.setDefaultImage()
                 return cell
             }
             
             ImageLoader.shared.load(url: url, item: identifier, beforeLoad: {
-                self.setDefaultImage(for: cell.imageView)
+                cell.setDefaultImage()
             }) { [weak self]
                 (fetchedItem, image, cached) in
                 guard let self = self else { return }

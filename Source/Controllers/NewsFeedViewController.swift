@@ -115,17 +115,14 @@ class NewsFeedViewController: UIViewController {
         
         imageUrlsUpdatedSubscriber = NewsImageUrlsExtractor.shared.imageUrlsUpdatedPublisher
             .receive(on: DispatchQueue.main)
-            .sink {
-                id in
-                
-                self.reloadItems([.image(id)], animate: true)
+            .sink { [weak self] id in
+                self?.reloadItems([.image(id)], animate: true)
             }
         
         newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
             .receive(on: DispatchQueue.main)
-            .sink {
-                ids in
-                
+            .sink { [weak self] ids in
+                guard let self = self else { return }
                 self.stopActivityIndicatorAnimating()
                 
                 if ids.isEmpty {
@@ -196,8 +193,9 @@ class NewsFeedViewController: UIViewController {
             return
         }
         
-        self.newsTextRequester.start(for: url, with: id) {
+        self.newsTextRequester.start(for: url, with: id) { [weak self]
             fetchedId, dataText in
+            guard let self = self else { return }
             
             guard let text = dataText, !text.isEmpty,
                   let id = fetchedId as? UInt  else {
@@ -221,8 +219,10 @@ class NewsFeedViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) {
+        self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [weak self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
+            
+            guard let self = self else { return nil }
             
             if indexPath.section == collectionView.numberOfSections - 1 {
                 self.requestNewsParty()
@@ -254,18 +254,17 @@ class NewsFeedViewController: UIViewController {
                         return cell
                     }
                     
-                    let fillDescription: (String) -> Void = {
-                        text in
+                    let fillDescription: (String) -> Void = { [weak self] text in
                         cell.descriptionLabel.text = text
                         cell.hideShowInFullButton(true)
                         let ctx = UICollectionViewLayoutInvalidationContext()
                         ctx.invalidateItems(at: [indexPath])
-                        self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
+                        self?.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
                     }
 
-                    cell.showInFullTappedHandler = {
+                    cell.showInFullTappedHandler = { [weak self] in
                         // TODO: add animating for Show in full button
-                        self.requestText(forNewsItemWith: id) {
+                        self?.requestText(forNewsItemWith: id) {
                             text, itemId in
                             if id == itemId {
                                 fillDescription(text)
@@ -308,14 +307,15 @@ class NewsFeedViewController: UIViewController {
         }
         
         updateSnapshot(&snapshot, with: identifiers, animate: false)
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
                 let indexPath = IndexPath(row: 0, section: sectionIndex)
                 self.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
-                    _, id in
-                    self.reloadItems([.main(id)], animate: true)
-                    self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: true)
+                    [weak self] _, id in
+                    self?.reloadItems([.main(id)], animate: true)
+                    self?.newsFeed.scrollToItem(at: indexPath, at: .top, animated: true)
                 }
                 
                 self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)

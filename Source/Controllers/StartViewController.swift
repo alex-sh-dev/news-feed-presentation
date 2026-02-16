@@ -41,20 +41,8 @@ class StartViewController: UIViewController {
     }
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
-    private var newsUpdatedSubscriber: AnyCancellable!
-    
-    private func extractIdentifiers() -> [NewsItemIdentifier] {
-        let storage = NewsStorage.shared
-        var identifiers: [NewsItemIdentifier]!
-        storage.lock.with {
-            identifiers = Array(storage.news.keys
-                .sorted(by: >)
-                .prefix(Constants.kNewsItemCount))
-                .compactMap{ NewsItemIdentifier.value($0) }
-        }
-        
-        return identifiers
-    }
+    private var identifiersActionSubscriber: AnyCancellable!
+    private var newsViewModel: PreviewNewsViewModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,37 +50,27 @@ class StartViewController: UIViewController {
         configureDataSource()
         configureLayout()
         
-        newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] ids in
-                if ids.isEmpty {
-                    return
-                }
-                
+        let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
+        self.newsViewModel = PreviewNewsViewModel(requestItemsFor: itemsCount)
+        
+        identifiersActionSubscriber = self.newsViewModel.identifiersActionPublisher
+            .sink { [weak self] action in
                 guard let self = self else { return }
-                
-                var identifiers = self.extractIdentifiers()
-                if identifiers.isEmpty {
-                    return
-                }
-                
+                var identifiers = self.transformedIdentifiers()
                 var snapshot = self.dataSource.snapshot()
-                let oldIdentifiers = snapshot.itemIdentifiers
-                if oldIdentifiers.isEmpty {
-                    if snapshot.numberOfSections == 0 {
-                        snapshot.appendSections([.main])
-                    }
-                    identifiers.append(.supplementary)
-                    snapshot.appendItems(identifiers)
-                    self.dataSource.apply(snapshot, animatingDifferences: false)
-                } else if identifiers.count != oldIdentifiers.count ||
-                            identifiers != oldIdentifiers {
+                var animate: Bool = true
+                switch action {
+                case .load:
+                    animate = false
+                case .replaceAll:
                     snapshot.deleteAllItems()
-                    snapshot.appendSections([.main])
-                    identifiers.append(.supplementary)
-                    snapshot.appendItems(identifiers)
-                    self.dataSource.apply(snapshot, animatingDifferences: false)
                 }
+                if snapshot.numberOfSections == 0 {
+                    snapshot.appendSections([.main])
+                }
+                identifiers.append(.supplementary)
+                snapshot.appendItems(identifiers)
+                self.dataSource.apply(snapshot, animatingDifferences: animate)
             }
     }
     
@@ -100,14 +78,20 @@ class StartViewController: UIViewController {
         guard let newsFeedVC = segue.destination.children.first as? NewsFeedViewController else {
             return
         }
-        
+
         guard let previewItem = sender as? PreviewNewsItemCell else {
             return
         }
-        
+
         newsFeedVC.startIdentifier = previewItem.itemIdentifier
     }
     
+    private func transformedIdentifiers() -> [NewsItemIdentifier] {
+        return self.newsViewModel.identifiers
+            .prefix(Constants.kNewsItemCount)
+            .compactMap{ NewsItemIdentifier.value($0) }
+    }
+
     private func setDefaultImage(for imageView: UIImageView) {
         imageView.image = nil
         imageView.backgroundColor = UIColor.lightGray
@@ -124,19 +108,14 @@ class StartViewController: UIViewController {
             
             let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsItemCell.self)
             
-            var newsItem: NewsItem?
-            NewsStorage.shared.lock.with {
-                newsItem = NewsStorage.shared.news[identifier.rawValue]
-            }
-            
-            if newsItem == nil {
+            guard let newsItem = self.newsViewModel.newsItem(at: identifier.rawValue) else {
                 return cell
             }
             
-            cell.itemIdentifier = .value(newsItem!.id)
-            cell.headerLabel.text = newsItem!.title
+            cell.itemIdentifier = .value(newsItem.id)
+            cell.headerLabel.text = newsItem.title
             
-            guard let url = newsItem!.titleImageUrl else {
+            guard let url = newsItem.titleImageUrl else {
                 self.setDefaultImage(for: cell.imageView)
                 return cell
             }
@@ -160,16 +139,7 @@ class StartViewController: UIViewController {
             return cell
         }
 
-        var snapshot = NSDiffableDataSourceSnapshot<Section, NewsItemIdentifier>()
-        snapshot.appendSections([.main])
-        var identifiers = self.extractIdentifiers()
-        if identifiers.isEmpty {
-            NewsParser.shared.requestData(
-                count: UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve))
-        } else {
-            identifiers.append(.supplementary)
-            snapshot.appendItems(identifiers)
-        }
+        let snapshot = NSDiffableDataSourceSnapshot<Section, NewsItemIdentifier>()
         dataSource.apply(snapshot, animatingDifferences: false)
     }
     

@@ -8,22 +8,6 @@
 import UIKit
 import Combine
 
-public enum NewsItemIdentifier: Hashable {
-    case notValid
-    case value(UInt)
-    
-    var rawValue: UInt {
-        get {
-            switch self {
-            case .notValid:
-                return 0
-            case .value(let val):
-                return val
-            }
-        }
-    }
-}
-
 class NewsFeedViewController: UIViewController {
     private enum NewsItemPartIdentifier: Hashable {
         case main(UInt)

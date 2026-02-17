@@ -138,15 +138,15 @@ class NewsFeedViewController: UIViewController {
             
             guard let self = self else { return nil }
             
-            if indexPath.section == collectionView.numberOfSections - 1 {
-                self.requestNewsParty()
-            }
-            
             let model = self.newsViewModel
             switch identifier {
             case .main(let id):
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
-                
+
+                if indexPath.section == collectionView.numberOfSections - 1 {
+                    self.requestNewsParty()
+                }
+
                 guard let newsItem = model.newsItem(at: id) else {
                     return cell
                 }

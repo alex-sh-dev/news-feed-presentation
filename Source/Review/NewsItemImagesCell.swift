@@ -54,7 +54,9 @@ class NewsItemImagesCell: UICollectionViewCell {
     @IBOutlet weak var imageCollection: UICollectionView! {
         didSet {
             self.imageCollection.collectionViewLayout = ImagesCompositionalLayout {
-                return self.imageUrls.count > 1
+                [weak self] in
+                let count = self?.imageUrls.count ?? 0
+                return count > 1
             }
             
             self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) { [weak self]

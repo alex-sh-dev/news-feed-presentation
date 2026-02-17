@@ -118,7 +118,8 @@ class StartViewController: UIViewController {
             }
             
             ImageLoader.shared.load(url: url, item: identifier, beforeLoad: {
-                cell.setDefaultImage()
+                [weak cell] in
+                cell?.setDefaultImage()
             }) { [weak self, weak cell]
                 (fetchedItem, image, cached) in
                 guard let self = self else { return }

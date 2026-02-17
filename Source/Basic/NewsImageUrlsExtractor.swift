@@ -104,13 +104,13 @@ class NewsImageUrlsExtractor {
             return
         }
         
-        self.operationQueue.enqueue {
+        self.operationQueue.enqueue { [weak self] in
             do {
-                if let urls = try await self.extract(for: url!) {
+                if let urls = try await self?.extract(for: url!) {
                     NewsStorage.shared.lock.with {
                         NewsStorage.shared.imageUrls[id!] = urls
                     }
-                    self.imageUrlsUpdatedPublisher.send(id!)
+                    self?.imageUrlsUpdatedPublisher.send(id!)
                 }
             } catch {}
         }

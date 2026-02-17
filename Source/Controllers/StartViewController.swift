@@ -119,11 +119,11 @@ class StartViewController: UIViewController {
             
             ImageLoader.shared.load(url: url, item: identifier, beforeLoad: {
                 cell.setDefaultImage()
-            }) { [weak self]
+            }) { [weak self, weak cell]
                 (fetchedItem, image, cached) in
                 guard let self = self else { return }
                 if cached && image != nil {
-                    cell.imageView.image = image
+                    cell?.imageView.image = image
                 } else {
                     if let idfr = fetchedItem as? NewsItemIdentifier, image != nil {
                         var updatedSnapshot = self.dataSource.snapshot()

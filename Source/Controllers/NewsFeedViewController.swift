@@ -169,9 +169,10 @@ class NewsFeedViewController: UIViewController {
                         return cell
                     }
                     
-                    let fillDescription: (String) -> Void = { [weak self] text in
-                        cell.descriptionLabel.text = text
-                        cell.hideShowInFullButton(true)
+                    let fillDescription: (String) -> Void = {
+                        [weak self, weak cell] text in
+                        cell?.descriptionLabel.text = text
+                        cell?.hideShowInFullButton(true)
                         let ctx = UICollectionViewLayoutInvalidationContext()
                         ctx.invalidateItems(at: [indexPath])
                         self?.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)

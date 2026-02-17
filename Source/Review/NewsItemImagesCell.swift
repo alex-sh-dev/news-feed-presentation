@@ -70,11 +70,11 @@ class NewsItemImagesCell: UICollectionViewCell {
                 
                 ImageLoader.shared.load(url: imageUrl, item: identifier, beforeLoad: {
                     cell.setDefaultImage()
-                }) { [weak self]
+                }) { [weak self, weak cell]
                     (fetchedItem, image, cached) in
                     guard let self = self else { return }
                     if cached && image != nil {
-                        cell.imageView.image = image
+                        cell?.imageView.image = image
                     } else {
                         if let item = fetchedItem as? ImageIdentifier, image != nil {
                             var snapshot = self.dataSource.snapshot()

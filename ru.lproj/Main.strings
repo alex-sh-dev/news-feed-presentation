@@ -1,0 +1,9 @@
+
+/* Class = "UIButton"; configuration.title = "News"; ObjectID = "3Y2-OP-IEi"; */
+"3Y2-OP-IEi.configuration.title" = "Новости";
+
+/* Class = "UINavigationItem"; title = "News"; ObjectID = "JF2-AQ-B0G"; */
+"JF2-AQ-B0G.title" = "Новости";
+
+/* Class = "UIButton"; configuration.title = "Show in full..."; ObjectID = "yhm-VO-z4f"; */
+"yhm-VO-z4f.configuration.title" = "Показать полностью...";

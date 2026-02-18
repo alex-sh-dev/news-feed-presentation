@@ -53,6 +53,8 @@
 		D711C6132F40AF59005D1971 /* FullNewsTextRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullNewsTextRequester.swift; sourceTree = "<group>"; };
 		D711C6152F41D704005D1971 /* AsyncQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncQueue.swift; sourceTree = "<group>"; };
 		D711C6192F425611005D1971 /* CollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionCell.swift; sourceTree = "<group>"; };
+		D7196C9C2F46339200132B20 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		D7196C9D2F46339200132B20 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		D72493AE2F39B9AC00B04CD6 /* NewsFeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedViewController.swift; sourceTree = "<group>"; };
 		D73CAF232F43515000ABB035 /* PreviewNewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewNewsViewModel.swift; sourceTree = "<group>"; };
 		D73CAF252F4360A700ABB035 /* NewsItemIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemIdentifier.swift; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = D7E5AF7C2F38689900B82167;
 			productRefGroup = D7E5AF862F38689900B82167 /* Products */;
@@ -303,6 +306,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D7E5AF8F2F38689900B82167 /* Base */,
+				D7196C9C2F46339200132B20 /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -311,6 +315,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D7E5AF942F38689A00B82167 /* Base */,
+				D7196C9D2F46339200132B20 /* ru */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -322,6 +327,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -382,6 +388,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -81,7 +82,7 @@
                                                     <buttonConfiguration key="configuration" style="plain">
                                                         <imageReference key="image" image="arrow.right.circle.fill" catalog="system" symbolScale="large"/>
                                                         <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="22"/>
-                                                        <color key="baseForegroundColor" systemColor="systemRedColor"/>
+                                                        <color key="baseForegroundColor" name="compColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
                                                         <segue destination="BDn-me-K7O" kind="show" id="foY-nb-VHE"/>
@@ -218,7 +219,7 @@
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Show in full...">
                                                         <fontDescription key="titleFontDescription" type="system" weight="medium" pointSize="19"/>
-                                                        <color key="baseForegroundColor" systemColor="systemRedColor"/>
+                                                        <color key="baseForegroundColor" name="compColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
                                                         <action selector="showInFullTapped:" destination="Wf0-MY-ut5" eventType="touchUpInside" id="Wqa-j8-Vvu"/>
@@ -366,6 +367,9 @@
     <resources>
         <image name="arrow.right.circle.fill" catalog="system" width="128" height="123"/>
         <image name="greaterthan" catalog="system" width="128" height="108"/>
+        <namedColor name="compColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

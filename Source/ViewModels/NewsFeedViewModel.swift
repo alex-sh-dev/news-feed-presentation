@@ -31,14 +31,14 @@ class NewsFeedViewModel: BaseNewsViewModel {
         }
     }
     
-    private var newsItemUpdatedSubscriber: AnyCancellable!
+    private var newsItemUpdatedSub: AnyCancellable!
     
     private var newsTextRequester = FullNewsTextRequester()
     
     final var fullTextContents: [UInt: String] = [:]
     final var showInFullPressed: Set<UInt> = []
     
-    final let identifiersActionPublisher = PassthroughSubject<IdentifiersAction, Never>()
+    final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
     
     override init() {
         super.init()
@@ -70,10 +70,10 @@ class NewsFeedViewModel: BaseNewsViewModel {
             .appendItems(identifiersToSend, newsItemParts) :
             .fill(identifiersToSend, newsItemParts)
         
-        self.identifiersActionPublisher.send(action)
+        self.identifiersActionPub.send(action)
     }
     
-    override func newsUpdatedSubscriberHandler() -> ([UInt]) -> Void {
+    override func newsUpdatedSubHandler() -> ([UInt]) -> Void {
         { [weak self] ids in
             if ids.isEmpty {
                 return
@@ -101,10 +101,10 @@ class NewsFeedViewModel: BaseNewsViewModel {
     
     override func bindToPublishers() {
         super.bindToPublishers()
-        newsItemUpdatedSubscriber = NewsParser.shared.newsItemParser.newsItemUpdatedPublisher
+        newsItemUpdatedSub = NewsParser.shared.newsItemParser.newsItemUpdatedPub
             .receive(on: DispatchQueue.main)
             .sink { [weak self] id in
-                self?.identifiersActionPublisher.send(.reloadImages(id))
+                self?.identifiersActionPub.send(.reloadImages(id))
                 let storage = NewsStorage.shared
                 storage.lock.with {
                     self?.fullTextContents[id] = storage.fullTextContents[id]

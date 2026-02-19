@@ -41,7 +41,7 @@ class StartViewController: UIViewController {
     }
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
-    private var identifiersActionSubscriber: AnyCancellable! {
+    private var identifiersActionSub: AnyCancellable! {
         didSet {
             let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
             self.newsViewModel.requestItems(count: itemsCount)
@@ -55,7 +55,7 @@ class StartViewController: UIViewController {
         configureDataSource()
         configureLayout()
         
-        identifiersActionSubscriber = self.newsViewModel.identifiersActionPublisher
+        identifiersActionSub = self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
                 var identifiers = self.transformedIdentifiers()

@@ -11,7 +11,7 @@ import Combine
 class NewsImageUrlsExtractor {
     static let shared = NewsImageUrlsExtractor()
     
-    let imageUrlsUpdatedPublisher = PassthroughSubject<UInt, Never>()
+    let imageUrlsUpdatedPub = PassthroughSubject<UInt, Never>()
     
     private let operationQueue = AsyncOperationQueue()
     
@@ -110,7 +110,7 @@ class NewsImageUrlsExtractor {
                     NewsStorage.shared.lock.with {
                         NewsStorage.shared.imageUrls[id!] = urls
                     }
-                    self?.imageUrlsUpdatedPublisher.send(id!)
+                    self?.imageUrlsUpdatedPub.send(id!)
                 }
             } catch {}
         }

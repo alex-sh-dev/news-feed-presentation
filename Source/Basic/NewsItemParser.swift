@@ -12,7 +12,7 @@ class NewsItemParser {
     private let config: WebConfig!
     private let operationSerialQueue = AsyncOperationQueue()
     
-    let newsItemUpdatedPublisher = PassthroughSubject<UInt, Never>()
+    let newsItemUpdatedPub = PassthroughSubject<UInt, Never>()
     
     init(config: WebConfig) {
         self.config = config
@@ -36,7 +36,7 @@ class NewsItemParser {
             }
         }
 
-        self.newsItemUpdatedPublisher.send(id)
+        self.newsItemUpdatedPub.send(id)
         easyLog("news item with id = \(id) parsed")
     }
     

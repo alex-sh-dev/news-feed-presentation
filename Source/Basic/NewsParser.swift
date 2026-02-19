@@ -24,7 +24,7 @@ class NewsParser {
     private let newsEndpoint: URL!
     
     private var cancellable = [String: AnyCancellable]()
-    let newsUpdatedPublisher = PassthroughSubject<[UInt], Never>()
+    let newsUpdatedPub = PassthroughSubject<[UInt], Never>()
     let newsItemParser: NewsItemParser!
     
     private init() {
@@ -61,7 +61,7 @@ class NewsParser {
             .sink(receiveValue: {
                 [weak self] result in
                 guard let news = result.news, !news.isEmpty else {
-                    self?.newsUpdatedPublisher.send([])
+                    self?.newsUpdatedPub.send([])
                     return
                 }
                 
@@ -77,7 +77,7 @@ class NewsParser {
                     }
                 }
                 easyLog("data received")
-                self?.newsUpdatedPublisher.send(ids)
+                self?.newsUpdatedPub.send(ids)
                 self?.cancellable.removeValue(forKey: uuid)
             })
         self.cancellable[uuid] = cancellable

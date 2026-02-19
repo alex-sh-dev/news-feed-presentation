@@ -15,9 +15,9 @@ class PreviewNewsViewModel: BaseNewsViewModel {
     }
     
     private var requestItemsCount: Int = 0
-    final let identifiersActionPublisher = PassthroughSubject<IdentifiersAction, Never>()
+    final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
     
-    override func newsUpdatedSubscriberHandler() -> ([UInt]) -> Void {
+    override func newsUpdatedSubHandler() -> ([UInt]) -> Void {
         { [weak self] ids in
             if ids.isEmpty {
                 return
@@ -34,10 +34,10 @@ class PreviewNewsViewModel: BaseNewsViewModel {
             let oldIdentifiers = self.identifiers
             self.identifiers = identifiers
             if oldIdentifiers.isEmpty {
-                self.identifiersActionPublisher.send(.fill)
+                self.identifiersActionPub.send(.fill)
             } else if identifiers.count != oldIdentifiers.count ||
                         identifiers != oldIdentifiers {
-                self.identifiersActionPublisher.send(.replaceAll)
+                self.identifiersActionPub.send(.replaceAll)
             }
         }
     }

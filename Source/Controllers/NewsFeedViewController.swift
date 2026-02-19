@@ -43,7 +43,7 @@ class NewsFeedViewController: UIViewController {
 
     var startIdentifier: NewsItemIdentifier = .notValid
     
-    private var identifiersActionSubscriber: AnyCancellable! {
+    private var identifiersActionSub: AnyCancellable! {
         didSet {
             self.newsViewModel.fillIdentifiersFromStorage()
         }
@@ -69,7 +69,7 @@ class NewsFeedViewController: UIViewController {
         configureDataSource()
         configureLayout()
         
-        identifiersActionSubscriber = self.newsViewModel.identifiersActionPublisher
+        identifiersActionSub = self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
                 switch action {

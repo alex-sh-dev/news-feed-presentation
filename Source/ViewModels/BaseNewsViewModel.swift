@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 class BaseNewsViewModel {
-    private var newsUpdatedSubscriber: AnyCancellable!
+    private var newsUpdatedSub: AnyCancellable!
     var identifiers: [UInt] = []
     
     init() {
@@ -17,15 +17,15 @@ class BaseNewsViewModel {
     }
     
     func bindToPublishers() {
-        let handler = newsUpdatedSubscriberHandler()
-        self.newsUpdatedSubscriber = NewsParser.shared.newsUpdatedPublisher
+        let handler = newsUpdatedSubHandler()
+        self.newsUpdatedSub = NewsParser.shared.newsUpdatedPub
             .receive(on: DispatchQueue.main)
             .sink { ids in
                 handler(ids)
             }
     }
     
-    func newsUpdatedSubscriberHandler() -> ([UInt]) -> Void {
+    func newsUpdatedSubHandler() -> ([UInt]) -> Void {
         return { _ in }
     }
     

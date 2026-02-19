@@ -174,11 +174,19 @@
 				D794E26A2F39F5AA0076DFAA /* NewsParser.swift */,
 				D794E26C2F3A3F0F0076DFAA /* NewsStorage.swift */,
 				D794E26E2F3AF10E0076DFAA /* NewsStructures.swift */,
-				D711C60B2F4069FC005D1971 /* NewsImageUrlsExtractor.swift */,
 				D780C5FB2F46DE4B00D58269 /* NewsItemParser.swift */,
 				D7E375FA2F4738AC00E35C28 /* NewsItemParseTask.swift */,
+				D7E375FC2F473C1D00E35C28 /* Unused */,
 			);
 			path = Basic;
+			sourceTree = "<group>";
+		};
+		D7E375FC2F473C1D00E35C28 /* Unused */ = {
+			isa = PBXGroup;
+			children = (
+				D711C60B2F4069FC005D1971 /* NewsImageUrlsExtractor.swift */,
+			);
+			path = Unused;
 			sourceTree = "<group>";
 		};
 		D7E5AF7C2F38689900B82167 = {

@@ -7,40 +7,65 @@
 
 import Foundation
 
-class NewsItemParseTask {
+class NewsItemParseTask: NSObject, XMLParserDelegate {
     private struct Consts {
         static let kObjRepCharSymbol = "\u{fffc}"
+        static let kCDivNode = "cdiv"
+        static let kImageNode = "img"
+        static let kImageSourceAttrName = "src"
     }
-
+    
     private(set) var texts: [String] = []
     private(set) var imageUrls: [URL] = []
     
-    private let text: String!
     private let titleImageUrl: URL?
     let id: UInt!
     
+    private var xmlParser: XMLParser!
+    
+    private var curNode = ""
+    private var startElementUpdated = false
+    private var curText = ""
+    
     init(text: String, titleImageUrl: URL?, for id: UInt) {
-        self.text = text
         self.titleImageUrl = titleImageUrl
         self.id = id
+        super.init()
+        self.xmlParser = XMLParser(data: self.preparedData(text))
+        self.xmlParser.delegate = self
+    }
+    
+    private func preparedData(_ rawText: String) -> Data {
+        var text = rawText
+        text.insert(contentsOf: "<\(Consts.kCDivNode)>",
+                    at: text.startIndex)
+        text.replace("\\\"", with: "'")
+        text.replace(/&[^;]+;/, with: "")
+        text.replace("\r\n\t", with:"\n")
+        text.replace("\r\n", with: "\n")
+        text.replace("<br />", with: "\n")
+        text.append("</\(Consts.kCDivNode)>")
+        return text.data(using: .utf8) ?? Data()
     }
     
     var finalText: String {
         if self.texts.isEmpty {
             return ""
         }
-
+        
         var finalText = self.texts.joined()
         finalText = finalText.replacingOccurrences(
             of: Consts.kObjRepCharSymbol, with: "")
+        finalText.replace(/\ +/, with: " ")
+        finalText.replace(/\n\ /, with: "\n")
+        finalText.replace(/\n+/, with: "\n\n")
+        while finalText.first == "\n" {
+            finalText.removeFirst()
+        }
         while finalText.last == "\n" {
             finalText.removeLast()
         }
-        finalText = finalText.replacingOccurrences(
-            of: "\\n+", with: "\n\n",
-            options: .regularExpression, range: nil
-        )
-
+        
         return finalText
     }
     
@@ -53,36 +78,44 @@ class NewsItemParseTask {
             self.imageUrls.removeAll { $0 == url }
             return self.imageUrls
         }
-
+        
         return nil
     }
     
     func start() {
-        guard let data = self.text.data(using: String.Encoding.utf16,
-                                   allowLossyConversion: false) else {
-            return
-        }
-        
-        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [.documentType: NSAttributedString.DocumentType.html]
-        guard let attrString = try? NSMutableAttributedString(data: data, options: options, documentAttributes: nil) else {
-            return
-        }
-        
-        attrString.enumerateAttributes(in: NSRange(location: 0, length: attrString.length), options: []) {
-            (attributes, range, stop) in
-            let substring = (attrString.string as NSString).substring(with: range)
-            let isPresent = !substring.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            if isPresent && (attributes[.link] == nil || attributes[.attachment] == nil) {
-                self.texts.append(substring)
+        self.xmlParser.parse()
+    }
+    
+    func parser(_ parser: XMLParser, didStartElement elementName: String,
+                namespaceURI: String?, qualifiedName qName: String?,
+                attributes attributeDict: [String : String] = [:]) {
+        self.curNode = elementName
+        if elementName == Consts.kImageNode {
+            if let src = attributeDict[Consts.kImageSourceAttrName],
+               let url = URL(string: src),
+                !url.pathExtension.isEmpty {
+                self.imageUrls.append(url)
             }
         }
-            
-        attrString.enumerateAttribute(.link, in: NSRange(location: 0, length: attrString.length), options: []) {
-            (value, range, stop) in
-            if let url = value as? URL,
-               !url.pathExtension.isEmpty {
-                imageUrls.append(url)
+        self.startElementUpdated = true
+    }
+    
+    func parser(_ parser: XMLParser, foundCharacters string: String) {
+        if self.startElementUpdated {
+            if !self.curText.isEmpty {
+                self.texts.append(self.curText)
+                self.curText = ""
             }
         }
+        self.curText.append(string)
+        self.startElementUpdated = false
+    }
+    
+    func parser(_ parser: XMLParser, didEndElement elementName: String,
+                namespaceURI: String?, qualifiedName qName: String?) {
+        if elementName == Consts.kCDivNode && !self.curText.isEmpty {
+            self.texts.append(self.curText)
+        }
+        self.startElementUpdated = false
     }
 }

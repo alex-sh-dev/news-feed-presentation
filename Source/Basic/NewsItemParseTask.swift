@@ -8,6 +8,10 @@
 import Foundation
 
 class NewsItemParseTask {
+    private struct Consts {
+        static let kObjRepCharSymbol = "\u{fffc}"
+    }
+
     private(set) var texts: [String] = []
     private(set) var imageUrls: [URL] = []
     
@@ -26,7 +30,18 @@ class NewsItemParseTask {
             return ""
         }
 
-        return self.texts.joined(separator: "\n") //??
+        var finalText = self.texts.joined()
+        finalText = finalText.replacingOccurrences(
+            of: Consts.kObjRepCharSymbol, with: "")
+        while finalText.last == "\n" {
+            finalText.removeLast()
+        }
+        finalText = finalText.replacingOccurrences(
+            of: "\\n+", with: "\n\n",
+            options: .regularExpression, range: nil
+        )
+
+        return finalText
     }
     
     var finalImageUrls: [URL]? {

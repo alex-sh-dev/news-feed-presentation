@@ -4,7 +4,6 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Image references" minToolsVersion="12.0"/>
-        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -238,7 +237,7 @@
                                                 <constraint firstItem="Ooh-i1-yvu" firstAttribute="top" secondItem="Vj7-7p-bXb" secondAttribute="bottom" constant="8" id="Ogp-ho-Flo"/>
                                                 <constraint firstItem="g4x-Iw-XAO" firstAttribute="leading" secondItem="Z0e-td-esC" secondAttribute="leading" constant="8" id="dhx-IE-ZVc"/>
                                                 <constraint firstAttribute="trailing" secondItem="Vj7-7p-bXb" secondAttribute="trailing" constant="8" id="fIN-2p-NPS"/>
-                                                <constraint firstItem="yhm-VO-z4f" firstAttribute="top" relation="greaterThanOrEqual" secondItem="uFq-ei-fOr" secondAttribute="bottom" id="m05-kN-MPH"/>
+                                                <constraint firstItem="yhm-VO-z4f" firstAttribute="top" relation="greaterThanOrEqual" secondItem="uFq-ei-fOr" secondAttribute="bottom" constant="8" id="m05-kN-MPH"/>
                                                 <constraint firstItem="Vj7-7p-bXb" firstAttribute="top" secondItem="g4x-Iw-XAO" secondAttribute="bottom" constant="4" id="ogf-m4-oaZ"/>
                                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Ooh-i1-yvu" secondAttribute="trailing" constant="8" id="olc-kS-Pf9"/>
                                                 <constraint firstItem="g4x-Iw-XAO" firstAttribute="top" secondItem="Z0e-td-esC" secondAttribute="top" id="vKs-IV-Mtq"/>

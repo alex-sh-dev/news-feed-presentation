@@ -6,59 +6,74 @@
 //
 
 import Foundation
+import Combine
 
 class NewsItemParser {
-    private(set) var texts: [String] = []
-    private(set) var imageUrls: [URL] = []
-    private let text: String!
+    private let config: WebConfig!
     
-    var finalText: String {
-        if self.texts.isEmpty {
-            return ""
-        }
-
-        return self.texts.joined(separator: "")
+    private var cancellable = [String: AnyCancellable]()
+    private let operationSerialQueue = AsyncOperationQueue()
+    
+    let imageUrlsUpdatedPublisher = PassthroughSubject<UInt, Never>()
+    let newsItemTextUpdatedPublisher = PassthroughSubject<UInt, Never>()
+    
+    init(config: WebConfig) {
+        self.config = config
     }
     
-    init(text: String) {
-        self.text = text
-    }
-    
-    func imageUrls(withExcludedUrl url: URL) -> [URL] {
-        if self.imageUrls.isEmpty {
-            return []
-        }
-        
-        self.imageUrls.removeAll { $0 == url }
-        return self.imageUrls
-    }
-    
-    func parse() {
-        guard let data = text.data(using: String.Encoding.utf16,
-                                   allowLossyConversion: false) else {
-            return
-        }
-        
-        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [.documentType: NSAttributedString.DocumentType.html]
-        guard let attrString = try? NSMutableAttributedString(data: data, options: options, documentAttributes: nil) else {
-            return
-        }
-        
-        attrString.enumerateAttributes(in: NSRange(location: 0, length: attrString.length), options: []) {
-            (attributes, range, stop) in
-            let substring = (attrString.string as NSString).substring(with: range)
-            let isPresent = !substring.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            if isPresent && (attributes[.link] == nil || attributes[.attachment] == nil) {
-                self.texts.append(substring)
-            }
-        }
+    private func addParseTask(_ parseTask: NewsItemParseTask) {
+        self.operationSerialQueue.enqueue { [weak self] in
+            guard let self = self else { return }
             
-        attrString.enumerateAttribute(.link, in: NSRange(location: 0, length: attrString.length), options: []) {
-            (value, range, stop) in
-            if let url = value as? URL,
-               !url.pathExtension.isEmpty {
-                imageUrls.append(url)
+            guard let id = parseTask.id else {
+                return
+            }
+            
+            parseTask.start()
+            
+            let storage = NewsStorage.shared
+            storage.lock.with {
+                storage.fullTextContents[id] = parseTask.finalText
+                self.newsItemTextUpdatedPublisher.send(id)
+            }
+            
+            storage.lock.with {
+                if let urls = parseTask.finalImageUrls {
+                    storage.imageUrls[id] = urls
+                    self.imageUrlsUpdatedPublisher.send(id)
+                }
             }
         }
     }
+    
+//    NewsImageUrlsExtractor.shared.addTask(for: newsItem.titleImageUrl, with: newsItem.id)//??
+    
+    func requestNewsItem(subUrl: URL, for id: UInt) {
+        let endpoint = self.config.newsItemEndpoint!
+            .appending(path: subUrl.absoluteString)
+            
+        let uuid = UUID().uuidString
+        let cancellable = URLSession.shared.dataTaskPublisher(for: endpoint)
+            .map { $0.data }
+            .retry(self.config.requestAttemptsCount)
+            .decode(type: TextNewsItem.self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+            .sink(receiveCompletion: { _ in
+            }, receiveValue: { [weak self] result in
+                guard let text = result.text else {
+                    return
+                }
+                let parseTask = NewsItemParseTask(text: text, titleImageUrl: result.titleImageUrl, for: id)
+                self?.addParseTask(parseTask)
+                DispatchQueue.main.async { [weak self] in
+                    self?.cancellable.removeValue(forKey: uuid)
+                }
+            })
+        self.cancellable[uuid] = cancellable
+    }
+    
+   
 }
+
+

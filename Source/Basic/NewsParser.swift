@@ -8,39 +8,38 @@
 import Foundation
 import Combine
 
+struct WebConfig {
+    var newsEndpoint: URL?
+    var newsItemEndpoint: URL?
+    let requestAttemptsCount = 3
+    
+    init() {}
+}
+
 class NewsParser {
     static let shared = NewsParser()
     
-    struct Config {
-        var newsEndpoint: URL?
-        var newsItemEndpoint: URL?
-        let requestAttemptsCount = 3
-        
-        init() {}
-    }
-    
-    private static var config: Config?
-    var newsEndpoint: URL?
-    var newsItemEndpoint: URL?
+    private static var config: WebConfig?
+    private let newsEndpoint: URL!
     
     private var cancellable = [String: AnyCancellable]()
     let newsUpdatedPublisher = PassthroughSubject<[UInt], Never>()
-    private let operationSerialQueue = AsyncOperationQueue()
+    let newsItemParser: NewsItemParser!
     
     private init() {
         guard let config = NewsParser.config else {
             fatalError("Error: you must call setup before accessing NewsParser.shared")
         }
         
-        self.newsEndpoint = config.newsEndpoint
-        self.newsItemEndpoint = config.newsItemEndpoint
-        
-        if self.newsEndpoint == nil || self.newsItemEndpoint == nil {
+        if config.newsEndpoint == nil || config.newsItemEndpoint == nil {
             fatalError("Error: endpoint(s) are not specified")
         }
+        
+        newsItemParser = NewsItemParser(config: config)
+        self.newsEndpoint = config.newsEndpoint
     }
     
-    class func setup(_ config: Config) {
+    class func setup(_ config: WebConfig) {
         NewsParser.config = config
     }
     
@@ -73,57 +72,12 @@ class NewsParser {
                     }
                     ids.append(newsItem.id)
                     if let subUrl = newsItem.url {
-                        self?.operationSerialQueue.enqueue { [weak self] in
-                            self?.requestNewsItem(subUrl: subUrl)
-                        }
+                        self?.newsItemParser.requestNewsItem(subUrl: subUrl, for: newsItem.id)
                     }
                 }
                 easyLog("data received")
                 self?.newsUpdatedPublisher.send(ids)
                 self?.cancellable.removeValue(forKey: uuid)
-            })
-        self.cancellable[uuid] = cancellable
-    }
-    
-    func requestNewsItem(subUrl: URL) {
-        let endpoint = self.newsItemEndpoint!
-            .appending(path: subUrl.absoluteString)
-        
-        let uuid = UUID().uuidString
-        let cancellable = URLSession.shared.dataTaskPublisher(for: endpoint)
-            .map { $0.data }
-            .retry(NewsParser.config!.requestAttemptsCount)
-            .decode(type: TextNewsItem.self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
-            .sink(receiveCompletion: { _ in
-            }, receiveValue: {
-                result in
-                guard let text = result.text else {
-                    return
-                }
-                
-                let parser = NewsItemParser(text: text)
-                parser.parse()
-
-                let storage = NewsStorage.shared
-                storage.lock.with {
-                    storage.fullTextContents[result.id] = parser.finalText
-                    //?? publish 
-                }
-                
-                if let url = result.titleImageUrl {
-                    storage.lock.with {
-                        storage.imageUrls[result.id] = parser.imageUrls(withExcludedUrl: url)
-                        //?? publish
-                    }
-                }
-                
-//                NewsImageUrlsExtractor.shared.addTask(for: newsItem.titleImageUrl, with: newsItem.id)//??
-                
-                DispatchQueue.main.async { [weak self] in
-                    easyLog("news item = \(subUrl) received")
-                    self?.cancellable.removeValue(forKey: uuid)
-                }
             })
         self.cancellable[uuid] = cancellable
     }

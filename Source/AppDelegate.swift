@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // TODO: add cache clenup (Settings)
         // urlCache.removeAllCachedResponses()
         
-        var config = NewsParser.Config()
+        var config = WebConfig()
         config.newsEndpoint = URL(string: Conf.kBaseEndpoint)?
             .appending(path: Conf.KNewsEndpointPostfix)
         config.newsItemEndpoint = URL(string: Conf.kBaseEndpoint)?

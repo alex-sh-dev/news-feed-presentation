@@ -31,18 +31,14 @@ class NewsFeedViewModel: BaseNewsViewModel {
         }
     }
     
-    private var imageUrlsUpdatedSubscriber: AnyCancellable!
+    private var newsItemUpdatedSubscriber: AnyCancellable!
+    
     private var newsTextRequester = FullNewsTextRequester()
     
     final var fullTextContents: [UInt: String] = [:]
     final var showInFullPressed: Set<UInt> = []
     
     final let identifiersActionPublisher = PassthroughSubject<IdentifiersAction, Never>()
-    
-    deinit {
-        self.saveFullTextContents()
-        easyLog(String(describing: self))
-    }
     
     override init() {
         super.init()
@@ -105,23 +101,15 @@ class NewsFeedViewModel: BaseNewsViewModel {
     
     override func bindToPublishers() {
         super.bindToPublishers()
-        imageUrlsUpdatedSubscriber = NewsImageUrlsExtractor.shared.imageUrlsUpdatedPublisher
+        newsItemUpdatedSubscriber = NewsParser.shared.newsItemParser.newsItemUpdatedPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] id in
                 self?.identifiersActionPublisher.send(.reloadImages(id))
+                let storage = NewsStorage.shared
+                storage.lock.with {
+                    self?.fullTextContents[id] = storage.fullTextContents[id]
+                }
             }
-    }
-    
-    private func saveFullTextContents() {
-        if self.fullTextContents.isEmpty {
-            return
-        }
-
-        let storage = NewsStorage.shared
-        storage.lock.with {
-            storage.fullTextContents
-                .merge(self.fullTextContents) { (current, _) in current }
-        }
     }
     
     private func restoreFullTextContents() {

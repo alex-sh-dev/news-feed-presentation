@@ -45,6 +45,6 @@
 
 Так как у меня недостаточно опыта в дизайне, вдохновлялся вашим приложением и сайтом =)
 
-<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/7643353c-8e5c-45d4-ae00-474d7b87cdb3" /> 
-<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/bad5358f-4b75-4de9-a2a7-f31b9edcd705" /> 
-<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/dbd62a39-99e4-4fc7-8c89-d14398857b0d" />
+<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/fb00f362-f53b-474d-abfd-134775e5c528" /> 
+<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/1a8c576a-02dd-46ea-a996-9d3393c3d20a" /> 
+<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/32647348-0a1d-4a72-a2b2-c0fae0877511" />

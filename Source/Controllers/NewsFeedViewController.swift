@@ -157,7 +157,7 @@ class NewsFeedViewController: UIViewController {
                 cell.descriptionLabel.text = newsItem.description
                 
                 if model.showInFullPressed.contains(id) {
-                    cell.descriptionLabel.text = model.fullTextContents[id]
+                    cell.descriptionLabel.text = model.newsTexts[id]
                     cell.hideShowInFullButton(true)
                 } else {
                     if cell.showInFullButton.isHidden {

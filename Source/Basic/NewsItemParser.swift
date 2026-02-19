@@ -27,7 +27,7 @@ class NewsItemParser {
 
         let storage = NewsStorage.shared
         storage.lock.with {
-            storage.fullTextContents[id] = parseTask.finalText
+            storage.newsTexts[id] = parseTask.finalText
         }
 
         storage.lock.with {

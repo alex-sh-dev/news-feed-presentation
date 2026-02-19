@@ -35,14 +35,14 @@ class NewsFeedViewModel: BaseNewsViewModel {
     
     private var newsTextRequester = FullNewsTextRequester()
     
-    final var fullTextContents: [UInt: String] = [:]
+    final var newsTexts: [UInt: String] = [:]
     final var showInFullPressed: Set<UInt> = []
     
     final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
     
     override init() {
         super.init()
-        self.restoreFullTextContents()
+        self.restoreNewsTexts()
     }
     
     private func sendIdentifiers(_ identifiers: [UInt], append: Bool = true) {
@@ -107,21 +107,21 @@ class NewsFeedViewModel: BaseNewsViewModel {
                 self?.identifiersActionPub.send(.reloadImages(id))
                 let storage = NewsStorage.shared
                 storage.lock.with {
-                    self?.fullTextContents[id] = storage.fullTextContents[id]
+                    self?.newsTexts[id] = storage.newsTexts[id]
                 }
             }
     }
     
-    private func restoreFullTextContents() {
+    private func restoreNewsTexts() {
         let storage = NewsStorage.shared
         storage.lock.with {
-            self.fullTextContents = storage.fullTextContents
+            self.newsTexts = storage.newsTexts
         }
     }
     
     final func requestText(forNewsItemWith id: UInt,
                              completionHandler: @escaping (String, UInt) -> Void) {
-        if let fullText = self.fullTextContents[id] {
+        if let fullText = self.newsTexts[id] {
             self.showInFullPressed.insert(id)
             completionHandler(fullText, id)
             return
@@ -141,7 +141,7 @@ class NewsFeedViewModel: BaseNewsViewModel {
                 return
             }
             
-            self.fullTextContents[id] = dataText
+            self.newsTexts[id] = dataText
             self.showInFullPressed.insert(id)
             
             completionHandler(text, id)

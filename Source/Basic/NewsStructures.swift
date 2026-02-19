@@ -21,7 +21,7 @@ struct NewsNode: Decodable {
     }
 }
 
-struct NewsItem: Decodable {
+class NewsItem: Decodable {
     var id: UInt!
     var title: String?
     var description: String?
@@ -37,8 +37,8 @@ struct NewsItem: Decodable {
         case url, fullUrl, titleImageUrl
         case categoryType
     }
-
-    init(from decoder: Decoder) throws {
+    
+    required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(UInt.self, forKey: .id)
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
@@ -56,5 +56,19 @@ struct NewsItem: Decodable {
         let titleImageUrlStr = try container.decodeIfPresent(String.self, forKey: .titleImageUrl) ?? ""
         self.titleImageUrl = URL(string: titleImageUrlStr)
         self.categoryType = try container.decodeIfPresent(String.self, forKey: .categoryType)
+    }
+}
+
+class TextNewsItem: NewsItem {
+    var text: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case text
+    }
+    
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.text = try container.decodeIfPresent(String.self, forKey: .text)
     }
 }

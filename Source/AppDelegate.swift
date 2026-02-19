@@ -14,7 +14,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         static let kMemoryCapacityMb = 40 * 1024 * 1024
         static let kDiskCapacityMb = 500 * 1024 * 1024
         static let kDiskPath = "urlcache"
-        static let kNewsEndpoint = "https://webapi.autodoc.ru/api/news"
+        static let kBaseEndpoint = "https://webapi.autodoc.ru/api"
+        static let KNewsEndpointPostfix = "news"
+        static let kNewsItemEndpointPostfix = "item"
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -25,8 +27,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // TODO: add cache clenup (Settings)
         // urlCache.removeAllCachedResponses()
         
-        let endpoint = URL(string: Conf.kNewsEndpoint)
-        NewsParser.setup(NewsParser.Config(baseEndpoint: endpoint!))
+        var config = NewsParser.Config()
+        config.newsEndpoint = URL(string: Conf.kBaseEndpoint)?
+            .appending(path: Conf.KNewsEndpointPostfix)
+        config.newsItemEndpoint = URL(string: Conf.kBaseEndpoint)?
+            .appending(path: Conf.KNewsEndpointPostfix)
+            .appending(path: Conf.kNewsItemEndpointPostfix)
+        NewsParser.setup(config)
         
         return true
     }

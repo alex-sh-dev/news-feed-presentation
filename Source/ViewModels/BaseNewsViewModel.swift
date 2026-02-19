@@ -40,7 +40,7 @@ class BaseNewsViewModel {
 
     func requestItems(page: UInt = 1, count: UInt) {
         if count > 0 {
-            NewsParser.shared.requestData(page: page, count: count)
+            NewsParser.shared.requestNews(page: page, count: count)
         }
     }
 }

@@ -31,15 +31,13 @@ class PreviewNewsItemCell: UICollectionViewCell {
     override var isHighlighted: Bool {
         didSet {
             if isHighlighted {
-                animateSelection { [weak self] in
+                animateSelection { [unowned self] in
                     let scale = Constants.kMinTfScale
-                    guard let self = self else { return }
                     self.transform = self.transform.scaledBy(x: scale, y: scale)
                 }
             } else {
-                animateSelection { [weak self] in
+                animateSelection { [unowned self] in
                     let scale = Constants.kOrigTfScale
-                    guard let self = self else { return }
                     self.transform = CGAffineTransform.identity.scaledBy(x: scale, y: scale)
                 }
             }

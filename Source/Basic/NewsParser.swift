@@ -59,9 +59,9 @@ class NewsParser {
             .replaceError(with: NewsNode.zero)
             .eraseToAnyPublisher()
             .sink(receiveValue: {
-                [weak self] result in
+                [unowned self] result in
                 guard let news = result.news, !news.isEmpty else {
-                    self?.newsUpdatedPub.send([])
+                    self.newsUpdatedPub.send([])
                     return
                 }
                 
@@ -73,12 +73,12 @@ class NewsParser {
                     }
                     ids.append(newsItem.id)
                     if let subUrl = newsItem.url {
-                        self?.newsItemParser.requestNewsItem(subUrl: subUrl, for: newsItem.id)
+                        self.newsItemParser.requestNewsItem(subUrl: subUrl, for: newsItem.id)
                     }
                 }
                 easyLog("data received")
-                self?.newsUpdatedPub.send(ids)
-                self?.cancellable.removeValue(forKey: uuid)
+                self.newsUpdatedPub.send(ids)
+                self.cancellable.removeValue(forKey: uuid)
             })
         self.cancellable[uuid] = cancellable
     }

@@ -25,16 +25,14 @@ class NewsItemImagesCell: UICollectionViewCell {
     
     var imageUrls: [URL] = [] {
         didSet {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+            DispatchQueue.main.async { [unowned self] in
                 self.imageUrlMap.removeAll()
                 var snapshot = self.dataSource.snapshot()
                 snapshot.deleteAllItems()
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
             
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+            DispatchQueue.main.async { [unowned self] in
                 var snapshot = self.dataSource.snapshot()
                 snapshot.appendSections([.main])
                 var identifiers: [ImageIdentifier] = []
@@ -54,16 +52,12 @@ class NewsItemImagesCell: UICollectionViewCell {
     @IBOutlet weak var imageCollection: UICollectionView! {
         didSet {
             self.imageCollection.collectionViewLayout = ImagesCompositionalLayout {
-                [weak self] in
-                let count = self?.imageUrls.count ?? 0
-                return count > 1
+                [unowned self] in
+                return self.imageUrls.count > 1
             }
             
-            self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) { [weak self]
+            self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) { [unowned self]
                 (collectionView: UICollectionView, indexPath: IndexPath, identifier: ImageIdentifier) -> UICollectionViewCell? in
-                
-                guard let self = self else { return nil }
-                
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImageCell.self)
                 
                 guard let imageUrl = self.imageUrlMap[identifier] else {

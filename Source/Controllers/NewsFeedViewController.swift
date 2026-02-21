@@ -133,11 +133,8 @@ class NewsFeedViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [weak self]
+        self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
-            
-            guard let self = self else { return nil }
-            
             let model = self.newsViewModel
             switch identifier {
             case .main(let id):
@@ -197,8 +194,7 @@ class NewsFeedViewController: UIViewController {
             }
         }
         
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+        DispatchQueue.main.async { [unowned self] in
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
                 let indexPath = IndexPath(row: 0, section: sectionIndex)

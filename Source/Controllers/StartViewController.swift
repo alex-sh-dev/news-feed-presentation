@@ -95,10 +95,8 @@ class StartViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) { [weak self]
+        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemIdentifier) -> UICollectionViewCell? in
-            guard let self = self else { return nil }
-            
             if identifier == .supplementary {
                 return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
             }

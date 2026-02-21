@@ -38,6 +38,10 @@ class BaseNewsViewModel {
         return newsItem
     }
 
+    func id(at index: UInt) -> UInt? {
+        return self.identifiers[Int(index)]
+    }
+
     func requestItems(page: UInt = 1, count: UInt) {
         if count > 0 {
             NewsParser.shared.requestNews(page: page, count: count)

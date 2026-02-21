@@ -195,6 +195,17 @@ class NewsFeedViewController: UIViewController {
         }
         
         DispatchQueue.main.async { [unowned self] in
+            switch (self.startIdentifier) {
+            case .index(let index):
+                if let identifier = self.newsViewModel.id(at: index) {
+                    self.startIdentifier = .value(identifier)
+                } else {
+                    self.startIdentifier = .notValid
+                }
+            default:
+                break
+            }
+
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
                 let indexPath = IndexPath(row: 0, section: sectionIndex)

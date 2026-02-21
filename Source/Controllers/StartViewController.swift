@@ -10,8 +10,8 @@ import Combine
 
 class StartViewController: UIViewController {
     private struct Constants {
-        static let kNewsItemCount = 10
-        static let kNewsItemReserve = 5
+        static let kNewsItemCount: UInt = 10
+        static let kNewsItemReserve: UInt = 5
     }
     
     private enum Section {
@@ -81,16 +81,16 @@ class StartViewController: UIViewController {
             return
         }
 
-        guard let previewItem = sender as? PreviewNewsItemCell else {
-            return
+        if let previewItem = sender as? PreviewNewsItemCell {
+            newsFeedVC.startIdentifier = previewItem.itemIdentifier
+        } else if sender is PreviewNewsSupplementaryCellButton {
+            newsFeedVC.startIdentifier = .index(Constants.kNewsItemCount)
         }
-
-        newsFeedVC.startIdentifier = previewItem.itemIdentifier
     }
     
     private func transformedIdentifiers() -> [NewsItemIdentifier] {
         return self.newsViewModel.identifiers
-            .prefix(Constants.kNewsItemCount)
+            .prefix(Int(Constants.kNewsItemCount))
             .compactMap{ NewsItemIdentifier.value($0) }
     }
     

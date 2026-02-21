@@ -8,3 +8,5 @@
 import UIKit
 
 class PreviewNewsSupplementaryCell: UICollectionViewCell {}
+
+class PreviewNewsSupplementaryCellButton: UIButton {}

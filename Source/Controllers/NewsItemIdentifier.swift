@@ -10,6 +10,7 @@ import Foundation
 public enum NewsItemIdentifier: Hashable {
     case notValid
     case value(UInt)
+    case index(UInt)
     
     var rawValue: UInt {
         get {
@@ -18,6 +19,8 @@ public enum NewsItemIdentifier: Hashable {
                 return 0
             case .value(let val):
                 return val
+            case .index(let ind):
+                return ind
             }
         }
     }

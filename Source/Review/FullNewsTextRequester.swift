@@ -18,21 +18,17 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
     typealias ItemId = Any
     var completionHandler: ((ItemId, String?) -> Void)?
     
-    private var webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 200, height: 300))
+    lazy private var webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 200, height: 300))
     private var timer: Timer?
     private var timerCount = 0
     private var id: ItemId = 0
-    
-    override init() {
-        super.init()
-        self.webView.configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-        self.webView.navigationDelegate = self
-    }
     
     func start(for url: URL, with id: ItemId, completionHandler: @escaping ((ItemId, String?) -> Void)) {
         self.id = id
         self.completionHandler = completionHandler
         let request = URLRequest(url: url)
+        self.webView.configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        self.webView.navigationDelegate = self
         self.webView.load(request)
     }
     

@@ -8,15 +8,6 @@
 import Foundation
 import Combine
 
-struct WebConfig {
-    var newsEndpoint: URL?
-    var newsItemEndpoint: URL?
-    let requestAttemptsCount = 3
-    let sendRequestDelayMs: UInt64 = 500
-    
-    init() {}
-}
-
 class NewsParser {
     static let shared = NewsParser()
     

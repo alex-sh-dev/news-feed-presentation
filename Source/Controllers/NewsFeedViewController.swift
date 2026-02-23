@@ -184,6 +184,16 @@ class NewsFeedViewController: UIViewController {
                             }
                         }
                     }
+
+                    if let fullUrl = newsItem.fullUrl {
+                        cell.shareButton.isHidden = false
+                        cell.shareTappedHandler = { [weak self, weak cell] in
+                            let activityVC = UIActivityViewController.linkOpener(url: fullUrl, sourceView: cell?.shareButton)
+                            self?.present(activityVC, animated: true)
+                        }
+                    } else {
+                        cell.shareButton.isHidden = true
+                    }
                 }
                 
                 return cell

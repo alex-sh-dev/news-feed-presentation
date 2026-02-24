@@ -21,8 +21,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        let urlCache = URLCache(memoryCapacity: Conf.kMemoryCapacityMb, diskCapacity: Conf.kDiskCapacityMb , diskPath: Conf.kDiskPath)
-        URLCache.shared = urlCache
+        URLCache.shared = URLCache(memoryCapacity: Conf.kMemoryCapacityMb,
+                                   diskCapacity: Conf.kDiskCapacityMb ,
+                                   diskPath: Conf.kDiskPath)
         
         // TODO: add cache clenup (Settings)
         // urlCache.removeAllCachedResponses()

@@ -17,7 +17,7 @@ class NewsImageUrlsExtractor {
     
     private init() {}
     
-    struct Consts {
+    struct Constants {
         static let kFileNameSeparator = "_"
         static let kFileNameMaxSplits = 2
         static let kMaxTaskCount = 30
@@ -33,20 +33,20 @@ class NewsImageUrlsExtractor {
 
         let fileName = url.deletingPathExtension().lastPathComponent
         
-        var cmps: [String] = fileName.components(separatedBy: Consts.kFileNameSeparator)
-        if cmps.count < Consts.kFileNameMaxSplits {
+        var cmps: [String] = fileName.components(separatedBy: Constants.kFileNameSeparator)
+        if cmps.count < Constants.kFileNameMaxSplits {
             return nil
         }
         
         guard var number = UInt(cmps.last!),
-              number <= Consts.kStartPoint  else {
+              number <= Constants.kStartPoint  else {
             return nil
         }
         
         cmps = Array(cmps.dropLast())
         var name = cmps.first
         if cmps.count > 1 {
-            name = cmps.joined(separator: Consts.kFileNameSeparator)
+            name = cmps.joined(separator: Constants.kFileNameSeparator)
         }
 
         number += 1
@@ -54,7 +54,7 @@ class NewsImageUrlsExtractor {
         
         var resUrls = [URL]()
         while true {
-            let newFileName = name! + Consts.kFileNameSeparator + String(number) + ".\(ext)"
+            let newFileName = name! + Constants.kFileNameSeparator + String(number) + ".\(ext)"
             let newUrl = basePath.appending(path: newFileName)
             
             var request = URLRequest(url: newUrl)
@@ -89,11 +89,11 @@ class NewsImageUrlsExtractor {
             }
             
             number += 1
-            if number > Consts.kMaxTaskCount {
+            if number > Constants.kMaxTaskCount {
                 break
             }
             
-            try await Task.sleep(nanoseconds: Consts.kSendRequestDelayMs * NSEC_PER_MSEC)
+            try await Task.sleep(nanoseconds: Constants.kSendRequestDelayMs * NSEC_PER_MSEC)
         }
         
         return resUrls

@@ -8,7 +8,7 @@
 import Foundation
 
 class NewsItemParseTask: NSObject, XMLParserDelegate {
-    private struct Consts {
+    private struct Constants {
         static let kObjRepCharSymbol = "\u{fffc}"
         static let kCDivNode = "cdiv"
         static let kImageNode = "img"
@@ -37,14 +37,14 @@ class NewsItemParseTask: NSObject, XMLParserDelegate {
     
     private func preparedData(_ rawText: String) -> Data {
         var text = rawText
-        text.insert(contentsOf: "<\(Consts.kCDivNode)>",
+        text.insert(contentsOf: "<\(Constants.kCDivNode)>",
                     at: text.startIndex)
         text.replace("\\\"", with: "'")
         text.replace(/&[^;]+;/, with: "")
         text.replace("\r\n\t", with:"\n")
         text.replace("\r\n", with: "\n")
         text.replace("<br />", with: "\n")
-        text.append("</\(Consts.kCDivNode)>")
+        text.append("</\(Constants.kCDivNode)>")
         return text.data(using: .utf8) ?? Data()
     }
     
@@ -55,7 +55,7 @@ class NewsItemParseTask: NSObject, XMLParserDelegate {
         
         var finalText = self.texts.joined()
         finalText = finalText.replacingOccurrences(
-            of: Consts.kObjRepCharSymbol, with: "")
+            of: Constants.kObjRepCharSymbol, with: "")
         finalText.replace(/\ +/, with: " ")
         finalText.replace(/\n\ /, with: "\n")
         finalText.replace(/\n+/, with: "\n\n")
@@ -90,8 +90,8 @@ class NewsItemParseTask: NSObject, XMLParserDelegate {
                 namespaceURI: String?, qualifiedName qName: String?,
                 attributes attributeDict: [String : String] = [:]) {
         self.curNode = elementName
-        if elementName == Consts.kImageNode {
-            if let src = attributeDict[Consts.kImageSourceAttrName],
+        if elementName == Constants.kImageNode {
+            if let src = attributeDict[Constants.kImageSourceAttrName],
                let url = URL(string: src),
                 !url.pathExtension.isEmpty {
                 self.imageUrls.append(url)
@@ -113,7 +113,7 @@ class NewsItemParseTask: NSObject, XMLParserDelegate {
     
     func parser(_ parser: XMLParser, didEndElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == Consts.kCDivNode && !self.curText.isEmpty {
+        if elementName == Constants.kCDivNode && !self.curText.isEmpty {
             self.texts.append(self.curText)
         }
         self.startElementUpdated = false

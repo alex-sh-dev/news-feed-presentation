@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 
 class FullNewsTextRequester: NSObject, WKNavigationDelegate {
-    private struct Consts {
+    private struct Constants {
         static let kNewsTextJSCode = "document.getElementsByClassName('news-text')[0].outerText"
         static let kAttemptCount = 6
         static let kRequestDelaySec: TimeInterval = 0.5
@@ -39,9 +39,9 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
             self.completionHandler?(self.id, nil)
         }
         
-        self.timer = Timer.scheduledTimer(withTimeInterval: Consts.kRequestDelaySec, repeats: true) {
+        self.timer = Timer.scheduledTimer(withTimeInterval: Constants.kRequestDelaySec, repeats: true) {
             [weak self] timer in
-            self?.webView.evaluateJavaScript(Consts.kNewsTextJSCode, completionHandler: { [weak self]
+            self?.webView.evaluateJavaScript(Constants.kNewsTextJSCode, completionHandler: { [weak self]
                 result, error in
                 guard let self = self else { return }
                 let stopTimer: (String?) -> Void = {
@@ -55,7 +55,7 @@ class FullNewsTextRequester: NSObject, WKNavigationDelegate {
                 } else {
                     self.timerCount += 1
                 }
-                if self.timerCount > Consts.kAttemptCount {
+                if self.timerCount > Constants.kAttemptCount {
                     stopTimer(nil)
                 }
             })

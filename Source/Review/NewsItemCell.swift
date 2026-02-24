@@ -23,7 +23,11 @@ class NewsItemCell: UICollectionViewCell {
     private var savedHeightConstant: CGFloat = 0
     
     var showInFullTappedHandler: (() -> Void)? = nil
-    var shareTappedHandler: (() -> Void)? = nil
+    var shareTappedHandler: (() -> Void)? = nil {
+        didSet {
+            self.shareButton.isHidden = self.shareTappedHandler == nil
+        }
+    }
     
     @IBAction func showInFullTapped(_ sender: Any) {
         self.showInFullTappedHandler?()

@@ -66,10 +66,11 @@ class NewsFeedViewController: UIViewController {
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
         
-        configureDataSource()
-        configureLayout()
+        self.configureDataSource()
+        self.scrollToStartItem()
+        self.configureLayout()
         
-        identifiersActionSub = self.newsViewModel.identifiersActionPub
+        self.identifiersActionSub = self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
                 switch action {
@@ -132,6 +133,33 @@ class NewsFeedViewController: UIViewController {
         self.actActivityIndicator(.start)
     }
     
+    private func scrollToStartItem() {
+        DispatchQueue.main.async { [unowned self] in
+            switch (self.startIdentifier) {
+            case .index(let index):
+                if let identifier = self.newsViewModel.id(at: index) {
+                    self.startIdentifier = .value(identifier)
+                } else {
+                    self.startIdentifier = .notValid
+                }
+            default:
+                break
+            }
+
+            if self.startIdentifier != .notValid,
+                let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
+                let indexPath = IndexPath(row: 0, section: sectionIndex)
+                self.newsViewModel.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
+                    [weak self] _, id in
+                    self?.reloadItems([.main(id)], animate: true)
+                    self?.newsFeed.scrollToItem(at: indexPath, at: .top, animated: true)
+                }
+
+                self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
+            }
+        }
+    }
+
     private func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
@@ -152,7 +180,7 @@ class NewsFeedViewController: UIViewController {
                 cell.dateLabel.text = newsItem.publishedDate?.relativeDate()
                 cell.categoryLabel.text = newsItem.categoryType
                 cell.descriptionLabel.text = newsItem.description
-                
+
                 if model.showInFullPressed.contains(id) {
                     cell.descriptionLabel.text = model.newsTexts[id]
                     cell.hideShowInFullButton(true)
@@ -160,9 +188,10 @@ class NewsFeedViewController: UIViewController {
                     if cell.showInFullButton.isHidden {
                         cell.hideShowInFullButton(false)
                     }
-                    
-                    if newsItem.fullUrl == nil {
+
+                    guard let fullUrl = newsItem.fullUrl else {
                         cell.hideShowInFullButton(true)
+                        cell.shareTappedHandler = nil
                         return cell
                     }
                     
@@ -185,14 +214,9 @@ class NewsFeedViewController: UIViewController {
                         }
                     }
 
-                    if let fullUrl = newsItem.fullUrl {
-                        cell.shareButton.isHidden = false
-                        cell.shareTappedHandler = { [weak self, weak cell] in
-                            let activityVC = UIActivityViewController.linkOpener(url: fullUrl, sourceView: cell?.shareButton)
-                            self?.present(activityVC, animated: true)
-                        }
-                    } else {
-                        cell.shareButton.isHidden = true
+                    cell.shareTappedHandler = { [weak self, weak cell] in
+                        let activityVC = UIActivityViewController.linkOpener(url: fullUrl, sourceView: cell?.shareButton)
+                        self?.present(activityVC, animated: true)
                     }
                 }
                 
@@ -201,31 +225,6 @@ class NewsFeedViewController: UIViewController {
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
                 cell.imageUrls = model.imageUrls(for: id)
                 return cell
-            }
-        }
-        
-        DispatchQueue.main.async { [unowned self] in
-            switch (self.startIdentifier) {
-            case .index(let index):
-                if let identifier = self.newsViewModel.id(at: index) {
-                    self.startIdentifier = .value(identifier)
-                } else {
-                    self.startIdentifier = .notValid
-                }
-            default:
-                break
-            }
-
-            if self.startIdentifier != .notValid,
-                let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
-                let indexPath = IndexPath(row: 0, section: sectionIndex)
-                self.newsViewModel.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
-                    [weak self] _, id in
-                    self?.reloadItems([.main(id)], animate: true)
-                    self?.newsFeed.scrollToItem(at: indexPath, at: .top, animated: true)
-                }
-                
-                self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
             }
         }
     }

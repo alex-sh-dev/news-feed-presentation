@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D70B53AD2F4D7FBB0059CB35 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70B53AC2F4D7FBB0059CB35 /* ActivityIndicator.swift */; };
 		D711C5D52F3E46DD005D1971 /* NewsItemImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C5D42F3E46DD005D1971 /* NewsItemImagesCell.swift */; };
 		D711C5D72F3E480F005D1971 /* NewsItemImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C5D62F3E480F005D1971 /* NewsItemImageCell.swift */; };
 		D711C5D92F3E4948005D1971 /* ImagesCompositionalLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C5D82F3E4948005D1971 /* ImagesCompositionalLayout.swift */; };
@@ -49,6 +50,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D70B53AC2F4D7FBB0059CB35 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		D711C5D42F3E46DD005D1971 /* NewsItemImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemImagesCell.swift; sourceTree = "<group>"; };
 		D711C5D62F3E480F005D1971 /* NewsItemImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemImageCell.swift; sourceTree = "<group>"; };
 		D711C5D82F3E4948005D1971 /* ImagesCompositionalLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesCompositionalLayout.swift; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 				D7F0C9752F4C3C9A007ACFE7 /* SafariActivity.swift */,
 				D7F0C9832F4C4653007ACFE7 /* Device.swift */,
 				D7F0C98F2F4C4C76007ACFE7 /* ActivityViewController.swift */,
+				D70B53AC2F4D7FBB0059CB35 /* ActivityIndicator.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -329,6 +332,7 @@
 				D794E2802F3C44E00076DFAA /* URLCache.swift in Sources */,
 				D7E375FB2F4738AC00E35C28 /* NewsItemParseTask.swift in Sources */,
 				D794E26B2F39F5AA0076DFAA /* NewsParser.swift in Sources */,
+				D70B53AD2F4D7FBB0059CB35 /* ActivityIndicator.swift in Sources */,
 				D73CAF262F4360A700ABB035 /* NewsItemIdentifier.swift in Sources */,
 				D711C5D92F3E4948005D1971 /* ImagesCompositionalLayout.swift in Sources */,
 				D794E28B2F3CACBC0076DFAA /* NewsCompositionalLayout.swift in Sources */,

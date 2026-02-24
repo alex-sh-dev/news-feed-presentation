@@ -39,12 +39,14 @@ class StartViewController: UIViewController {
             previewNewsFeed.alwaysBounceHorizontal = true
         }
     }
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
     private var identifiersActionSub: AnyCancellable! {
         didSet {
             let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
             self.newsViewModel.requestItems(count: itemsCount)
+            self.activityIndicator.setAction(.start)
         }
     }
     private var newsViewModel = PreviewNewsViewModel()
@@ -64,6 +66,7 @@ class StartViewController: UIViewController {
                 switch action {
                 case .fill:
                     animate = false
+                    self.activityIndicator.setAction(.stop)
                 case .replaceAll:
                     snapshot.deleteAllItems()
                 }

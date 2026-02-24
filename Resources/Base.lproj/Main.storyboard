@@ -22,9 +22,14 @@
                                 <rect key="frame" x="0.0" y="99.333333333333314" width="393" height="140"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
+                                    <constraint firstItem="DWl-wf-6FO" firstAttribute="centerY" secondItem="gVv-yA-h8X" secondAttribute="centerY" id="V8b-jb-Efg"/>
                                     <constraint firstAttribute="height" constant="140" id="pq6-zC-uaL"/>
+                                    <constraint firstItem="DWl-wf-6FO" firstAttribute="centerX" secondItem="gVv-yA-h8X" secondAttribute="centerX" id="w6h-UX-Cxh"/>
                                 </constraints>
                                 <collectionViewLayout key="collectionViewLayout" id="aNy-dc-6Nx"/>
+                                <activityIndicatorView key="backgroundView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="DWl-wf-6FO" userLabel="activityIndicator">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="140"/>
+                                </activityIndicatorView>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="PreviewNewsItemCellIdentifier" id="2uo-vw-hgc" customClass="PreviewNewsItemCell" customModule="NewsFeedPresentation" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="113" height="90"/>
@@ -120,6 +125,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="DWl-wf-6FO" id="xh8-hZ-UdI"/>
                         <outlet property="previewNewsFeed" destination="gVv-yA-h8X" id="fUv-QV-u0F"/>
                     </connections>
                 </viewController>

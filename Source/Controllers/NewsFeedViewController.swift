@@ -25,11 +25,6 @@ class NewsFeedViewController: UIViewController {
         }
     }
     
-    private enum ActivityIndicatorAction {
-        case start
-        case stop
-    }
-    
     private struct Constants {
         static let kItemCountPerPage: UInt = 5
     }
@@ -77,7 +72,7 @@ class NewsFeedViewController: UIViewController {
                 case .reloadImages(let id):
                     self.reloadItems([.image(id)], animate: true)
                 case .appendItems(let newIdentifiers, let newsParts):
-                    self.actActivityIndicator(.stop)
+                    self.activityIndicator.setAction(.stop)
                     var snapshot = self.dataSource.snapshot()
                     self.updateSnapshot(&snapshot, with: newIdentifiers, and:newsParts, animate: true)
                 case .fill(let identifiers, let newsParts):
@@ -85,16 +80,6 @@ class NewsFeedViewController: UIViewController {
                     self.updateSnapshot(&snapshot, with: identifiers, and: newsParts, animate: false)
                 }
             }
-    }
-    
-    private func actActivityIndicator(_ action: ActivityIndicatorAction) {
-        let start = action == .start
-        self.activityIndicator.isHidden = !start
-        if start {
-            self.activityIndicator.startAnimating()
-        } else {
-            self.activityIndicator.stopAnimating()
-        }
     }
     
     private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
@@ -130,7 +115,7 @@ class NewsFeedViewController: UIViewController {
         let total = UInt(self.newsFeed.numberOfSections)
         let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
         self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
-        self.actActivityIndicator(.start)
+        self.activityIndicator.setAction(.start)
     }
     
     private func scrollToStartItem() {

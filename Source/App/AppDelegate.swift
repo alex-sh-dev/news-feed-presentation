@@ -9,8 +9,7 @@ import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    private struct Conf {
+    private struct Config {
         static let kMemoryCapacityMb = 40 * 1024 * 1024
         static let kDiskCapacityMb = 500 * 1024 * 1024
         static let kDiskPath = "urlcache"
@@ -21,19 +20,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        URLCache.shared = URLCache(memoryCapacity: Conf.kMemoryCapacityMb,
-                                   diskCapacity: Conf.kDiskCapacityMb ,
-                                   diskPath: Conf.kDiskPath)
+        URLCache.shared = URLCache(memoryCapacity: Config.kMemoryCapacityMb,
+                                   diskCapacity: Config.kDiskCapacityMb ,
+                                   diskPath: Config.kDiskPath)
         
         // TODO: add cache clenup (Settings)
         // urlCache.removeAllCachedResponses()
         
         var config = WebConfig()
-        config.newsEndpoint = URL(string: Conf.kBaseEndpoint)?
-            .appending(path: Conf.KNewsEndpointPostfix)
-        config.newsItemEndpoint = URL(string: Conf.kBaseEndpoint)?
-            .appending(path: Conf.KNewsEndpointPostfix)
-            .appending(path: Conf.kNewsItemEndpointPostfix)
+        config.newsEndpoint = URL(string: Config.kBaseEndpoint)?
+            .appending(path: Config.KNewsEndpointPostfix)
+        config.newsItemEndpoint = URL(string: Config.kBaseEndpoint)?
+            .appending(path: Config.KNewsEndpointPostfix)
+            .appending(path: Config.kNewsItemEndpointPostfix)
         NewsParser.setup(config)
         
         return true

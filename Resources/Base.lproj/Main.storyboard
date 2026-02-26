@@ -125,6 +125,7 @@
                     </view>
                     <connections>
                         <outlet property="activityIndicator" destination="DWl-wf-6FO" id="xh8-hZ-UdI"/>
+                        <outlet property="newsFeedButton" destination="3Y2-OP-IEi" id="P94-Ip-L7A"/>
                         <outlet property="previewNewsFeed" destination="gVv-yA-h8X" id="fUv-QV-u0F"/>
                     </connections>
                 </viewController>

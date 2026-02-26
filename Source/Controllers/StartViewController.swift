@@ -40,8 +40,10 @@ class StartViewController: UIViewController {
         }
     }
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var newsFeedButton: UIButton!
+
     private var noNewsLabel: UILabel?
-    
+
     private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
     private var identifiersActionSub: AnyCancellable! {
         didSet {
@@ -108,6 +110,16 @@ class StartViewController: UIViewController {
         } else if sender is PreviewNewsSupplementaryCellButton {
             newsFeedVC.startIdentifier = .index(Constants.kNewsItemCount)
         }
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if let button = sender as? UIButton,
+           button == self.newsFeedButton,
+           self.newsViewModel.identifiers.isEmpty {
+            return false
+        }
+
+        return super.shouldPerformSegue(withIdentifier: identifier, sender: sender)
     }
     
     private func transformedIdentifiers() -> [NewsItemIdentifier] {

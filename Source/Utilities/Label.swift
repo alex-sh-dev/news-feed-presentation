@@ -27,3 +27,21 @@ class InsetLabel: UILabel {
         return intrinsicContentSize
     }
 }
+
+class CenteredLabel: UILabel {
+    init(text: LocalizedStringResource, parent: UIView) {
+        super.init(frame: .zero)
+        self.text = String(localized: text)
+        self.textColor = UIColor.secondaryLabel
+        self.translatesAutoresizingMaskIntoConstraints = false
+        parent.addSubview(self)
+        NSLayoutConstraint.activate([
+            self.centerXAnchor.constraint(equalTo: parent.centerXAnchor),
+            self.centerYAnchor.constraint(equalTo: parent.centerYAnchor)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+}

@@ -40,6 +40,7 @@ class StartViewController: UIViewController {
         }
     }
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    private var noNewsLabel: UILabel?
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
     private var identifiersActionSub: AnyCancellable! {
@@ -54,21 +55,25 @@ class StartViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureDataSource()
-        configureLayout()
+        self.configureDataSource()
+        self.configureLayout()
         
-        identifiersActionSub = self.newsViewModel.identifiersActionPub
+        self.identifiersActionSub = self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
                 var identifiers = self.transformedIdentifiers()
                 var snapshot = self.dataSource.snapshot()
-                var animate: Bool = true
+                var animate: Bool = false
                 switch action {
                 case .fill:
-                    animate = false
                     self.activityIndicator.setAction(.stop)
                 case .replaceAll:
+                    animate = true
                     snapshot.deleteAllItems()
+                case .empty:
+                    self.activityIndicator.setAction(.stop)
+                    self.showNoNews()
+                    return
                 }
                 if snapshot.numberOfSections == 0 {
                     snapshot.appendSections([.main])
@@ -76,9 +81,23 @@ class StartViewController: UIViewController {
                 identifiers.append(.supplementary)
                 snapshot.appendItems(identifiers)
                 self.dataSource.apply(snapshot, animatingDifferences: animate)
+                self.hideNoNewsIfNeeded()
             }
     }
-    
+
+    private func showNoNews() {
+        if self.noNewsLabel == nil {
+            self.noNewsLabel = CenteredLabel(text: "No news", parent: self.previewNewsFeed)
+        }
+    }
+
+    private func hideNoNewsIfNeeded() {
+        if self.noNewsLabel != nil {
+            self.noNewsLabel!.removeFromSuperview()
+            self.noNewsLabel = nil
+        }
+    }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let newsFeedVC = segue.destination.children.first as? NewsFeedViewController else {
             return

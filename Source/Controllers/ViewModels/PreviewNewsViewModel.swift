@@ -10,6 +10,7 @@ import Combine
 
 class PreviewNewsViewModel: BaseNewsViewModel {
     enum IdentifiersAction {
+        case empty
         case fill
         case replaceAll
     }
@@ -19,11 +20,13 @@ class PreviewNewsViewModel: BaseNewsViewModel {
     
     override func newsUpdatedSubHandler() -> ([UInt]) -> Void {
         { [weak self] ids in
+            guard let self = self else { return }
             if ids.isEmpty {
+                if self.identifiers.isEmpty {
+                    self.identifiersActionPub.send(.empty)
+                }
                 return
             }
-            guard let self = self else { return }
-            
             var identifiers: [UInt]!
             let storage = NewsStorage.shared
             storage.lock.with {

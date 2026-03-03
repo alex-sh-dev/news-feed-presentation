@@ -34,6 +34,11 @@
 
 В разработке дизайна опирался на сайт и iOS приложение компании 
 
-<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/fb00f362-f53b-474d-abfd-134775e5c528" /> 
-<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/1a8c576a-02dd-46ea-a996-9d3393c3d20a" /> 
-<img width="1024" height="1366" alt="" src="https://github.com/user-attachments/assets/32647348-0a1d-4a72-a2b2-c0fae0877511" />
+<img width="295" height="639" alt="" src="https://github.com/user-attachments/assets/7e47b12e-ef0b-4922-930f-8e67f2667c4e" />
+<img width="295" height="639" alt="" src="https://github.com/user-attachments/assets/6ddca689-5dc9-460f-8cd2-71f777830157" />
+<img width="295" height="639" alt="" src="https://github.com/user-attachments/assets/bd477a3f-eff1-4da3-b541-067c538a838f" />
+<img width="295" height="639" alt="" src="https://github.com/user-attachments/assets/38e17945-7cb7-4639-af1b-2c867e856f56" />
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/484e846e-46f5-4636-a336-f5802ee96c0a" />
+</div>

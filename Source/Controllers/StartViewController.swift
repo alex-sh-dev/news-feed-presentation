@@ -160,7 +160,7 @@ class StartViewController: UIViewController {
                 } else {
                     if let idfr = fetchedItem as? NewsItemIdentifier, image != nil {
                         var updatedSnapshot = self.dataSource.snapshot()
-                        updatedSnapshot.reloadItems([idfr])
+                        updatedSnapshot.reconfigureItems([idfr])
                         self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
                     }
                 }

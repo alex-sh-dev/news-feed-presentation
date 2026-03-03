@@ -105,7 +105,7 @@ class NewsFeedViewController: UIViewController {
         var snapshot = self.dataSource.snapshot()
         for idfr in identifiers {
             if snapshot.itemIdentifiers.contains(idfr) {
-                snapshot.reloadItems([idfr])
+                snapshot.reconfigureItems([idfr])
             }
         }
         self.dataSource.apply(snapshot, animatingDifferences: true)

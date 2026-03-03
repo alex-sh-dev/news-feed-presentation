@@ -76,7 +76,7 @@ class NewsItemImagesCell: UICollectionViewCell {
                         if let item = fetchedItem as? ImageIdentifier, image != nil {
                             var snapshot = self.dataSource.snapshot()
                             if snapshot.itemIdentifiers.contains(item) {
-                                snapshot.reloadItems([item])
+                                snapshot.reconfigureItems([item])
                             }
                             self.dataSource.apply(snapshot, animatingDifferences: true)
                         }

@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                    diskPath: Config.kDiskPath)
         
         // TODO: add cache clenup (Settings)
-        // urlCache.removeAllCachedResponses()
+        // URLCache.shared.removeAllCachedResponses()
         
         var config = WebConfig()
         config.newsEndpoint = URL(string: Config.kBaseEndpoint)?

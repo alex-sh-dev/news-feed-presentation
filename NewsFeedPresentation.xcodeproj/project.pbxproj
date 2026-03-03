@@ -14,7 +14,6 @@
 		D711C5DB2F3F2476005D1971 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C5DA2F3F2476005D1971 /* Date.swift */; };
 		D711C5DD2F3F2702005D1971 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C5DC2F3F2702005D1971 /* Label.swift */; };
 		D711C5E12F3F52D4005D1971 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C5E02F3F52D4005D1971 /* Log.swift */; };
-		D711C60C2F4069FC005D1971 /* NewsImageUrlsExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C60B2F4069FC005D1971 /* NewsImageUrlsExtractor.swift */; };
 		D711C6142F40AF59005D1971 /* FullNewsTextRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C6132F40AF59005D1971 /* FullNewsTextRequester.swift */; };
 		D711C6162F41D704005D1971 /* AsyncQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C6152F41D704005D1971 /* AsyncQueue.swift */; };
 		D711C61A2F425611005D1971 /* CollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D711C6192F425611005D1971 /* CollectionCell.swift */; };
@@ -57,7 +56,6 @@
 		D711C5DA2F3F2476005D1971 /* Date.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		D711C5DC2F3F2702005D1971 /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
 		D711C5E02F3F52D4005D1971 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
-		D711C60B2F4069FC005D1971 /* NewsImageUrlsExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsImageUrlsExtractor.swift; sourceTree = "<group>"; };
 		D711C6132F40AF59005D1971 /* FullNewsTextRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullNewsTextRequester.swift; sourceTree = "<group>"; };
 		D711C6152F41D704005D1971 /* AsyncQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncQueue.swift; sourceTree = "<group>"; };
 		D711C6192F425611005D1971 /* CollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionCell.swift; sourceTree = "<group>"; };
@@ -192,17 +190,8 @@
 				D794E26E2F3AF10E0076DFAA /* NewsStructures.swift */,
 				D780C5FB2F46DE4B00D58269 /* NewsItemParser.swift */,
 				D7E375FA2F4738AC00E35C28 /* NewsItemParseTask.swift */,
-				D7E375FC2F473C1D00E35C28 /* Unused */,
 			);
 			path = Basic;
-			sourceTree = "<group>";
-		};
-		D7E375FC2F473C1D00E35C28 /* Unused */ = {
-			isa = PBXGroup;
-			children = (
-				D711C60B2F4069FC005D1971 /* NewsImageUrlsExtractor.swift */,
-			);
-			path = Unused;
 			sourceTree = "<group>";
 		};
 		D7E5AF7C2F38689900B82167 = {
@@ -345,7 +334,6 @@
 				D711C61A2F425611005D1971 /* CollectionCell.swift in Sources */,
 				D7F0C9902F4C4C76007ACFE7 /* ActivityViewController.swift in Sources */,
 				D7F0C9762F4C3C9A007ACFE7 /* SafariActivity.swift in Sources */,
-				D711C60C2F4069FC005D1971 /* NewsImageUrlsExtractor.swift in Sources */,
 				D794E2822F3C46130076DFAA /* Lock.swift in Sources */,
 				D711C6142F40AF59005D1971 /* FullNewsTextRequester.swift in Sources */,
 				D73CAF242F43515000ABB035 /* PreviewNewsViewModel.swift in Sources */,

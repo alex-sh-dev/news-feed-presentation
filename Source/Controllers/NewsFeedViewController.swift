@@ -134,10 +134,9 @@ class NewsFeedViewController: UIViewController {
             if self.startIdentifier != .notValid,
                 let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
                 let indexPath = IndexPath(row: 0, section: sectionIndex)
-                self.newsViewModel.requestText(forNewsItemWith: self.startIdentifier.rawValue) {
-                    [weak self] _, id in
-                    self?.reloadItems([.main(id)], animate: true)
-                    self?.newsFeed.scrollToItem(at: indexPath, at: .top, animated: true)
+                let id = self.startIdentifier.rawValue
+                if self.newsViewModel.newsItemText(for: id) != nil {
+                    self.reloadItems([.main(id)], animate: true)
                 }
 
                 self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
@@ -167,7 +166,7 @@ class NewsFeedViewController: UIViewController {
                 cell.descriptionLabel.text = newsItem.description
 
                 if model.showInFullPressed.contains(id) {
-                    cell.descriptionLabel.text = model.newsTexts[id]
+                    cell.descriptionLabel.text = model.newsItemText(for: id)
                     cell.hideShowInFullButton(true)
                 } else {
                     if cell.showInFullButton.isHidden {
@@ -190,12 +189,8 @@ class NewsFeedViewController: UIViewController {
                     }
 
                     cell.showInFullTappedHandler = { [weak self] in
-                        // TODO: add animating for Show in full button
-                        self?.newsViewModel.requestText(forNewsItemWith: id) {
-                            text, itemId in
-                            if id == itemId {
-                                fillDescription(text)
-                            }
+                        if let text = self?.newsViewModel.newsItemText(for: id) {
+                            fillDescription(text)
                         }
                     }
 

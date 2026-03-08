@@ -33,17 +33,9 @@ class NewsFeedViewModel: BaseNewsViewModel {
     
     private var newsItemUpdatedSub: AnyCancellable!
     
-    private var newsTextRequester = FullNewsTextRequester()
-    
-    final var newsTexts: [UInt: String] = [:]
     final var showInFullPressed: Set<UInt> = []
     
     final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
-    
-    override init() {
-        super.init()
-        self.restoreNewsTexts()
-    }
     
     private func sendIdentifiers(_ identifiers: [UInt], append: Bool = true) {
         var identifiersToSend: [UInt] = []
@@ -105,47 +97,21 @@ class NewsFeedViewModel: BaseNewsViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] id in
                 self?.identifiersActionPub.send(.reloadImages(id))
-                let storage = NewsStorage.shared
-                storage.lock.with {
-                    self?.newsTexts[id] = storage.newsTexts[id]
-                }
             }
     }
-    
-    private func restoreNewsTexts() {
+
+    final func newsItemText(for id: UInt) -> String? {
         let storage = NewsStorage.shared
+        var text: String?
         storage.lock.with {
-            self.newsTexts = storage.newsTexts
-        }
-    }
-    
-    final func requestText(forNewsItemWith id: UInt,
-                             completionHandler: @escaping (String, UInt) -> Void) {
-        if let fullText = self.newsTexts[id] {
-            self.showInFullPressed.insert(id)
-            completionHandler(fullText, id)
-            return
+            text = storage.newsTexts[id]
         }
         
-        guard let newsItem = self.newsItem(at: id),
-              let url = newsItem.fullUrl else {
-            return
-        }
-        
-        self.newsTextRequester.start(for: url, with: id) { [weak self]
-            fetchedId, dataText in
-            guard let self = self else { return }
-            
-            guard let text = dataText, !text.isEmpty,
-                  let id = fetchedId as? UInt  else {
-                return
-            }
-            
-            self.newsTexts[id] = dataText
+        if text != nil {
             self.showInFullPressed.insert(id)
-            
-            completionHandler(text, id)
         }
+
+        return text
     }
     
     final func imageUrls(for id: UInt) -> [URL] {

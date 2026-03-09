@@ -10,10 +10,10 @@ import Foundation
 extension Date {
     func relativeDate(timeStyle: DateFormatter.Style = .none,
                       dateStyle: DateFormatter.Style = .full) -> String {
-        let relativeDateFormatter = DateFormatter()
-        relativeDateFormatter.timeStyle = timeStyle
-        relativeDateFormatter.dateStyle = dateStyle
-        relativeDateFormatter.doesRelativeDateFormatting = true
-        return relativeDateFormatter.string(from: self)
+        let formatter = DateFormatter()
+        formatter.timeStyle = timeStyle
+        formatter.dateStyle = dateStyle
+        formatter.doesRelativeDateFormatting = true
+        return formatter.string(from: self)
     }
 }

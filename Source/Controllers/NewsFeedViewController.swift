@@ -36,7 +36,22 @@ class NewsFeedViewController: UIViewController {
         }
     }
 
-    var startIdentifier: NewsItemIdentifier = .notValid
+    private var startIdentifierRaw: NewsItemIdentifier = .notValid
+    var startIdentifier: NewsItemIdentifier {
+        set { startIdentifierRaw = newValue }
+        get {
+            switch (startIdentifierRaw) {
+            case .index(let index):
+                if let identifier = self.newsViewModel.id(at: index) {
+                    return .value(identifier)
+                } else {
+                    return .notValid
+                }
+            default:
+                return startIdentifierRaw
+            }
+        }
+    }
     
     private var identifiersActionSub: AnyCancellable! {
         didSet {
@@ -62,7 +77,6 @@ class NewsFeedViewController: UIViewController {
         self.navigationItem.largeTitleDisplayMode = .always
         
         self.configureDataSource()
-        self.scrollToStartItem()
         self.configureLayout()
         
         self.identifiersActionSub = self.newsViewModel.identifiersActionPub
@@ -78,12 +92,12 @@ class NewsFeedViewController: UIViewController {
                 case .fill(let identifiers, let newsParts):
                     var snapshot = NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>()
                     self.updateSnapshot(&snapshot, with: identifiers, and: newsParts, animate: false)
+                    self.scrollToStartItem()
                 }
             }
     }
     
     private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
-        
         let sections = identifiers
             .compactMap{ NewsItemIdentifier.value($0) }
         snapshot.appendSections(sections)
@@ -117,30 +131,18 @@ class NewsFeedViewController: UIViewController {
         self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
         self.activityIndicator.setAction(.start)
     }
-    
+
     private func scrollToStartItem() {
-        DispatchQueue.main.async { [unowned self] in
-            switch (self.startIdentifier) {
-            case .index(let index):
-                if let identifier = self.newsViewModel.id(at: index) {
-                    self.startIdentifier = .value(identifier)
-                } else {
-                    self.startIdentifier = .notValid
-                }
-            default:
-                break
+        let identifier = self.startIdentifier
+        if identifier != .notValid,
+            let sectionIndex = self.dataSource.snapshot().indexOfSection(identifier) {
+            let indexPath = IndexPath(row: 0, section: sectionIndex)
+            let id = identifier.rawValue
+            if self.newsViewModel.newsItemText(for: id) != nil {
+                self.reloadItems([.main(id)], animate: true)
             }
 
-            if self.startIdentifier != .notValid,
-                let sectionIndex = self.dataSource.snapshot().indexOfSection(self.startIdentifier) {
-                let indexPath = IndexPath(row: 0, section: sectionIndex)
-                let id = self.startIdentifier.rawValue
-                if self.newsViewModel.newsItemText(for: id) != nil {
-                    self.reloadItems([.main(id)], animate: true)
-                }
-
-                self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
-            }
+            self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
         }
     }
 
@@ -159,7 +161,7 @@ class NewsFeedViewController: UIViewController {
                 guard let newsItem = model.newsItem(at: id) else {
                     return cell
                 }
-                
+
                 cell.titleLabel.text = newsItem.title
                 cell.dateLabel.text = newsItem.publishedDate?.relativeDate()
                 cell.categoryLabel.text = newsItem.categoryType

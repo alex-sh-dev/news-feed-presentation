@@ -102,15 +102,16 @@ class NewsFeedViewModel: BaseNewsViewModel {
 
     final func newsItemText(for id: UInt) -> String? {
         let storage = NewsStorage.shared
-        var text: String?
-        storage.lock.with {
-            text = storage.newsTexts[id]
-        }
-        
-        if text != nil {
-            self.showInFullPressed.insert(id)
+        storage.lock.lock()
+        defer {
+            storage.lock.unlock()
         }
 
+        guard let text = storage.newsTexts[id] else {
+            return nil
+        }
+
+        self.showInFullPressed.insert(id)
         return text
     }
     

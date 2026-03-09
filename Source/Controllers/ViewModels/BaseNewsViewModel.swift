@@ -39,6 +39,9 @@ class BaseNewsViewModel {
     }
 
     func id(at index: UInt) -> UInt? {
+        if index >= self.identifiers.count {
+            return nil
+        }
         return self.identifiers[Int(index)]
     }
 

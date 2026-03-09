@@ -30,20 +30,12 @@ class NewsParser {
         newsItemParser = NewsItemParser(config: config)
         self.newsEndpoint = config.newsEndpoint
     }
-    
+
     class func setup(_ config: WebConfig) {
         NewsParser.config = config
     }
-    
-    func requestNews(page: UInt = 1, count: UInt) {
-        easyLog("page = \(page); count = \(count)")
-        let endpoint = self.newsEndpoint!
-            .appending(path: String(page))
-            .appending(path: String(count))
-        
-        let uuid = UUID().uuidString
-        var request = URLRequest(url: endpoint)
-        request.timeoutInterval = NewsParser.config!.requestTimeoutSec
+
+    private func sendRequest(_ request: URLRequest, uuid: String = UUID().uuidString) {
         let cancellable = URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .retry(NewsParser.config!.requestAttemptsCount)
@@ -74,5 +66,16 @@ class NewsParser {
                 self.cancellable.removeValue(forKey: uuid)
             })
         self.cancellable[uuid] = cancellable
+    }
+
+    func requestNews(page: UInt = 1, count: UInt) {
+        easyLog("page = \(page); count = \(count)")
+        let endpoint = self.newsEndpoint!
+            .appending(path: String(page))
+            .appending(path: String(count))
+
+        var request = URLRequest(url: endpoint)
+        request.timeoutInterval = NewsParser.config!.requestTimeoutSec
+        sendRequest(request)
     }
 }

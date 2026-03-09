@@ -26,7 +26,7 @@ class NewsFeedViewController: UIViewController {
     }
     
     private struct Constants {
-        static let kItemCountPerPage: UInt = 5
+        static let kItemCountPerPage: UInt = 10
     }
     
     @IBOutlet weak var newsFeed: UICollectionView!
@@ -75,7 +75,7 @@ class NewsFeedViewController: UIViewController {
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
-        
+
         self.configureDataSource()
         self.configureLayout()
         
@@ -114,23 +114,6 @@ class NewsFeedViewController: UIViewController {
         
         self.dataSource.apply(snapshot, animatingDifferences: animate)
     }
-    
-    private func reloadItems(_ identifiers: [NewsItemPartIdentifier], animate: Bool = false) {
-        var snapshot = self.dataSource.snapshot()
-        for idfr in identifiers {
-            if snapshot.itemIdentifiers.contains(idfr) {
-                snapshot.reconfigureItems([idfr])
-            }
-        }
-        self.dataSource.apply(snapshot, animatingDifferences: true)
-    }
-    
-    private func requestNewsParty() {
-        let total = UInt(self.newsFeed.numberOfSections)
-        let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
-        self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
-        self.activityIndicator.setAction(.start)
-    }
 
     private func scrollToStartItem() {
         let identifier = self.startIdentifier
@@ -146,6 +129,30 @@ class NewsFeedViewController: UIViewController {
         }
     }
 
+    private func reloadItems(_ identifiers: [NewsItemPartIdentifier], animate: Bool = false) {
+        var snapshot = self.dataSource.snapshot()
+        for idfr in identifiers {
+            if snapshot.itemIdentifiers.contains(idfr) {
+                snapshot.reconfigureItems([idfr])
+            }
+        }
+        self.dataSource.apply(snapshot, animatingDifferences: true)
+    }
+
+    private func requestNewsPartyIfNeeded(using indexPath: IndexPath) {
+        if self.activityIndicator.isAnimating {
+            return
+        }
+
+        let total = UInt(self.newsFeed.numberOfSections)
+        let current = indexPath.section
+        if current == total - Constants.kItemCountPerPage / 2 {
+            let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
+            self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
+            self.activityIndicator.setAction(.start)
+        }
+    }
+
     private func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
@@ -153,10 +160,7 @@ class NewsFeedViewController: UIViewController {
             switch identifier {
             case .main(let id):
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
-
-                if indexPath.section == collectionView.numberOfSections - 1 {
-                    self.requestNewsParty()
-                }
+                self.requestNewsPartyIfNeeded(using: indexPath)
 
                 guard let newsItem = model.newsItem(at: id) else {
                     return cell

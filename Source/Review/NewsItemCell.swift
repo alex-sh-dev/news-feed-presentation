@@ -19,7 +19,7 @@ class NewsItemCell: UICollectionViewCell {
              savedHeightConstant = self.showInFullHeightConstraint.constant
         }
     }
-    
+
     private var savedHeightConstant: CGFloat = 0
     
     var showInFullTappedHandler: (() -> Void)? = nil

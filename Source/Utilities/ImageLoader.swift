@@ -8,16 +8,49 @@
 import UIKit
 
 public class ImageLoader {
-    public static let shared = ImageLoader()
-    
+    static let shared = ImageLoader()
+
     typealias AnyItem = Any
     typealias LoadCompletion = (_ item: AnyItem, _ image: UIImage?, _ cached: Bool) -> Void
     typealias LoadCompletionItemPair = (LoadCompletion, AnyItem)
 
     private var loadingResponses: [URL: [LoadCompletionItemPair]] = [:]
+    private var tasks: [URL: URLSessionDataTask] = [:]
     private let lock = NSLock()
 
     private init() {}
+
+    final func suspendTasks(for urls: [URL]) {
+        for (url, task) in self.tasks {
+            if urls.contains(url) {
+                task.suspend()
+                continue
+            }
+
+            if task.state == .suspended {
+                task.resume()
+            }
+        }
+    }
+
+    private func iterateLoadCompletions(image: UIImage?, url: URL) {
+        DispatchQueue.main.async {
+            self.lock.lock()
+            defer {
+                self.lock.unlock()
+            }
+            if let loadCompletions = self.loadingResponses[url] {
+                if let image = image {
+                    URLCache.storeImage(image, for: url)
+                }
+                for (loadCompletion, savedItem) in loadCompletions {
+                    loadCompletion(savedItem, image, false)
+                }
+                self.loadingResponses.removeValue(forKey: url)
+                self.tasks.removeValue(forKey: url)
+            }
+        }
+    }
 
     final func load(url: URL, item: AnyItem, beforeLoad: @escaping () -> Void = {},
                     completion: @escaping LoadCompletion) {
@@ -34,32 +67,27 @@ public class ImageLoader {
                 loadingResponses[url] = [(completion, item)]
             }
         }
-        
+
         beforeLoad()
-        
-        URLSession.shared.dataTask(with: url) {
+
+        let task = URLSession.shared.dataTask(with: url) {
             (data, response, error) in
             var existLoadCompletions: Bool = false
             self.lock.with { existLoadCompletions = self.loadingResponses[url] != nil }
-            guard let responseData = data, let image = UIImage(data: responseData),
-                  existLoadCompletions, error == nil else {
-                DispatchQueue.main.async {
-                    completion(item, nil, false)
-                }
+            if !existLoadCompletions {
                 return
             }
-            
-            DispatchQueue.main.async {
-                self.lock.with {
-                    if let loadCompletions = self.loadingResponses[url] {
-                        URLCache.storeImage(image, for: url)
-                        for (loadCompletion, savedItem) in loadCompletions {
-                            loadCompletion(savedItem, image, false)
-                        }
-                        self.loadingResponses.removeValue(forKey: url)
-                    }
-                }
+
+            guard let responseData = data,
+                  let image = UIImage(data: responseData), error == nil else {
+                self.iterateLoadCompletions(image: nil, url: url)
+                return
             }
-        }.resume()
+
+            self.iterateLoadCompletions(image: image, url: url)
+        }
+
+        task.resume()
+        self.tasks[url] = task
     }
 }

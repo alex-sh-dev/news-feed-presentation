@@ -20,9 +20,8 @@ class NewsItemImagesCell: UICollectionViewCell {
             return .value(uuid)
         }
     }
-    
+
     private var imageUrlMap: [ImageIdentifier: URL] = [:]
-    
     var imageUrls: [URL] = [] {
         didSet {
             DispatchQueue.main.async { [unowned self] in
@@ -46,7 +45,32 @@ class NewsItemImagesCell: UICollectionViewCell {
             }
         }
     }
-    
+    var visibleImageUrls: [URL] {
+        get {
+            let identifiers = self.visibleItemIdentifiers()
+            var urls: [URL] = []
+            for idfr in identifiers {
+                guard let url = self.imageUrlMap[idfr] else {
+                    continue
+                }
+                urls.append(url)
+            }
+
+            return urls
+        }
+    }
+
+    private func visibleItemIdentifiers() -> [ImageIdentifier] {
+        let visibleIndexPaths = self.imageCollection.indexPathsForVisibleItems
+        var visibleIdentifiers: [ImageIdentifier] = []
+        for indexPath in visibleIndexPaths {
+            if let idfr = self.dataSource.itemIdentifier(for: indexPath) {
+                visibleIdentifiers.append(idfr)
+            }
+        }
+        return visibleIdentifiers
+    }
+
     private var dataSource: UICollectionViewDiffableDataSource<Section, ImageIdentifier>!
     
     @IBOutlet weak var imageCollection: UICollectionView! {

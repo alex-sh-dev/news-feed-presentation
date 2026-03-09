@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class NewsFeedViewController: UIViewController {
+class NewsFeedViewController: UIViewController, UICollectionViewDelegate {
     private enum NewsItemPartIdentifier: Hashable {
         case main(UInt)
         case image(UInt)
@@ -76,6 +76,7 @@ class NewsFeedViewController: UIViewController {
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
 
+        self.newsFeed.delegate = self
         self.configureDataSource()
         self.configureLayout()
         
@@ -151,6 +152,14 @@ class NewsFeedViewController: UIViewController {
             self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
             self.activityIndicator.setAction(.start)
         }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let imagesCell = cell as? NewsItemImagesCell else {
+            return
+        }
+
+        ImageLoader.shared.suspendTasks(for: imagesCell.visibleImageUrls)
     }
 
     private func configureDataSource() {

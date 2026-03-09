@@ -40,8 +40,8 @@ class NewsItemParser {
         easyLog("news item with id = \(id) parsed")
     }
     
-    private func request(for url: URL, with id: UInt) async throws {
-        let (data, _) = try await URLSession.shared.data(from: url)
+    private func sendRequest(_ request: URLRequest, for id: UInt) async throws {
+        let (data, _) = try await URLSession.shared.data(for: request)
         if data.isEmpty {
             return
         }
@@ -58,6 +58,8 @@ class NewsItemParser {
     func requestNewsItem(subUrl: URL, for id: UInt) {
         let endpoint = self.config.newsItemEndpoint!
             .appending(path: subUrl.absoluteString)
+        var request = URLRequest(url: endpoint)
+        request.timeoutInterval = self.config.requestTimeoutSec
         
         self.operationSerialQueue.enqueue { [weak self] in
             guard let self = self else { return }
@@ -65,7 +67,7 @@ class NewsItemParser {
             let delay = self.config.sendRequestDelayMs * NSEC_PER_MSEC
             for _ in 0..<maxRetries {
                 do {
-                    try await self.request(for: endpoint, with: id)
+                    try await self.sendRequest(request, for: id)
                     break
                 } catch {
                     do {

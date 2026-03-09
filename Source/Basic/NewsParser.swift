@@ -42,7 +42,9 @@ class NewsParser {
             .appending(path: String(count))
         
         let uuid = UUID().uuidString
-        let cancellable = URLSession.shared.dataTaskPublisher(for: endpoint)
+        var request = URLRequest(url: endpoint)
+        request.timeoutInterval = NewsParser.config!.requestTimeoutSec
+        let cancellable = URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .retry(NewsParser.config!.requestAttemptsCount)
             .decode(type: NewsNode.self, decoder: JSONDecoder())

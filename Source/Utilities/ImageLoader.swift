@@ -33,6 +33,14 @@ public class ImageLoader {
         }
     }
 
+    final func resumeTasksIfNeeded(for urls: [URL]) {
+        for (url, task) in self.tasks {
+            if urls.contains(url) && task.state == .suspended {
+                task.resume()
+            }
+        }
+    }
+
     private func iterateLoadCompletions(image: UIImage?, url: URL) {
         DispatchQueue.main.async {
             self.lock.lock()
@@ -60,11 +68,12 @@ public class ImageLoader {
         }
         
         self.lock.with {
-            if loadingResponses[url] != nil {
-                loadingResponses[url]?.append((completion, item))
+            if self.loadingResponses[url] != nil {
+                self.loadingResponses[url]?.append((completion, item))
+                self.resumeTasksIfNeeded(for: [url])
                 return
             } else {
-                loadingResponses[url] = [(completion, item)]
+                self.loadingResponses[url] = [(completion, item)]
             }
         }
 

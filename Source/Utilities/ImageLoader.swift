@@ -41,6 +41,12 @@ public class ImageLoader {
         }
     }
 
+    final func cancelAllTasks() {
+        for (_, task) in self.tasks {
+            task.cancel()
+        }
+    }
+
     private func iterateLoadCompletions(image: UIImage?, url: URL) {
         DispatchQueue.main.async {
             self.lock.lock()

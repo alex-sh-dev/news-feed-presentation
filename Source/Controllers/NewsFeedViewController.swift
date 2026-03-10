@@ -68,6 +68,7 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
     
     deinit {
         easyLog(String(describing: self))
+        ImageLoader.shared.cancelAllTasks()
     }
     
     override func viewDidLoad() {

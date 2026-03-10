@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class NewsFeedViewController: UIViewController, UICollectionViewDelegate {
+class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsItemCellDelegate {
     private enum NewsItemPartIdentifier: Hashable {
         case main(UInt)
         case image(UInt)
@@ -59,7 +59,7 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate {
         }
     }
     private let newsViewModel: NewsFeedViewModel = NewsFeedViewModel()
-    
+
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
     }
@@ -162,6 +162,33 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate {
         ImageLoader.shared.suspendTasks(for: imagesCell.visibleImageUrls)
     }
 
+    func showInFullTapped(cell: NewsItemCell) {
+        let id = cell.newsItemId
+        guard let text = self.newsViewModel.newsItemText(for: id) else {
+            return
+        }
+
+        cell.descriptionLabel.text = text
+        cell.hideShowInFullButton(true)
+
+        guard let indexPath = self.newsFeed.indexPath(for: cell) else {
+            return
+        }
+
+        let ctx = UICollectionViewLayoutInvalidationContext()
+        ctx.invalidateItems(at: [indexPath])
+        self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
+    }
+
+    func shareTapped(cell: NewsItemCell) {
+        guard let newsItem = self.newsViewModel.newsItem(at: cell.newsItemId),
+              let fullUrl = newsItem.fullUrl else {
+            return
+        }
+        let activityVC = UIActivityViewController.linkOpener(url: fullUrl, sourceView: cell.shareButton)
+        self.present(activityVC, animated: true)
+    }
+
     private func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
@@ -169,52 +196,11 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate {
             switch identifier {
             case .main(let id):
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
+                cell.delegate = self
                 self.requestNewsPartyIfNeeded(using: indexPath)
-
-                guard let newsItem = model.newsItem(at: id) else {
-                    return cell
+                if !cell.fill(model: model, id: id) {
+                    return UICollectionViewCell()
                 }
-
-                cell.titleLabel.text = newsItem.title
-                cell.dateLabel.text = newsItem.publishedDate?.relativeDate()
-                cell.categoryLabel.text = newsItem.categoryType
-                cell.descriptionLabel.text = newsItem.description
-
-                if model.showInFullPressed.contains(id) {
-                    cell.descriptionLabel.text = model.newsItemText(for: id)
-                    cell.hideShowInFullButton(true)
-                } else {
-                    if cell.showInFullButton.isHidden {
-                        cell.hideShowInFullButton(false)
-                    }
-
-                    guard let fullUrl = newsItem.fullUrl else {
-                        cell.hideShowInFullButton(true)
-                        cell.shareTappedHandler = nil
-                        return cell
-                    }
-                    
-                    let fillDescription: (String) -> Void = {
-                        [weak self, weak cell] text in
-                        cell?.descriptionLabel.text = text
-                        cell?.hideShowInFullButton(true)
-                        let ctx = UICollectionViewLayoutInvalidationContext()
-                        ctx.invalidateItems(at: [indexPath])
-                        self?.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
-                    }
-
-                    cell.showInFullTappedHandler = { [weak self] in
-                        if let text = self?.newsViewModel.newsItemText(for: id) {
-                            fillDescription(text)
-                        }
-                    }
-
-                    cell.shareTappedHandler = { [weak self, weak cell] in
-                        let activityVC = UIActivityViewController.linkOpener(url: fullUrl, sourceView: cell?.shareButton)
-                        self?.present(activityVC, animated: true)
-                    }
-                }
-                
                 return cell
             case .image(let id):
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
@@ -223,7 +209,7 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate {
             }
         }
     }
-    
+
     private func configureLayout() {
         self.newsFeed.collectionViewLayout = NewsCompositionalLayout()
     }

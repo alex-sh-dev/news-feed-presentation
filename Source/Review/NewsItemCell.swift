@@ -7,6 +7,11 @@
 
 import UIKit
 
+protocol NewsItemCellDelegate: AnyObject {
+    func showInFullTapped(cell: NewsItemCell)
+    func shareTapped(cell: NewsItemCell)
+}
+
 class NewsItemCell: UICollectionViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
@@ -21,24 +26,43 @@ class NewsItemCell: UICollectionViewCell {
     }
 
     private var savedHeightConstant: CGFloat = 0
-    
-    var showInFullTappedHandler: (() -> Void)? = nil
-    var shareTappedHandler: (() -> Void)? = nil {
-        didSet {
-            self.shareButton.isHidden = self.shareTappedHandler == nil
-        }
-    }
-    
+
+    var newsItemId: UInt = 0
+    weak var delegate: NewsItemCellDelegate?
+
     @IBAction func showInFullTapped(_ sender: Any) {
-        self.showInFullTappedHandler?()
+        self.delegate?.showInFullTapped(cell: self)
     }
     
     @IBAction func shareTapped(_ sender: Any) {
-        self.shareTappedHandler?()
+        self.delegate?.shareTapped(cell: self)
     }
     
     func hideShowInFullButton(_ hidden: Bool) {
         self.showInFullButton.isHidden = hidden
         self.showInFullHeightConstraint.constant = hidden ? 0 : self.savedHeightConstant
+    }
+
+    func fill(model: NewsFeedViewModel, id: UInt) -> Bool {
+        guard let newsItem = model.newsItem(at: id) else {
+            return false
+        }
+
+        self.newsItemId = id
+        self.titleLabel.text = newsItem.title
+        self.dateLabel.text = newsItem.publishedDate?.relativeDate()
+        self.categoryLabel.text = newsItem.categoryType
+        self.descriptionLabel.text = newsItem.description
+
+        if model.showInFullPressed.contains(id) {
+            self.descriptionLabel.text = model.newsItemText(for: id)
+            self.hideShowInFullButton(true)
+        } else {
+            let hidden = newsItem.fullUrl == nil
+            self.hideShowInFullButton(hidden)
+            self.shareButton.isHidden = hidden
+        }
+
+        return true
     }
 }

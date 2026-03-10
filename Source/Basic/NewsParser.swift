@@ -14,7 +14,9 @@ class NewsParser {
     private static var config: WebConfig?
     private let newsEndpoint: URL!
     
-    private var cancellable = [String: AnyCancellable]()
+    private var runningTasks = [String: AnyCancellable]()
+    private var requestQueue = Queue<URLRequest>()
+
     let newsUpdatedPub = PassthroughSubject<[UInt], Never>()
     let newsItemParser: NewsItemParser!
     
@@ -36,7 +38,7 @@ class NewsParser {
     }
 
     private func sendRequest(_ request: URLRequest, uuid: String = UUID().uuidString) {
-        let cancellable = URLSession.shared.dataTaskPublisher(for: request)
+        let task = URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .retry(NewsParser.config!.requestAttemptsCount)
             .decode(type: NewsNode.self, decoder: JSONDecoder())
@@ -45,6 +47,12 @@ class NewsParser {
             .eraseToAnyPublisher()
             .sink(receiveValue: {
                 [unowned self] result in
+                defer {
+                    self.runningTasks.removeValue(forKey: uuid)
+                    if let request = self.requestQueue.dequeue() {
+                        sendRequest(request)
+                    }
+                }
                 guard let news = result.news, !news.isEmpty else {
                     self.newsUpdatedPub.send([])
                     return
@@ -63,9 +71,8 @@ class NewsParser {
                 }
                 easyLog("data received")
                 self.newsUpdatedPub.send(ids)
-                self.cancellable.removeValue(forKey: uuid)
             })
-        self.cancellable[uuid] = cancellable
+        self.runningTasks[uuid] = task
     }
 
     func requestNews(page: UInt = 1, count: UInt) {
@@ -76,6 +83,11 @@ class NewsParser {
 
         var request = URLRequest(url: endpoint)
         request.timeoutInterval = NewsParser.config!.requestTimeoutSec
-        sendRequest(request)
+
+        if self.runningTasks.isEmpty {
+            sendRequest(request)
+        } else {
+            self.requestQueue.enqueue(request)
+        }
     }
 }

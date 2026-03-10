@@ -140,17 +140,19 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
         self.dataSource.apply(snapshot, animatingDifferences: true)
     }
 
-    private func requestNewsPartyIfNeeded(using indexPath: IndexPath) {
-        if self.activityIndicator.isAnimating {
-            return
-        }
-
+    private func requestNewsParty() {
         let total = UInt(self.newsFeed.numberOfSections)
+        let itemCount = Constants.kItemCountPerPage
+        let page = (total + itemCount) / itemCount
+        self.newsViewModel.requestItems(page: page, count: itemCount)
+        self.activityIndicator.setAction(.start)
+    }
+
+    private func requestNewsPartyIfNeeded(using indexPath: IndexPath) {
         let current = indexPath.section
+        let total = UInt(self.newsFeed.numberOfSections)
         if current == total - Constants.kItemCountPerPage / 2 {
-            let page = (total + Constants.kItemCountPerPage) / Constants.kItemCountPerPage
-            self.newsViewModel.requestItems(page: page, count: Constants.kItemCountPerPage)
-            self.activityIndicator.setAction(.start)
+            self.requestNewsParty()
         }
     }
 
@@ -160,6 +162,16 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
         }
 
         ImageLoader.shared.suspendTasks(for: imagesCell.visibleImageUrls)
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let frameHeight = scrollView.frame.size.height
+
+        if offsetY >= contentHeight - frameHeight {
+            self.requestNewsParty()
+        }
     }
 
     func showInFullTapped(cell: NewsItemCell) {

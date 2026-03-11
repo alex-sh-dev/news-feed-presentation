@@ -119,6 +119,53 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
+		D780AC4D2F61836B00C0222C /* Configurations */ = {
+			isa = PBXGroup;
+			children = (
+				D780AC492F6147D900C0222C /* TitledImageContentConfiguration.swift */,
+				D780AC4B2F615D9C00C0222C /* RemoteImageContentConfiguration.swift */,
+			);
+			path = Configurations;
+			sourceTree = "<group>";
+		};
+		D780AC4E2F6183BC00C0222C /* Activity */ = {
+			isa = PBXGroup;
+			children = (
+				D7F0C9752F4C3C9A007ACFE7 /* SafariActivity.swift */,
+				D7F0C98F2F4C4C76007ACFE7 /* ActivityViewController.swift */,
+			);
+			path = Activity;
+			sourceTree = "<group>";
+		};
+		D780AC4F2F6183F500C0222C /* RemoteImage */ = {
+			isa = PBXGroup;
+			children = (
+				D794E2722F3B23C20076DFAA /* ImageLoader.swift */,
+				D794E27F2F3C44E00076DFAA /* URLCache.swift */,
+			);
+			path = RemoteImage;
+			sourceTree = "<group>";
+		};
+		D780AC502F61842200C0222C /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				D711C5DA2F3F2476005D1971 /* Date.swift */,
+				D794E2812F3C46130076DFAA /* Lock.swift */,
+				D711C6192F425611005D1971 /* CollectionCell.swift */,
+				D7F0C9832F4C4653007ACFE7 /* Device.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		D780AC512F61845800C0222C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D711C5DC2F3F2702005D1971 /* Label.swift */,
+				D70B53AC2F4D7FBB0059CB35 /* ActivityIndicator.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		D794E2742F3C1DFD0076DFAA /* Source */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,21 +215,14 @@
 		D794E2842F3C63220076DFAA /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				D711C6192F425611005D1971 /* CollectionCell.swift */,
-				D711C5DA2F3F2476005D1971 /* Date.swift */,
-				D794E2722F3B23C20076DFAA /* ImageLoader.swift */,
-				D794E27F2F3C44E00076DFAA /* URLCache.swift */,
-				D794E2812F3C46130076DFAA /* Lock.swift */,
-				D711C5DC2F3F2702005D1971 /* Label.swift */,
+				D780AC512F61845800C0222C /* Views */,
+				D780AC502F61842200C0222C /* Extensions */,
+				D780AC4F2F6183F500C0222C /* RemoteImage */,
+				D780AC4E2F6183BC00C0222C /* Activity */,
+				D780AC4D2F61836B00C0222C /* Configurations */,
 				D711C5E02F3F52D4005D1971 /* Log.swift */,
 				D711C6152F41D704005D1971 /* AsyncQueue.swift */,
-				D7F0C9752F4C3C9A007ACFE7 /* SafariActivity.swift */,
-				D7F0C9832F4C4653007ACFE7 /* Device.swift */,
-				D7F0C98F2F4C4C76007ACFE7 /* ActivityViewController.swift */,
-				D70B53AC2F4D7FBB0059CB35 /* ActivityIndicator.swift */,
 				D780AC472F6012BC00C0222C /* Queue.swift */,
-				D780AC492F6147D900C0222C /* TitledImageContentConfiguration.swift */,
-				D780AC4B2F615D9C00C0222C /* RemoteImageContentConfiguration.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";

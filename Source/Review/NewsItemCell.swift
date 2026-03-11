@@ -43,11 +43,8 @@ class NewsItemCell: UICollectionViewCell {
         self.showInFullHeightConstraint.constant = hidden ? 0 : self.savedHeightConstant
     }
 
-    func fill(model: NewsFeedViewModel, id: UInt) -> Bool {
-        guard let newsItem = model.newsItem(at: id) else {
-            return false
-        }
-
+    func configure(with id: UInt, from model: NewsFeedViewModel) {
+        let newsItem = model.newsItem(at: id)!
         self.newsItemId = id
         self.titleLabel.text = newsItem.title
         self.dateLabel.text = newsItem.publishedDate?.relativeDate()
@@ -62,7 +59,5 @@ class NewsItemCell: UICollectionViewCell {
             self.hideShowInFullButton(hidden)
             self.shareButton.isHidden = hidden
         }
-
-        return true
     }
 }

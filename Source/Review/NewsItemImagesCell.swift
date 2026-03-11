@@ -79,35 +79,20 @@ class NewsItemImagesCell: UICollectionViewCell {
                 [unowned self] in
                 return self.imageUrls.count > 1
             }
-            
+
+            let newsItemImageCellRegistration = UICollectionView.CellRegistration<NewsItemImageCell, URL> {
+                cell, _, item in
+                cell.configure(with: item)
+            }
+
             self.dataSource = UICollectionViewDiffableDataSource<Section, ImageIdentifier>(collectionView: self.imageCollection) { [unowned self]
                 (collectionView: UICollectionView, indexPath: IndexPath, identifier: ImageIdentifier) -> UICollectionViewCell? in
-                let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImageCell.self)
-                
-                guard let imageUrl = self.imageUrlMap[identifier] else {
-                    return cell
-                }
-                
-                ImageLoader.shared.load(url: imageUrl, item: identifier, beforeLoad: {
-                    [weak cell] in
-                    cell?.setDefaultImage()
-                }) { [weak self, weak cell]
-                    (fetchedItem, image, cached) in
-                    guard let self = self else { return }
-                    if cached && image != nil {
-                        cell?.imageView.image = image
-                    } else {
-                        if let item = fetchedItem as? ImageIdentifier, image != nil {
-                            var snapshot = self.dataSource.snapshot()
-                            if snapshot.itemIdentifiers.contains(item) {
-                                snapshot.reconfigureItems([item])
-                            }
-                            self.dataSource.apply(snapshot, animatingDifferences: true)
-                        }
-                    }
-                }
-                
-                return cell
+                let imageUrl = self.imageUrlMap[identifier]
+                return collectionView.dequeueConfiguredReusableCell(
+                    using: newsItemImageCellRegistration,
+                    for: indexPath,
+                    item: imageUrl
+                )
             }
             
             var snapshot = NSDiffableDataSourceSnapshot<Section, ImageIdentifier>()

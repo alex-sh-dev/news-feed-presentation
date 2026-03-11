@@ -8,9 +8,9 @@
 import UIKit
 
 class NewsItemImageCell: UICollectionViewCell {
-    @IBOutlet weak var imageView: UIImageView!
-    
-    func setDefaultImage() {
-        setDefaultImage(for: self.imageView)
+    func configure(with url: URL) {
+        var config = RemoteImageContentConfiguration()
+        config.imageUrl = url
+        self.contentConfiguration = config
     }
 }

@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class StartViewController: UIViewController {
+class StartViewController: UIViewController, UICollectionViewDelegate {
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5
@@ -57,6 +57,7 @@ class StartViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.previewNewsFeed.delegate = self
         self.configureDataSource()
         self.configureLayout()
         
@@ -127,46 +128,31 @@ class StartViewController: UIViewController {
             .prefix(Int(Constants.kNewsItemCount))
             .compactMap{ NewsItemIdentifier.value($0) }
     }
-    
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath)
+        self.performSegue(withIdentifier: "NewsNavigationControllerIdentifier", sender: cell)
+    }
+
     private func configureDataSource() {
+        let newsItemCellRegistration = UICollectionView.CellRegistration<PreviewNewsItemCell, NewsItem> {
+            cell, _, item in
+            cell.configure(with: item.title, and: item.titleImageUrl)
+            cell.itemIdentifier = .value(item.id)
+        }
+
         self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemIdentifier) -> UICollectionViewCell? in
             if identifier == .supplementary {
                 return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
             }
-            
-            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsItemCell.self)
-            
-            guard let newsItem = self.newsViewModel.newsItem(at: identifier.rawValue) else {
-                return cell
-            }
-            
-            cell.itemIdentifier = .value(newsItem.id)
-            cell.headerLabel.text = newsItem.title
-            
-            guard let url = newsItem.titleImageUrl else {
-                cell.setDefaultImage()
-                return cell
-            }
-            
-            ImageLoader.shared.load(url: url, item: identifier, beforeLoad: {
-                [weak cell] in
-                cell?.setDefaultImage()
-            }) { [weak self, weak cell]
-                (fetchedItem, image, cached) in
-                guard let self = self else { return }
-                if cached && image != nil {
-                    cell?.imageView.image = image
-                } else {
-                    if let idfr = fetchedItem as? NewsItemIdentifier, image != nil {
-                        var updatedSnapshot = self.dataSource.snapshot()
-                        updatedSnapshot.reconfigureItems([idfr])
-                        self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
-                    }
-                }
-            }
-            
-            return cell
+
+            let newsItem = self.newsViewModel.newsItem(at: identifier.rawValue)!
+            return collectionView.dequeueConfiguredReusableCell(
+                using: newsItemCellRegistration,
+                for: indexPath,
+                item: newsItem
+            )
         }
 
         let snapshot = NSDiffableDataSourceSnapshot<Section, NewsItemIdentifier>()

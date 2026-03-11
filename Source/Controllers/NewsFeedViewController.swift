@@ -211,9 +211,7 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
                 cell.delegate = self
                 self.requestNewsPartyIfNeeded(using: indexPath)
-                if !cell.fill(model: model, id: id) {
-                    return UICollectionViewCell()
-                }
+                cell.configure(with: id, from: model)
                 return cell
             case .image(let id):
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)

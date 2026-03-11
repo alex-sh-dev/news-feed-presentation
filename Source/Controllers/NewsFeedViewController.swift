@@ -127,7 +127,9 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
                 self.reloadItems([.main(id)], animate: true)
             }
 
-            self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
+            DispatchQueue.main.async {
+                self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
+            }
         }
     }
 

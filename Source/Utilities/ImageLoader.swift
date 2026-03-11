@@ -10,11 +10,9 @@ import UIKit
 public class ImageLoader {
     static let shared = ImageLoader()
 
-    typealias AnyItem = Any
-    typealias LoadCompletion = (_ item: AnyItem, _ image: UIImage?, _ cached: Bool) -> Void
-    typealias LoadCompletionItemPair = (LoadCompletion, AnyItem)
+    typealias LoadCompletion = (_ url: URL, _ image: UIImage?, _ cached: Bool) -> Void
 
-    private var loadingResponses: [URL: [LoadCompletionItemPair]] = [:]
+    private var loadingResponses: [URL: [LoadCompletion]] = [:]
     private var tasks: [URL: URLSessionDataTask] = [:]
     private let lock = NSLock()
 
@@ -57,8 +55,8 @@ public class ImageLoader {
                 if let image = image {
                     URLCache.storeImage(image, for: url)
                 }
-                for (loadCompletion, savedItem) in loadCompletions {
-                    loadCompletion(savedItem, image, false)
+                for completion in loadCompletions {
+                    completion(url, image, false)
                 }
                 self.loadingResponses.removeValue(forKey: url)
                 self.tasks.removeValue(forKey: url)
@@ -66,20 +64,20 @@ public class ImageLoader {
         }
     }
 
-    final func load(url: URL, item: AnyItem, beforeLoad: @escaping () -> Void = {},
+    final func load(url: URL, beforeLoad: @escaping () -> Void = {},
                     completion: @escaping LoadCompletion) {
         if let cachedImage = URLCache.image(for: url) {
-            completion(item, cachedImage, true)
+            completion(url, cachedImage, true)
             return
         }
-        
+
         self.lock.with {
             if self.loadingResponses[url] != nil {
-                self.loadingResponses[url]?.append((completion, item))
+                self.loadingResponses[url]?.append(completion)
                 self.resumeTasksIfNeeded(for: [url])
                 return
             } else {
-                self.loadingResponses[url] = [(completion, item)]
+                self.loadingResponses[url] = [completion]
             }
         }
 

@@ -8,7 +8,7 @@
 import UIKit
 
 class RemoteImageContentView: UIView, UIContentView {
-    private var imageView: UIImageView! {
+    private(set) var imageView: UIImageView! {
         didSet {
             imageView.contentMode = .scaleAspectFill
         }
@@ -38,11 +38,19 @@ class RemoteImageContentView: UIView, UIContentView {
         super.init(frame: frame)
     }
 
+    func customConstraints(for imageView: UIImageView) -> [NSLayoutConstraint]? {
+        return nil
+    }
+
     func setupUI() {
         self.imageView = UIImageView(frame: .zero)
         self.imageView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(self.imageView)
         self.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        if let constraints = self.customConstraints(for: self.imageView) {
+            NSLayoutConstraint.activate(constraints)
+            return
+        }
         NSLayoutConstraint.activate([
             self.imageView.topAnchor.constraint(equalTo: self.topAnchor),
             self.imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor),

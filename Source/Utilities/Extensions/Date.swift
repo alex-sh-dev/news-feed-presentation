@@ -16,4 +16,13 @@ extension Date {
         formatter.doesRelativeDateFormatting = true
         return formatter.string(from: self)
     }
+
+    func localizedNumericDate(timeStyle: DateFormatter.Style = .none,
+                              dateStyle: DateFormatter.Style = .short) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = dateStyle
+        formatter.timeStyle = timeStyle
+        formatter.locale = Locale.current
+        return formatter.string(from: self)
+    }
 }

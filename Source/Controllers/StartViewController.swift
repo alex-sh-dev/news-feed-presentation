@@ -12,6 +12,8 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5
+        static let kNewsSegueIdfr = "NewsSegueIdentifier"
+        static let kNewsGridSegueIdfr = "NewsGridSegueIdentifier"
     }
     
     private enum Section {
@@ -40,7 +42,14 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
         }
     }
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var newsFeedButton: UIButton!
+
+    @IBAction func newsButtonTapped(_ sender: Any) {
+        if self.newsViewModel.isEmpty() {
+            return
+        }
+        let idfr = UIDevice.isPad ? Constants.kNewsGridSegueIdfr : Constants.kNewsSegueIdfr
+        self.performSegue(withIdentifier: idfr, sender: sender)
+    }
 
     private var noNewsLabel: UILabel?
 
@@ -113,16 +122,6 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
         }
     }
     
-    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-        if let button = sender as? UIButton,
-           button == self.newsFeedButton,
-           self.newsViewModel.identifiers.isEmpty {
-            return false
-        }
-
-        return super.shouldPerformSegue(withIdentifier: identifier, sender: sender)
-    }
-    
     private func transformedIdentifiers() -> [NewsItemIdentifier] {
         return self.newsViewModel.identifiers
             .prefix(Int(Constants.kNewsItemCount))
@@ -131,7 +130,7 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath)
-        self.performSegue(withIdentifier: "NewsNavigationControllerIdentifier", sender: cell)
+        self.performSegue(withIdentifier: Constants.kNewsSegueIdfr, sender: cell)
     }
 
     private func configureDataSource() {

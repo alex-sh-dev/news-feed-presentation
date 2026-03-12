@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="iNO-Nh-f9t">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hv5-y0-8VV">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Start View Controller-->
+        <!--Main-->
         <scene sceneID="SN0-He-uft">
             <objects>
                 <viewController id="iNO-Nh-f9t" customClass="StartViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
@@ -19,14 +19,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="gVv-yA-h8X" userLabel="previewNewsFeed">
-                                <rect key="frame" x="0.0" y="99.333333333333314" width="393" height="140"/>
+                                <rect key="frame" x="0.0" y="143.33333333333334" width="393" height="140.00000000000003"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="140" id="pq6-zC-uaL"/>
                                 </constraints>
                                 <collectionViewLayout key="collectionViewLayout" id="aNy-dc-6Nx"/>
                                 <activityIndicatorView key="backgroundView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" id="DWl-wf-6FO" userLabel="activityIndicator">
-                                    <rect key="frame" x="0.0" y="0.0" width="393" height="140"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="140.00000000000003"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 </activityIndicatorView>
                                 <cells>
@@ -62,13 +62,13 @@
                                 </cells>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Y2-OP-IEi" userLabel="newsFeedButton">
-                                <rect key="frame" x="0.0" y="59" width="102.33333333333333" height="40.333333333333343"/>
+                                <rect key="frame" x="0.0" y="103" width="102.33333333333333" height="40.333333333333343"/>
                                 <buttonConfiguration key="configuration" style="plain" image="greaterthan" catalog="system" imagePlacement="trailing" title="News" subtitle="">
                                     <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="20" weight="medium"/>
                                     <fontDescription key="titleFontDescription" style="UICTFontTextStyleTitle2"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <segue destination="BDn-me-K7O" kind="show" identifier="NewsNavigationControllerIdentifier" id="NaC-Jw-pwQ"/>
+                                    <action selector="newsButtonTapped:" destination="iNO-Nh-f9t" eventType="touchUpInside" id="t2P-FN-bRu"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -82,26 +82,28 @@
                             <constraint firstItem="gVv-yA-h8X" firstAttribute="leading" secondItem="b8j-Sg-JtK" secondAttribute="leading" id="xhR-dQ-GB9"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Main" largeTitleDisplayMode="never" id="hji-iy-gXt"/>
                     <connections>
                         <outlet property="activityIndicator" destination="DWl-wf-6FO" id="xh8-hZ-UdI"/>
-                        <outlet property="newsFeedButton" destination="3Y2-OP-IEi" id="P94-Ip-L7A"/>
                         <outlet property="previewNewsFeed" destination="gVv-yA-h8X" id="fUv-QV-u0F"/>
+                        <segue destination="BDn-me-K7O" kind="show" identifier="NewsSegueIdentifier" id="b3x-nt-aI6"/>
+                        <segue destination="POT-LV-qhn" kind="show" identifier="NewsGridSegueIdentifier" id="YQP-Ls-a4L"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qwj-Qd-V58" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="588.54961832061065" y="-75.352112676056336"/>
+            <point key="canvasLocation" x="1515.2671755725189" y="-75.352112676056336"/>
         </scene>
         <!--News-->
         <scene sceneID="2nN-Df-zyP">
             <objects>
                 <viewController id="zWh-op-k4n" customClass="NewsFeedViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="suG-GD-2ns">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Lob-xS-Obq">
-                                <rect key="frame" x="0.0" y="56" width="393" height="786"/>
+                                <rect key="frame" x="0.0" y="103" width="393" height="715"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="jgt-6Z-ZZl"/>
                                 <cells>
@@ -266,7 +268,7 @@
                                 </cells>
                             </collectionView>
                             <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="qaz-36-r7f" userLabel="activityIndicator">
-                                <rect key="frame" x="186.66666666666666" y="822" width="20" height="20"/>
+                                <rect key="frame" x="186.66666666666666" y="798" width="20" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="20" id="2BN-dl-zyE"/>
                                     <constraint firstAttribute="height" constant="20" id="6t3-K9-AHD"/>
@@ -298,7 +300,23 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SFQ-lN-4Qu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2382.4427480916029" y="-75.352112676056336"/>
+            <point key="canvasLocation" x="3309.1603053435115" y="-75.352112676056336"/>
+        </scene>
+        <!--News-->
+        <scene sceneID="8t7-PR-ymR">
+            <objects>
+                <viewController id="POT-LV-qhn" customClass="NewsFeedGridViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="vh0-vX-0eq">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="s5J-oj-1Bo"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="News" id="hxE-oT-BRF"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hvd-Ev-R8g" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2379.3893129770991" y="-750"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="esC-aW-Utb">
@@ -307,7 +325,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="ifp-Id-wje"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="M9m-xX-x0D">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -317,11 +335,29 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NNN-Wd-yEZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1455.7251908396945" y="-75.352112676056336"/>
+            <point key="canvasLocation" x="2380.9160305343512" y="-75.352112676056336"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="3QA-3j-ed1">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hv5-y0-8VV" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="gni-hT-2cE">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="iNO-Nh-f9t" kind="relationship" relationship="rootViewController" id="BKI-DC-fd6"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="K11-V5-EFb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="588.54961832061065" y="-75.352112676056336"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="NaC-Jw-pwQ"/>
+        <segue reference="b3x-nt-aI6"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.right.circle.fill" catalog="system" width="128" height="123"/>

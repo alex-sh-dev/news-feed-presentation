@@ -50,4 +50,8 @@ class BaseNewsViewModel {
             NewsParser.shared.requestNews(page: page, count: count)
         }
     }
+
+    func isEmpty() -> Bool {
+        return self.identifiers.isEmpty
+    }
 }

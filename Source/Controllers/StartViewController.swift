@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class StartViewController: UIViewController, UICollectionViewDelegate {
+class StartViewController: UIViewController, NewsFeedInterface {
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5
@@ -16,11 +16,11 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
         static let kNewsGridSegueIdfr = "NewsGridSegueIdentifier"
     }
     
-    private enum Section {
+    enum Section {
         case main
     }
     
-    private enum NewsItemIdentifier: Hashable {
+    enum NewsItemIdentifier: Hashable {
         case value(UInt)
         case supplementary
         
@@ -35,10 +35,10 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
             }
         }
     }
-    
-    @IBOutlet weak var previewNewsFeed: UICollectionView! {
+
+    @IBOutlet weak var newsFeed: UICollectionView! {
         didSet {
-            previewNewsFeed.alwaysBounceHorizontal = true
+            newsFeed.alwaysBounceHorizontal = true
         }
     }
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -53,20 +53,21 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
 
     private var noNewsLabel: UILabel?
 
-    private var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
-    private var identifiersActionSub: AnyCancellable! {
+    var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
+    var identifiersActionSub: AnyCancellable! {
         didSet {
             let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
             self.newsViewModel.requestItems(count: itemsCount)
             self.activityIndicator.setAction(.start)
         }
     }
-    private var newsViewModel = PreviewNewsViewModel()
-    
+
+    var newsViewModel = PreviewNewsViewModel()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.previewNewsFeed.delegate = self
+        self.newsFeed.delegate = self
         self.configureDataSource()
         self.configureLayout()
         
@@ -99,7 +100,7 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
 
     private func showNoNews() {
         if self.noNewsLabel == nil {
-            self.noNewsLabel = CenteredLabel(text: "No news", parent: self.previewNewsFeed)
+            self.noNewsLabel = CenteredLabel(text: "No news", parent: self.newsFeed)
         }
     }
 
@@ -133,14 +134,14 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
         self.performSegue(withIdentifier: Constants.kNewsSegueIdfr, sender: cell)
     }
 
-    private func configureDataSource() {
+    func configureDataSource() {
         let newsItemCellRegistration = UICollectionView.CellRegistration<PreviewNewsItemCell, NewsItem> {
             cell, _, item in
             cell.configure(with: item.title, and: item.titleImageUrl)
             cell.itemIdentifier = .value(item.id)
         }
 
-        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.previewNewsFeed) { [unowned self]
+        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemIdentifier) -> UICollectionViewCell? in
             if identifier == .supplementary {
                 return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
@@ -158,7 +159,7 @@ class StartViewController: UIViewController, UICollectionViewDelegate {
         dataSource.apply(snapshot, animatingDifferences: false)
     }
     
-    private func configureLayout() {
-        self.previewNewsFeed.collectionViewLayout = PreviewNewsCompositionalLayout()
+    func configureLayout() {
+        self.newsFeed.collectionViewLayout = PreviewNewsCompositionalLayout()
     }
 }

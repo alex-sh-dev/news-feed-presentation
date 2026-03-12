@@ -8,8 +8,8 @@
 import UIKit
 import Combine
 
-class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsItemCellDelegate {
-    private enum NewsItemPartIdentifier: Hashable {
+class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellDelegate {
+    enum NewsItemPartIdentifier: Hashable {
         case main(UInt)
         case image(UInt)
         
@@ -53,18 +53,18 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
         }
     }
     
-    private var identifiersActionSub: AnyCancellable! {
+    var identifiersActionSub: AnyCancellable! {
         didSet {
             self.newsViewModel.fillIdentifiersFromStorage()
         }
     }
-    private let newsViewModel: NewsFeedViewModel = NewsFeedViewModel()
+    var newsViewModel: NewsFeedViewModel = NewsFeedViewModel()
 
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
     }
     
-    private var dataSource: UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>!
+    var dataSource: UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>!
     
     deinit {
         easyLog(String(describing: self))
@@ -204,7 +204,7 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
         self.present(activityVC, animated: true)
     }
 
-    private func configureDataSource() {
+    func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
             let model = self.newsViewModel
@@ -223,7 +223,7 @@ class NewsFeedViewController: UIViewController, UICollectionViewDelegate, NewsIt
         }
     }
 
-    private func configureLayout() {
+    func configureLayout() {
         self.newsFeed.collectionViewLayout = NewsCompositionalLayout()
     }
 }

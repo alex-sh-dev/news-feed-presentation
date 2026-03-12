@@ -18,7 +18,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="gVv-yA-h8X" userLabel="previewNewsFeed">
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="gVv-yA-h8X" userLabel="newsFeed">
                                 <rect key="frame" x="0.0" y="143.33333333333334" width="393" height="140.00000000000003"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
@@ -85,14 +85,14 @@
                     <navigationItem key="navigationItem" title="Main" largeTitleDisplayMode="never" id="hji-iy-gXt"/>
                     <connections>
                         <outlet property="activityIndicator" destination="DWl-wf-6FO" id="xh8-hZ-UdI"/>
-                        <outlet property="previewNewsFeed" destination="gVv-yA-h8X" id="fUv-QV-u0F"/>
+                        <outlet property="newsFeed" destination="gVv-yA-h8X" id="eko-0R-9Zi"/>
                         <segue destination="BDn-me-K7O" kind="show" identifier="NewsSegueIdentifier" id="b3x-nt-aI6"/>
                         <segue destination="POT-LV-qhn" kind="show" identifier="NewsGridSegueIdentifier" id="YQP-Ls-a4L"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qwj-Qd-V58" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1515.2671755725189" y="-75.352112676056336"/>
+            <point key="canvasLocation" x="1513.7404580152672" y="-75.352112676056336"/>
         </scene>
         <!--News-->
         <scene sceneID="2nN-Df-zyP">
@@ -309,10 +309,46 @@
                     <view key="view" contentMode="scaleToFill" id="vh0-vX-0eq">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="zog-8h-b11" userLabel="newsFeed">
+                                <rect key="frame" x="0.0" y="103" width="393" height="715"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewLayout key="collectionViewLayout" id="ynN-fc-cnG"/>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="Np6-WX-Bkh">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="urk-lC-IcP">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </collectionViewCellContentView>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="gsu-Pm-oXm" userLabel="activityIndicator">
+                                <rect key="frame" x="186.66666666666666" y="798" width="20" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="kkU-zt-tRu"/>
+                                    <constraint firstAttribute="height" constant="20" id="qgQ-fF-kUX"/>
+                                </constraints>
+                            </activityIndicatorView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="s5J-oj-1Bo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="s5J-oj-1Bo" firstAttribute="trailing" secondItem="zog-8h-b11" secondAttribute="trailing" id="0PG-0C-NQE"/>
+                            <constraint firstItem="s5J-oj-1Bo" firstAttribute="bottom" secondItem="gsu-Pm-oXm" secondAttribute="bottom" id="5n5-pX-0lm"/>
+                            <constraint firstItem="s5J-oj-1Bo" firstAttribute="bottom" secondItem="zog-8h-b11" secondAttribute="bottom" id="HxY-9j-etF"/>
+                            <constraint firstItem="zog-8h-b11" firstAttribute="top" secondItem="s5J-oj-1Bo" secondAttribute="top" id="cBF-qd-fWI"/>
+                            <constraint firstItem="zog-8h-b11" firstAttribute="leading" secondItem="s5J-oj-1Bo" secondAttribute="leading" id="d0I-dP-beO"/>
+                            <constraint firstItem="gsu-Pm-oXm" firstAttribute="centerX" secondItem="vh0-vX-0eq" secondAttribute="centerX" id="q8O-jb-fwr"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="News" id="hxE-oT-BRF"/>
+                    <connections>
+                        <outlet property="activityIndicator" destination="gsu-Pm-oXm" id="twF-Xc-rar"/>
+                        <outlet property="newsFeed" destination="zog-8h-b11" id="MqE-YW-n17"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hvd-Ev-R8g" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

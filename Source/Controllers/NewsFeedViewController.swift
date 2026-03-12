@@ -95,6 +95,8 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
                     var snapshot = NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>()
                     self.updateSnapshot(&snapshot, with: identifiers, and: newsParts, animate: false)
                     self.scrollToStartItem()
+                case .itemsRequested:
+                    self.activityIndicator.setAction(.start)
                 }
             }
     }
@@ -143,22 +145,6 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
         self.dataSource.apply(snapshot, animatingDifferences: true)
     }
 
-    private func requestNewsParty() {
-        let total = UInt(self.newsFeed.numberOfSections)
-        let itemCount = Constants.kItemCountPerPage
-        let page = (total + itemCount) / itemCount
-        self.newsViewModel.requestItems(page: page, count: itemCount)
-        self.activityIndicator.setAction(.start)
-    }
-
-    private func requestNewsPartyIfNeeded(using indexPath: IndexPath) {
-        let current = indexPath.section
-        let total = UInt(self.newsFeed.numberOfSections)
-        if current == total - Constants.kItemCountPerPage / 2 {
-            self.requestNewsParty()
-        }
-    }
-
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let imagesCell = cell as? NewsItemImagesCell else {
             return
@@ -168,12 +154,8 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
     }
 
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let frameHeight = scrollView.frame.size.height
-
-        if offsetY >= contentHeight - frameHeight {
-            self.requestNewsParty()
+        if scrollView.reachedBottom() {
+            self.newsViewModel.requestNews(desiredItemCount: Constants.kItemCountPerPage)
         }
     }
 
@@ -210,9 +192,10 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
             let model = self.newsViewModel
             switch identifier {
             case .main(let id):
+                model.requestNewsIfNeeded(currentItemRow: UInt(indexPath.section),
+                                          desiredItemCount: Constants.kItemCountPerPage)
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
                 cell.delegate = self
-                self.requestNewsPartyIfNeeded(using: indexPath)
                 cell.configure(with: id, from: model)
                 return cell
             case .image(let id):

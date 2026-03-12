@@ -11,7 +11,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     private struct Config {
         static let kMemoryCapacityMb = 40 * 1024 * 1024
-        static let kDiskCapacityMb = 500 * 1024 * 1024
+        static let kDiskCapacityMb = 2048 * 1024 * 1024
         static let kDiskPath = "urlcache"
         static let kBaseEndpoint = "https://webapi.autodoc.ru/api"
         static let KNewsEndpointPostfix = "news"
@@ -19,7 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
         URLCache.shared = URLCache(memoryCapacity: Config.kMemoryCapacityMb,
                                    diskCapacity: Config.kDiskCapacityMb ,
                                    diskPath: Config.kDiskPath)

@@ -45,10 +45,13 @@ class BaseNewsViewModel {
         return self.identifiers[Int(index)]
     }
 
-    func requestItems(page: UInt = 1, count: UInt) {
+    func requestItems(page: UInt = 1, count: UInt) -> Bool {
         if count > 0 {
             NewsParser.shared.requestNews(page: page, count: count)
+            return true
         }
+
+        return false
     }
 
     func isEmpty() -> Bool {

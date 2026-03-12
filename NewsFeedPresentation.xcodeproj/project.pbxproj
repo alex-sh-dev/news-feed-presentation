@@ -29,6 +29,8 @@
 		D780AC5A2F62DB6C00C0222C /* GridItemContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC592F62DB6C00C0222C /* GridItemContentConfiguration.swift */; };
 		D780AC5C2F62DBBB00C0222C /* GridNewsCompositionalLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC5B2F62DBBB00C0222C /* GridNewsCompositionalLayout.swift */; };
 		D780AC5E2F62E2B100C0222C /* GridItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC5D2F62E2B100C0222C /* GridItemCell.swift */; };
+		D780AC602F636C0A00C0222C /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC5F2F636C0A00C0222C /* Common.swift */; };
+		D780AC622F636D4F00C0222C /* ScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC612F636D4F00C0222C /* ScrollView.swift */; };
 		D780C5FC2F46DE4B00D58269 /* NewsItemParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780C5FB2F46DE4B00D58269 /* NewsItemParser.swift */; };
 		D794E26B2F39F5AA0076DFAA /* NewsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D794E26A2F39F5AA0076DFAA /* NewsParser.swift */; };
 		D794E26D2F3A3F0F0076DFAA /* NewsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D794E26C2F3A3F0F0076DFAA /* NewsStorage.swift */; };
@@ -80,6 +82,8 @@
 		D780AC592F62DB6C00C0222C /* GridItemContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridItemContentConfiguration.swift; sourceTree = "<group>"; };
 		D780AC5B2F62DBBB00C0222C /* GridNewsCompositionalLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridNewsCompositionalLayout.swift; sourceTree = "<group>"; };
 		D780AC5D2F62E2B100C0222C /* GridItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridItemCell.swift; sourceTree = "<group>"; };
+		D780AC5F2F636C0A00C0222C /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
+		D780AC612F636D4F00C0222C /* ScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollView.swift; sourceTree = "<group>"; };
 		D780C5FB2F46DE4B00D58269 /* NewsItemParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemParser.swift; sourceTree = "<group>"; };
 		D794E26A2F39F5AA0076DFAA /* NewsParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsParser.swift; sourceTree = "<group>"; };
 		D794E26C2F3A3F0F0076DFAA /* NewsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsStorage.swift; sourceTree = "<group>"; };
@@ -163,6 +167,7 @@
 				D794E2812F3C46130076DFAA /* Lock.swift */,
 				D711C6192F425611005D1971 /* CollectionCell.swift */,
 				D7F0C9832F4C4653007ACFE7 /* Device.swift */,
+				D780AC612F636D4F00C0222C /* ScrollView.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -246,6 +251,7 @@
 				D711C5E02F3F52D4005D1971 /* Log.swift */,
 				D711C6152F41D704005D1971 /* AsyncQueue.swift */,
 				D780AC472F6012BC00C0222C /* Queue.swift */,
+				D780AC5F2F636C0A00C0222C /* Common.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -375,6 +381,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D780AC552F62AA3500C0222C /* NewsFeedGridViewController.swift in Sources */,
+				D780AC622F636D4F00C0222C /* ScrollView.swift in Sources */,
 				D780AC572F62CEC000C0222C /* NewsFeedInterface.swift in Sources */,
 				D794E26D2F3A3F0F0076DFAA /* NewsStorage.swift in Sources */,
 				D794E2782F3C1F2C0076DFAA /* PreviewNewsItemCell.swift in Sources */,
@@ -405,6 +412,7 @@
 				D73CAF292F43693900ABB035 /* BaseNewsViewModel.swift in Sources */,
 				D780AC4C2F615D9C00C0222C /* RemoteImageContentConfiguration.swift in Sources */,
 				D711C5D72F3E480F005D1971 /* NewsItemImageCell.swift in Sources */,
+				D780AC602F636C0A00C0222C /* Common.swift in Sources */,
 				D711C5DB2F3F2476005D1971 /* Date.swift in Sources */,
 				D711C61A2F425611005D1971 /* CollectionCell.swift in Sources */,
 				D780AC4A2F6147D900C0222C /* TitledImageContentConfiguration.swift in Sources */,

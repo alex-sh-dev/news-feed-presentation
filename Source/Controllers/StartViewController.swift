@@ -15,11 +15,7 @@ class StartViewController: UIViewController, NewsFeedInterface {
         static let kNewsSegueIdfr = "NewsSegueIdentifier"
         static let kNewsGridSegueIdfr = "NewsGridSegueIdentifier"
     }
-    
-    enum Section {
-        case main
-    }
-    
+
     enum NewsItemIdentifier: Hashable {
         case value(UInt)
         case supplementary

@@ -18,6 +18,7 @@ class NewsFeedViewModel: BaseNewsViewModel {
         case reloadImages(UInt)
         case fill([UInt], [NewsItemPart])
         case appendItems([UInt], [NewsItemPart])
+        case itemsRequested
         
         var rawValue: UInt {
             get {
@@ -133,5 +134,20 @@ class NewsFeedViewModel: BaseNewsViewModel {
         }
         
         return imageUrls
+    }
+
+    func requestNews(desiredItemCount: UInt) {
+        let total = UInt(self.identifiers.count)
+        let page = (total + desiredItemCount) / desiredItemCount
+        if self.requestItems(page: page, count: desiredItemCount) {
+            self.identifiersActionPub.send(.itemsRequested)
+        }
+    }
+
+    func requestNewsIfNeeded(currentItemRow: UInt, desiredItemCount: UInt) {
+        let total = UInt(self.identifiers.count)
+        if currentItemRow == total - desiredItemCount / 2 {
+            self.requestNews(desiredItemCount: desiredItemCount)
+        }
     }
 }

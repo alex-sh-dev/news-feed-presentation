@@ -8,10 +8,6 @@
 import UIKit
 
 class NewsItemImagesCell: UICollectionViewCell {
-    private enum Section {
-        case main
-    }
-
     var imageUrls: [URL] = [] {
         didSet {
             var snapshot = self.dataSource.snapshot()

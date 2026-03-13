@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, NewsFeedViewModel> {
+class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, NewsFeedViewModel, GridItemCell> {
     private struct Constants {
         static let kItemCountPerPage: UInt = 20
     }
@@ -70,23 +70,19 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
         return true
     }
 
-    override func configureDataSource() {
-        let gridCellRegistration = UICollectionView.CellRegistration<GridItemCell, NewsItem> {
-            cell, _, item in
-            cell.configure(item: item)
-            cell.itemIdentifier = .value(item.id)
-        }
+    override func cellRegistrationHandler(cell: GridItemCell, indexPath: IndexPath, item: NewsItem) {
+        cell.configure(item: item)
+        cell.itemIdentifier = .value(item.id)
+    }
 
-        self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? in
-            self.newsViewModel.requestNewsIfNeeded(currentItemRow: UInt(indexPath.row))
-            let newsItem = self.newsViewModel.newsItem(at: identifier)!
-            return collectionView.dequeueConfiguredReusableCell(
-                using: gridCellRegistration,
-                for: indexPath,
-                item: newsItem
-            )
-        }
+    override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? {
+        self.newsViewModel.requestNewsIfNeeded(currentItemRow: UInt(indexPath.row))
+        let newsItem = self.newsViewModel.newsItem(at: identifier)!
+        return collectionView.dequeueConfiguredReusableCell(
+            using: self.cellRegistration,
+            for: indexPath,
+            item: newsItem
+        )
     }
 
     override func configureLayout() -> UICollectionViewLayout {

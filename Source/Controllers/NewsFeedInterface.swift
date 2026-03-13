@@ -20,6 +20,9 @@ protocol NewsFeedInterface: UICollectionViewDelegate {
     var dataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>! { get set }
     var identifiersActionSub: AnyCancellable! { get set }
 
-    func configureDataSource()
+    func dataSourceCellProvider(collectionView: UICollectionView,
+                                indexPath: IndexPath,
+                                identifier: ItemIdentifierType) -> UICollectionViewCell?
+
     func configureLayout() -> UICollectionViewLayout
 }

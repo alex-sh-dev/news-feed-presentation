@@ -24,7 +24,7 @@ enum NewsItemPartIdentifier: Hashable {
     }
 }
 
-class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsFeedViewModel>, NewsItemCellDelegate {
+class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsFeedViewModel, CollectionViewCellDefault>, NewsItemCellDelegate {
     private struct Constants {
         static let kItemCountPerPage: UInt = 10
     }
@@ -162,22 +162,19 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         self.present(activityVC, animated: true)
     }
 
-    override func configureDataSource() {
-        self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
-            let model = self.newsViewModel
-            switch identifier {
-            case .main(let id):
-                model.requestNewsIfNeeded(currentItemRow: UInt(indexPath.section))
-                let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
-                cell.delegate = self
-                cell.configure(with: id, from: model)
-                return cell
-            case .image(let id):
-                let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
-                cell.imageUrls = model.imageUrls(for: id)
-                return cell
-            }
+    override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? {
+        let model = self.newsViewModel
+        switch identifier {
+        case .main(let id):
+            model.requestNewsIfNeeded(currentItemRow: UInt(indexPath.section))
+            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
+            cell.delegate = self
+            cell.configure(with: id, from: model)
+            return cell
+        case .image(let id):
+            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
+            cell.imageUrls = model.imageUrls(for: id)
+            return cell
         }
     }
 

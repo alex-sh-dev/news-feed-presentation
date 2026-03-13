@@ -8,9 +8,12 @@
 import UIKit
 import Combine
 
-class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType>: UIViewController, NewsFeedInterface where SectionIdentifierType: Hashable, SectionIdentifierType: Sendable, ItemIdentifierType: Hashable, ItemIdentifierType: Sendable, NewsViewModelType: BaseNewsViewModel {
+typealias CollectionViewCellDefault = UICollectionViewCell
+
+class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType>: UIViewController, NewsFeedInterface where SectionIdentifierType: Hashable, SectionIdentifierType: Sendable, ItemIdentifierType: Hashable, ItemIdentifierType: Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: UICollectionViewCell {
     typealias NewsFeedViewDiffableDataSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
     typealias NewsFeedDiffableDataSourceSnapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
+    typealias CollectionViewCellRegistration = UICollectionView.CellRegistration<CollectionViewCellType, NewsItem>
 
     let kNewsSegueIdentifier = "NewsSegueIdentifier"
 
@@ -24,6 +27,7 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
     var dataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>!
     var newsViewModel = BaseNewsViewModel.createObject(fromType: NewsViewModelType.self)
     var identifiersActionSub: AnyCancellable!
+    private(set) var cellRegistration: CollectionViewCellRegistration!
 
     deinit {
         easyLog(String(describing: self))
@@ -73,7 +77,22 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         }
     }
 
-    func configureDataSource() {}
+    private func configureDataSource() {
+        self.cellRegistration = CollectionViewCellRegistration() {
+            [unowned self] cell, indexPath, item in
+            self.cellRegistrationHandler(cell: cell, indexPath: indexPath, item: item)
+        }
+        self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
+            (collectionView: UICollectionView, indexPath: IndexPath, identifier: ItemIdentifierType) -> UICollectionViewCell? in
+            return self.dataSourceCellProvider(collectionView: collectionView, indexPath: indexPath, identifier: identifier)
+        }
+    }
+
+    func cellRegistrationHandler(cell: CollectionViewCellType, indexPath: IndexPath, item: NewsItem) {}
+
+    func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: ItemIdentifierType) -> UICollectionViewCell? {
+        return nil
+    }
 
     func configureLayout() -> UICollectionViewLayout {
         return UICollectionViewFlowLayout()

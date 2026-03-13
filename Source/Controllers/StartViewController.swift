@@ -24,7 +24,7 @@ enum PreviewNewsItemIdentifier: Hashable {
     }
 }
 
-class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel> {
+class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel, PreviewNewsItemCell> {
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5
@@ -56,13 +56,15 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
             .sink { [weak self] action in
                 guard let self = self else { return }
                 var identifiers = self.transformedIdentifiers()
-                var snapshot = self.dataSource.snapshot()
+                var snapshot: NewsFeedDiffableDataSourceSnapshot!
                 var animate: Bool = false
                 switch action {
                 case .fill:
+                    snapshot = NewsFeedDiffableDataSourceSnapshot()
                     self.activityIndicator.setAction(.stop)
                 case .replaceAll:
                     animate = true
+                    snapshot = self.dataSource.snapshot()
                     snapshot.deleteAllItems()
                 case .empty:
                     self.activityIndicator.setAction(.stop)
@@ -115,28 +117,22 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
             .compactMap{ PreviewNewsItemIdentifier.value($0) }
     }
 
-    override func configureDataSource() {
-        let newsItemCellRegistration = UICollectionView.CellRegistration<PreviewNewsItemCell, NewsItem> {
-            cell, _, item in
-            cell.configure(with: item.title, and: item.titleImageUrl)
-            cell.itemIdentifier = .value(item.id)
+    override func cellRegistrationHandler(cell: PreviewNewsItemCell, indexPath: IndexPath, item: NewsItem) {
+        cell.configure(with: item.title, and: item.titleImageUrl)
+        cell.itemIdentifier = .value(item.id)
+    }
+
+    override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: PreviewNewsItemIdentifier) -> UICollectionViewCell? {
+        if identifier == .supplementary {
+            return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
         }
 
-        self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: PreviewNewsItemIdentifier) -> UICollectionViewCell? in
-            if identifier == .supplementary {
-                return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
-            }
-
-            let newsItem = self.newsViewModel.newsItem(at: identifier.rawValue)!
-            return collectionView.dequeueConfiguredReusableCell(
-                using: newsItemCellRegistration,
-                for: indexPath,
-                item: newsItem
-            )
-        }
-
-        dataSource.apply(NewsFeedDiffableDataSourceSnapshot(), animatingDifferences: false)
+        let newsItem = self.newsViewModel.newsItem(at: identifier.rawValue)!
+        return collectionView.dequeueConfiguredReusableCell(
+            using: self.cellRegistration,
+            for: indexPath,
+            item: newsItem
+        )
     }
 
     override func configureLayout() -> UICollectionViewLayout {

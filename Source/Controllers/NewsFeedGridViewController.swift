@@ -35,7 +35,7 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
                     self.activityIndicator.setAction(.stop)
                     snapshot.appendItems(newIdentifiers)
                 case .fill(let identifiers, _):
-                    snapshot = NSDiffableDataSourceSnapshot<Section, UInt>()
+                    snapshot = NewsFeedDiffableDataSourceSnapshot()
                     snapshot.appendSections([.main])
                     snapshot.appendItems(identifiers)
                     animate = false
@@ -77,7 +77,7 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
             cell.itemIdentifier = .value(item.id)
         }
 
-        self.dataSource = UICollectionViewDiffableDataSource<Section, UInt>(collectionView: self.newsFeed) { [unowned self]
+        self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? in
             self.newsViewModel.requestNewsIfNeeded(currentItemRow: UInt(indexPath.row))
             let newsItem = self.newsViewModel.newsItem(at: identifier)!

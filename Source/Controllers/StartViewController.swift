@@ -122,7 +122,7 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
             cell.itemIdentifier = .value(item.id)
         }
 
-        self.dataSource = UICollectionViewDiffableDataSource<Section, PreviewNewsItemIdentifier>(collectionView: self.newsFeed) { [unowned self]
+        self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: PreviewNewsItemIdentifier) -> UICollectionViewCell? in
             if identifier == .supplementary {
                 return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
@@ -136,8 +136,7 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
             )
         }
 
-        let snapshot = NSDiffableDataSourceSnapshot<Section, PreviewNewsItemIdentifier>()
-        dataSource.apply(snapshot, animatingDifferences: false)
+        dataSource.apply(NewsFeedDiffableDataSourceSnapshot(), animatingDifferences: false)
     }
     
     override func configureLayout() {

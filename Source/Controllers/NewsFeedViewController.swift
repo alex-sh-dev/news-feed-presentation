@@ -73,7 +73,7 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
                     var snapshot = self.dataSource.snapshot()
                     self.updateSnapshot(&snapshot, with: newIdentifiers, and:newsParts, animate: true)
                 case .fill(let identifiers, let newsParts):
-                    var snapshot = NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>()
+                    var snapshot = NewsFeedDiffableDataSourceSnapshot()
                     self.updateSnapshot(&snapshot, with: identifiers, and: newsParts, animate: false)
                     self.scrollToStartItem()
                 case .itemsRequested:
@@ -83,7 +83,7 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
     
-    private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
+    private func updateSnapshot(_ snapshot: inout NewsFeedDiffableDataSourceSnapshot, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
         let sections = identifiers
             .compactMap{ NewsItemIdentifier.value($0) }
         snapshot.appendSections(sections)
@@ -163,7 +163,7 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
     }
 
     override func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [unowned self]
+        self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
             let model = self.newsViewModel
             switch identifier {

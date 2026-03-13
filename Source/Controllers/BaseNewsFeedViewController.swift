@@ -9,6 +9,9 @@ import UIKit
 import Combine
 
 class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType>: UIViewController, NewsFeedInterface where SectionIdentifierType: Hashable, SectionIdentifierType: Sendable, ItemIdentifierType: Hashable, ItemIdentifierType: Sendable, NewsViewModelType: BaseNewsViewModel {
+    typealias NewsFeedViewDiffableDataSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
+    typealias NewsFeedDiffableDataSourceSnapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
+
     let kNewsSegueIdentifier = "NewsSegueIdentifier"
 
     @IBOutlet weak var newsFeed: UICollectionView!

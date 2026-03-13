@@ -44,7 +44,8 @@ class PreviewNewsViewModel: BaseNewsViewModel {
             }
         }
     }
-    
+
+    @discardableResult
     override func requestItems(page: UInt = 1, count: UInt) -> Bool {
         self.requestItemsCount = Int(count)
         return super.requestItems(page: page, count: count)

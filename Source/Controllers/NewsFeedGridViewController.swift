@@ -66,6 +66,16 @@ class NewsFeedGridViewController: UIViewController, NewsFeedInterface {
             }
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let newsFeedVC = segue.destination.children.first as? NewsFeedViewController else {
+            return
+        }
+
+        if let previewItem = sender as? GridItemCell {
+            newsFeedVC.startIdentifier = previewItem.itemIdentifier
+        }
+    }
+
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let id = self.dataSource.itemIdentifier(for: indexPath),
               let newsItem = self.newsViewModel.newsItem(at: id),
@@ -80,6 +90,11 @@ class NewsFeedGridViewController: UIViewController, NewsFeedInterface {
         if scrollView.reachedBottom() {
             self.newsViewModel.requestNews(desiredItemCount: Constants.kItemCountPerPage)
         }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath)
+        self.performSegue(withIdentifier: "NewsSegueIdentifier", sender: cell)
     }
 
     func configureDataSource() {

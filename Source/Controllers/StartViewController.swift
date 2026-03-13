@@ -138,8 +138,8 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
 
         dataSource.apply(NewsFeedDiffableDataSourceSnapshot(), animatingDifferences: false)
     }
-    
-    override func configureLayout() {
-        self.newsFeed.collectionViewLayout = PreviewNewsCompositionalLayout()
+
+    override func configureLayout() -> UICollectionViewLayout {
+        return PreviewNewsCompositionalLayout()
     }
 }

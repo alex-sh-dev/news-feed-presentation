@@ -34,7 +34,7 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         super.viewDidLoad()
         self.newsFeed.delegate = self
         self.configureDataSource()
-        self.configureLayout()
+        self.newsFeed.collectionViewLayout = self.configureLayout()
     }
 
     func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
@@ -75,5 +75,7 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
 
     func configureDataSource() {}
 
-    func configureLayout() {}
+    func configureLayout() -> UICollectionViewLayout {
+        return UICollectionViewFlowLayout()
+    }
 }

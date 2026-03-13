@@ -181,7 +181,7 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         }
     }
 
-    override func configureLayout() {
-        self.newsFeed.collectionViewLayout = NewsCompositionalLayout()
+    override func configureLayout() -> UICollectionViewLayout {
+        return NewsCompositionalLayout()
     }
 }

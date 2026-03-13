@@ -89,7 +89,7 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
         }
     }
 
-    override func configureLayout() {
-        self.newsFeed.collectionViewLayout = GridNewsCompositionalLayout()
+    override func configureLayout() -> UICollectionViewLayout {
+        return GridNewsCompositionalLayout()
     }
 }

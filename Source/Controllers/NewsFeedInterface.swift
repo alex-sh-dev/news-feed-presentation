@@ -21,5 +21,5 @@ protocol NewsFeedInterface: UICollectionViewDelegate {
     var identifiersActionSub: AnyCancellable! { get set }
 
     func configureDataSource()
-    func configureLayout()
+    func configureLayout() -> UICollectionViewLayout
 }

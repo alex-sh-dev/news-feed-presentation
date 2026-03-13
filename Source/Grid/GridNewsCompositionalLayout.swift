@@ -42,7 +42,7 @@ class GridNewsCompositionalLayout: UICollectionViewCompositionalLayout{
                 items.append(item)
             }
 
-            // TODO: refactor
+            // TODO: refactor (solution for iOS 17 +)
             // https://stackoverflow.com/questions/70914299/uicollectionviewcompositionallayout-how-to-expand-cells-to-same-height
             // https://developer.apple.com/documentation/uikit/nscollectionlayoutdimension/uniformacrosssiblings(estimate:)
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(Constants.kGroupFracWidth), heightDimension: .absolute(newHeight))

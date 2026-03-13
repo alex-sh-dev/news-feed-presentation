@@ -22,9 +22,7 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
     }
 
     var dataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>!
-
     var newsViewModel = BaseNewsViewModel.createObject(fromType: NewsViewModelType.self)
-
     var identifiersActionSub: AnyCancellable!
 
     deinit {

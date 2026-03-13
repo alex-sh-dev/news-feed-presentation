@@ -37,7 +37,11 @@ class NewsFeedViewModel: BaseNewsViewModel {
     final var showInFullPressed: Set<UInt> = []
     
     final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
-    
+
+    required init() {
+        super.init()
+    }
+
     private func sendIdentifiers(_ identifiers: [UInt], append: Bool = true) {
         var identifiersToSend: [UInt] = []
         var newsItemParts: [NewsItemPart] = []
@@ -136,18 +140,11 @@ class NewsFeedViewModel: BaseNewsViewModel {
         return imageUrls
     }
 
-    func requestNews(desiredItemCount: UInt) {
-        let total = UInt(self.identifiers.count)
-        let page = (total + desiredItemCount) / desiredItemCount
-        if self.requestItems(page: page, count: desiredItemCount) {
+    override func requestNews() -> Bool {
+        if super.requestNews() {
             self.identifiersActionPub.send(.itemsRequested)
+            return true
         }
-    }
-
-    func requestNewsIfNeeded(currentItemRow: UInt, desiredItemCount: UInt) {
-        let total = UInt(self.identifiers.count)
-        if currentItemRow == total - desiredItemCount / 2 {
-            self.requestNews(desiredItemCount: desiredItemCount)
-        }
+        return false
     }
 }

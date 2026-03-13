@@ -17,7 +17,11 @@ class PreviewNewsViewModel: BaseNewsViewModel {
     
     private var requestItemsCount: Int = 0
     final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
-    
+
+    required init() {
+        super.init()
+    }
+
     override func newsUpdatedSubHandler() -> ([UInt]) -> Void {
         { [weak self] ids in
             guard let self = self else { return }

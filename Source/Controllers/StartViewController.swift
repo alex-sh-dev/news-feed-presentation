@@ -8,49 +8,40 @@
 import UIKit
 import Combine
 
-class StartViewController: UIViewController, NewsFeedInterface {
-    private struct Constants {
-        static let kNewsItemCount: UInt = 10
-        static let kNewsItemReserve: UInt = 5
-        static let kNewsSegueIdfr = "NewsSegueIdentifier"
-        static let kNewsGridSegueIdfr = "NewsGridSegueIdentifier"
-    }
+enum PreviewNewsItemIdentifier: Hashable {
+    case value(UInt)
+    case supplementary
 
-    enum NewsItemIdentifier: Hashable {
-        case value(UInt)
-        case supplementary
-        
-        var rawValue: UInt {
-            get {
-                switch self {
-                case .supplementary:
-                    return UInt.max
-                case .value(let val):
-                    return val
-                }
+    var rawValue: UInt {
+        get {
+            switch self {
+            case .supplementary:
+                return UInt.max
+            case .value(let val):
+                return val
             }
         }
     }
+}
 
-    @IBOutlet weak var newsFeed: UICollectionView! {
-        didSet {
-            newsFeed.alwaysBounceHorizontal = true
-        }
+class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel> {
+    private struct Constants {
+        static let kNewsItemCount: UInt = 10
+        static let kNewsItemReserve: UInt = 5
+        static let kNewsGridSegueIdentifier = "NewsGridSegueIdentifier"
     }
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
     @IBAction func newsButtonTapped(_ sender: Any) {
         if self.newsViewModel.isEmpty() {
             return
         }
-        let idfr = UIDevice.isPad ? Constants.kNewsGridSegueIdfr : Constants.kNewsSegueIdfr
+        let idfr = UIDevice.isPad ? Constants.kNewsGridSegueIdentifier : self.kNewsSegueIdentifier
         self.performSegue(withIdentifier: idfr, sender: sender)
     }
 
     private var noNewsLabel: UILabel?
 
-    var dataSource: UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>!
-    var identifiersActionSub: AnyCancellable! {
+    override var identifiersActionSub: AnyCancellable! {
         didSet {
             let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
             self.newsViewModel.requestItems(count: itemsCount)
@@ -58,15 +49,9 @@ class StartViewController: UIViewController, NewsFeedInterface {
         }
     }
 
-    var newsViewModel = PreviewNewsViewModel()
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.newsFeed.delegate = self
-        self.configureDataSource()
-        self.configureLayout()
-        
+        self.newsFeed.alwaysBounceHorizontal = true
         self.identifiersActionSub = self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
@@ -107,38 +92,38 @@ class StartViewController: UIViewController, NewsFeedInterface {
         }
     }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let newsFeedVC = segue.destination.children.first as? NewsFeedViewController else {
-            return
-        }
-
+    override func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
         if let previewItem = sender as? PreviewNewsItemCell {
-            newsFeedVC.startIdentifier = previewItem.itemIdentifier
+            return previewItem.itemIdentifier
         } else if sender is PreviewNewsSupplementaryCellButton {
-            newsFeedVC.startIdentifier = .index(Constants.kNewsItemCount)
+           return .index(Constants.kNewsItemCount)
         }
+        return nil
     }
-    
-    private func transformedIdentifiers() -> [NewsItemIdentifier] {
+
+    override func shouldHandleCellSelection() -> Bool {
+        return true
+    }
+
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollView.contentOffset.y = 0
+    }
+
+    private func transformedIdentifiers() -> [PreviewNewsItemIdentifier] {
         return self.newsViewModel.identifiers
             .prefix(Int(Constants.kNewsItemCount))
-            .compactMap{ NewsItemIdentifier.value($0) }
+            .compactMap{ PreviewNewsItemIdentifier.value($0) }
     }
 
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = collectionView.cellForItem(at: indexPath)
-        self.performSegue(withIdentifier: Constants.kNewsSegueIdfr, sender: cell)
-    }
-
-    func configureDataSource() {
+    override func configureDataSource() {
         let newsItemCellRegistration = UICollectionView.CellRegistration<PreviewNewsItemCell, NewsItem> {
             cell, _, item in
             cell.configure(with: item.title, and: item.titleImageUrl)
             cell.itemIdentifier = .value(item.id)
         }
 
-        self.dataSource = UICollectionViewDiffableDataSource<Section, NewsItemIdentifier>(collectionView: self.newsFeed) { [unowned self]
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemIdentifier) -> UICollectionViewCell? in
+        self.dataSource = UICollectionViewDiffableDataSource<Section, PreviewNewsItemIdentifier>(collectionView: self.newsFeed) { [unowned self]
+            (collectionView: UICollectionView, indexPath: IndexPath, identifier: PreviewNewsItemIdentifier) -> UICollectionViewCell? in
             if identifier == .supplementary {
                 return UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: PreviewNewsSupplementaryCell.self)
             }
@@ -151,11 +136,11 @@ class StartViewController: UIViewController, NewsFeedInterface {
             )
         }
 
-        let snapshot = NSDiffableDataSourceSnapshot<Section, NewsItemIdentifier>()
+        let snapshot = NSDiffableDataSourceSnapshot<Section, PreviewNewsItemIdentifier>()
         dataSource.apply(snapshot, animatingDifferences: false)
     }
     
-    func configureLayout() {
+    override func configureLayout() {
         self.newsFeed.collectionViewLayout = PreviewNewsCompositionalLayout()
     }
 }

@@ -8,32 +8,25 @@
 import UIKit
 import Combine
 
-class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellDelegate {
-    enum NewsItemPartIdentifier: Hashable {
-        case main(UInt)
-        case image(UInt)
-        
-        var rawValue: UInt {
-            get {
-                switch self {
-                case .main(let val):
-                    return val
-                case .image(let val):
-                    return val
-                }
+enum NewsItemPartIdentifier: Hashable {
+    case main(UInt)
+    case image(UInt)
+
+    var rawValue: UInt {
+        get {
+            switch self {
+            case .main(let val):
+                return val
+            case .image(let val):
+                return val
             }
         }
     }
-    
+}
+
+class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsFeedViewModel>, NewsItemCellDelegate {
     private struct Constants {
         static let kItemCountPerPage: UInt = 10
-    }
-    
-    @IBOutlet weak var newsFeed: UICollectionView!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView! {
-        didSet {
-            self.activityIndicator.isHidden = true
-        }
     }
 
     private var startIdentifierRaw: NewsItemIdentifier = .notValid
@@ -52,35 +45,23 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
             }
         }
     }
-    
-    var identifiersActionSub: AnyCancellable! {
+
+    override var identifiersActionSub: AnyCancellable! {
         didSet {
             self.newsViewModel.fillIdentifiersFromStorage()
         }
     }
-    var newsViewModel: NewsFeedViewModel = NewsFeedViewModel()
 
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
     }
-    
-    var dataSource: UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>!
-    
-    deinit {
-        easyLog(String(describing: self))
-        ImageLoader.shared.cancelAllTasks()
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
 
-        self.newsFeed.delegate = self
-        self.configureDataSource()
-        self.configureLayout()
-        
         self.identifiersActionSub = self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
@@ -99,6 +80,7 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
                     self.activityIndicator.setAction(.start)
                 }
             }
+        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
     
     private func updateSnapshot(_ snapshot: inout NSDiffableDataSourceSnapshot<NewsItemIdentifier, NewsItemPartIdentifier>, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
@@ -145,18 +127,12 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
         self.dataSource.apply(snapshot, animatingDifferences: true)
     }
 
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let imagesCell = cell as? NewsItemImagesCell else {
             return
         }
 
         ImageLoader.shared.suspendTasks(for: imagesCell.visibleImageUrls)
-    }
-
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if scrollView.reachedBottom() {
-            self.newsViewModel.requestNews(desiredItemCount: Constants.kItemCountPerPage)
-        }
     }
 
     func showInFullTapped(cell: NewsItemCell) {
@@ -186,14 +162,13 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
         self.present(activityVC, animated: true)
     }
 
-    func configureDataSource() {
+    override func configureDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource<NewsItemIdentifier, NewsItemPartIdentifier>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? in
             let model = self.newsViewModel
             switch identifier {
             case .main(let id):
-                model.requestNewsIfNeeded(currentItemRow: UInt(indexPath.section),
-                                          desiredItemCount: Constants.kItemCountPerPage)
+                model.requestNewsIfNeeded(currentItemRow: UInt(indexPath.section))
                 let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
                 cell.delegate = self
                 cell.configure(with: id, from: model)
@@ -206,7 +181,7 @@ class NewsFeedViewController: UIViewController, NewsFeedInterface, NewsItemCellD
         }
     }
 
-    func configureLayout() {
+    override func configureLayout() {
         self.newsFeed.collectionViewLayout = NewsCompositionalLayout()
     }
 }

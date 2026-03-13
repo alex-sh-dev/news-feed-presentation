@@ -8,38 +8,19 @@
 import UIKit
 import Combine
 
-class NewsFeedGridViewController: UIViewController, NewsFeedInterface {
+class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, NewsFeedViewModel> {
     private struct Constants {
         static let kItemCountPerPage: UInt = 20
     }
 
-    @IBOutlet weak var newsFeed: UICollectionView!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView! {
-        didSet {
-            self.activityIndicator.isHidden = true
-        }
-    }
-
-    var identifiersActionSub: AnyCancellable! {
+    override var identifiersActionSub: AnyCancellable! {
         didSet {
             self.newsViewModel.fillIdentifiersFromStorage()
         }
     }
-    var newsViewModel: NewsFeedViewModel = NewsFeedViewModel()
-    var dataSource: UICollectionViewDiffableDataSource<Section, UInt>!
-
-    deinit {
-        easyLog(String(describing: self))
-        ImageLoader.shared.cancelAllTasks()
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.newsFeed.delegate = self
-        self.configureDataSource()
-        self.configureLayout()
-
         self.identifiersActionSub = self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
@@ -64,19 +45,18 @@ class NewsFeedGridViewController: UIViewController, NewsFeedInterface {
                 }
                 self.dataSource.apply(snapshot, animatingDifferences: animate)
             }
+        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let newsFeedVC = segue.destination.children.first as? NewsFeedViewController else {
-            return
-        }
-
+    override func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
         if let previewItem = sender as? GridItemCell {
-            newsFeedVC.startIdentifier = previewItem.itemIdentifier
+            return previewItem.itemIdentifier
         }
+
+        return nil
     }
 
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let id = self.dataSource.itemIdentifier(for: indexPath),
               let newsItem = self.newsViewModel.newsItem(at: id),
               let url = newsItem.titleImageUrl else {
@@ -86,18 +66,11 @@ class NewsFeedGridViewController: UIViewController, NewsFeedInterface {
         ImageLoader.shared.suspendTasks(for: [url])
     }
 
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if scrollView.reachedBottom() {
-            self.newsViewModel.requestNews(desiredItemCount: Constants.kItemCountPerPage)
-        }
+    override func shouldHandleCellSelection() -> Bool {
+        return true
     }
 
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = collectionView.cellForItem(at: indexPath)
-        self.performSegue(withIdentifier: "NewsSegueIdentifier", sender: cell)
-    }
-
-    func configureDataSource() {
+    override func configureDataSource() {
         let gridCellRegistration = UICollectionView.CellRegistration<GridItemCell, NewsItem> {
             cell, _, item in
             cell.configure(item: item)
@@ -106,8 +79,7 @@ class NewsFeedGridViewController: UIViewController, NewsFeedInterface {
 
         self.dataSource = UICollectionViewDiffableDataSource<Section, UInt>(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? in
-            self.newsViewModel.requestNewsIfNeeded(currentItemRow: UInt(indexPath.row),
-                                                   desiredItemCount: Constants.kItemCountPerPage)
+            self.newsViewModel.requestNewsIfNeeded(currentItemRow: UInt(indexPath.row))
             let newsItem = self.newsViewModel.newsItem(at: identifier)!
             return collectionView.dequeueConfiguredReusableCell(
                 using: gridCellRegistration,
@@ -117,7 +89,7 @@ class NewsFeedGridViewController: UIViewController, NewsFeedInterface {
         }
     }
 
-    func configureLayout() {
+    override func configureLayout() {
         self.newsFeed.collectionViewLayout = GridNewsCompositionalLayout()
     }
 }

@@ -84,8 +84,8 @@
                     </view>
                     <navigationItem key="navigationItem" title="Main" largeTitleDisplayMode="never" id="hji-iy-gXt"/>
                     <connections>
-                        <outlet property="activityIndicator" destination="DWl-wf-6FO" id="xh8-hZ-UdI"/>
-                        <outlet property="newsFeed" destination="gVv-yA-h8X" id="eko-0R-9Zi"/>
+                        <outlet property="activityIndicator" destination="DWl-wf-6FO" id="DHg-Ge-h0Y"/>
+                        <outlet property="newsFeed" destination="gVv-yA-h8X" id="2d4-nd-79Q"/>
                         <segue destination="BDn-me-K7O" kind="show" identifier="NewsSegueIdentifier" id="b3x-nt-aI6"/>
                         <segue destination="POT-LV-qhn" kind="show" identifier="NewsGridSegueIdentifier" id="YQP-Ls-a4L"/>
                     </connections>
@@ -294,8 +294,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="activityIndicator" destination="qaz-36-r7f" id="EIP-74-r1Q"/>
-                        <outlet property="newsFeed" destination="Lob-xS-Obq" id="zev-8y-yZ7"/>
+                        <outlet property="activityIndicator" destination="qaz-36-r7f" id="grO-GR-vZp"/>
+                        <outlet property="newsFeed" destination="Lob-xS-Obq" id="1g9-Tr-ofp"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SFQ-lN-4Qu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -346,8 +346,8 @@
                     </view>
                     <navigationItem key="navigationItem" title="News" id="hxE-oT-BRF"/>
                     <connections>
-                        <outlet property="activityIndicator" destination="gsu-Pm-oXm" id="twF-Xc-rar"/>
-                        <outlet property="newsFeed" destination="zog-8h-b11" id="MqE-YW-n17"/>
+                        <outlet property="activityIndicator" destination="gsu-Pm-oXm" id="cXt-8b-kxC"/>
+                        <outlet property="newsFeed" destination="zog-8h-b11" id="x3d-hW-68m"/>
                         <segue destination="BDn-me-K7O" kind="show" identifier="NewsSegueIdentifier" id="J7U-2e-syY"/>
                     </connections>
                 </viewController>
@@ -394,7 +394,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="J7U-2e-syY"/>
+        <segue reference="foY-nb-VHE"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.right.circle.fill" catalog="system" width="128" height="123"/>

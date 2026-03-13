@@ -196,6 +196,7 @@
 		D794E2742F3C1DFD0076DFAA /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				D780AC5F2F636C0A00C0222C /* Common.swift */,
 				D7F0C95D2F4C26C2007ACFE7 /* App */,
 				D794E2852F3C63DE0076DFAA /* Basic */,
 				D794E2842F3C63220076DFAA /* Utilities */,
@@ -254,7 +255,6 @@
 				D711C5E02F3F52D4005D1971 /* Log.swift */,
 				D711C6152F41D704005D1971 /* AsyncQueue.swift */,
 				D780AC472F6012BC00C0222C /* Queue.swift */,
-				D780AC5F2F636C0A00C0222C /* Common.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";

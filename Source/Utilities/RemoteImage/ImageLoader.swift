@@ -14,7 +14,6 @@ public class ImageLoader {
 
     private var loadingResponses: [URL: [LoadCompletion]] = [:]
     private var tasks: [URL: URLSessionDataTask] = [:]
-    private let lock = NSLock()
 
     private init() {}
 
@@ -47,10 +46,6 @@ public class ImageLoader {
 
     private func iterateLoadCompletions(image: UIImage?, url: URL) {
         DispatchQueue.main.async {
-            self.lock.lock()
-            defer {
-                self.lock.unlock()
-            }
             if let loadCompletions = self.loadingResponses[url] {
                 if let image = image {
                     URLCache.storeImage(image, for: url)
@@ -71,26 +66,18 @@ public class ImageLoader {
             return
         }
 
-        self.lock.with {
-            if self.loadingResponses[url] != nil {
-                self.loadingResponses[url]?.append(completion)
-                self.resumeTasksIfNeeded(for: [url])
-                return
-            } else {
-                self.loadingResponses[url] = [completion]
-            }
+        if self.loadingResponses[url] != nil {
+            self.loadingResponses[url]?.append(completion)
+            self.resumeTasksIfNeeded(for: [url])
+            return
+        } else {
+            self.loadingResponses[url] = [completion]
         }
 
         beforeLoad()
 
         let task = URLSession.shared.dataTask(with: url) {
             (data, response, error) in
-            var existLoadCompletions: Bool = false
-            self.lock.with { existLoadCompletions = self.loadingResponses[url] != nil }
-            if !existLoadCompletions {
-                return
-            }
-
             guard let responseData = data,
                   let image = UIImage(data: responseData), error == nil else {
                 self.iterateLoadCompletions(image: nil, url: url)

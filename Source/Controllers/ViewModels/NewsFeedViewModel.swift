@@ -8,35 +8,32 @@
 import Foundation
 import Combine
 
-class NewsFeedViewModel: BaseNewsViewModel {
-    enum NewsItemPart {
-        case textImage
-        case onlyText
-    }
+enum NewsItemPart {
+    case textImage
+    case onlyText
+}
+
+enum NewsFeedIdentifiersAction {
+    case reloadImages(UInt)
+    case fill([UInt], [NewsItemPart])
+    case appendItems([UInt], [NewsItemPart])
+    case itemsRequested
     
-    enum IdentifiersAction {
-        case reloadImages(UInt)
-        case fill([UInt], [NewsItemPart])
-        case appendItems([UInt], [NewsItemPart])
-        case itemsRequested
-        
-        var rawValue: UInt {
-            get {
-                switch self {
-                case .reloadImages(let id):
-                    return id
-                default:
-                    return UInt.max
-                }
+    var rawValue: UInt {
+        get {
+            switch self {
+            case .reloadImages(let id):
+                return id
+            default:
+                return UInt.max
             }
         }
     }
-    
+}
+
+class NewsFeedViewModel: BaseActingNewsViewModel<NewsFeedIdentifiersAction> {
     private var newsItemUpdatedSub: AnyCancellable!
-    
     final var showInFullPressed: Set<UInt> = []
-    
-    final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
 
     required init() {
         super.init()
@@ -63,7 +60,7 @@ class NewsFeedViewModel: BaseNewsViewModel {
             return
         }
         
-        let action: IdentifiersAction = append ?
+        let action: NewsFeedIdentifiersAction = append ?
             .appendItems(identifiersToSend, newsItemParts) :
             .fill(identifiersToSend, newsItemParts)
         

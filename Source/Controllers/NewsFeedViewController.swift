@@ -46,23 +46,21 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         }
     }
 
-    override var identifiersActionSub: AnyCancellable! {
-        didSet {
-            self.newsViewModel.fillIdentifiersFromStorage()
-        }
-    }
-
     @IBAction func closeTapped(_ sender: Any) {
         self.dismiss(animated: true)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
+    }
 
-        self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationItem.largeTitleDisplayMode = .always
+    override func identifiersActionSubcriberDidSet() {
+        self.newsViewModel.fillIdentifiersFromStorage()
+    }
 
-        self.identifiersActionSub = self.newsViewModel.identifiersActionPub
+    override func configureIdentifiersActionSubcriber() -> AnyCancellable? {
+        return self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
                 switch action {
@@ -80,10 +78,9 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
                     self.activityIndicator.setAction(.start)
                 }
             }
-        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
-    
-    private func updateSnapshot(_ snapshot: inout NewsFeedDiffableDataSourceSnapshot, with identifiers: [UInt], and parts:[NewsFeedViewModel.NewsItemPart], animate: Bool = false) {
+
+    private func updateSnapshot(_ snapshot: inout NewsFeedDiffableDataSourceSnapshot, with identifiers: [UInt], and parts:[NewsItemPart], animate: Bool = false) {
         let sections = identifiers
             .compactMap{ NewsItemIdentifier.value($0) }
         snapshot.appendSections(sections)

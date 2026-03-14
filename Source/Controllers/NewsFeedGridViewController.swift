@@ -13,15 +13,17 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
         static let kItemCountPerPage: UInt = 20
     }
 
-    override var identifiersActionSub: AnyCancellable! {
-        didSet {
-            self.newsViewModel.fillIdentifiersFromStorage()
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.identifiersActionSub = self.newsViewModel.identifiersActionPub
+        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
+    }
+
+    override func identifiersActionSubcriberDidSet() {
+        self.newsViewModel.fillIdentifiersFromStorage()
+    }
+
+    override func configureIdentifiersActionSubcriber() -> AnyCancellable? {
+        return self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
                 var snapshot = self.dataSource.snapshot()
@@ -45,7 +47,6 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
                 }
                 self.dataSource.apply(snapshot, animatingDifferences: animate)
             }
-        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
 
     override func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {

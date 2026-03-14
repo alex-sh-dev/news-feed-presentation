@@ -8,6 +8,10 @@
 import Foundation
 import Combine
 
+class BaseActingNewsViewModel<IdentifiersActionType>: BaseNewsViewModel {
+    final let identifiersActionPub = PassthroughSubject<IdentifiersActionType, Never>()
+}
+
 class BaseNewsViewModel {
     private var newsUpdatedSub: AnyCancellable!
     var identifiers: [UInt] = []

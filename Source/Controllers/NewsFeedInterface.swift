@@ -18,7 +18,7 @@ protocol NewsFeedInterface: UICollectionViewDelegate {
     associatedtype SectionIdentifierType: Hashable
     associatedtype ItemIdentifierType: Hashable
     var dataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>! { get set }
-    var identifiersActionSub: AnyCancellable! { get set }
+    var identifiersActionSub: AnyCancellable? { get set }
 
     func dataSourceCellProvider(collectionView: UICollectionView,
                                 indexPath: IndexPath,

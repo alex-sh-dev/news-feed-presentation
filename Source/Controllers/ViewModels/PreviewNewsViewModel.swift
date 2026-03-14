@@ -8,15 +8,14 @@
 import Foundation
 import Combine
 
-class PreviewNewsViewModel: BaseNewsViewModel {
-    enum IdentifiersAction {
-        case empty
-        case fill
-        case replaceAll
-    }
-    
+enum PreviewNewsIdentifiersAction {
+    case empty
+    case fill
+    case replaceAll
+}
+
+class PreviewNewsViewModel: BaseActingNewsViewModel<PreviewNewsIdentifiersAction> {
     private var requestItemsCount: Int = 0
-    final let identifiersActionPub = PassthroughSubject<IdentifiersAction, Never>()
 
     required init() {
         super.init()

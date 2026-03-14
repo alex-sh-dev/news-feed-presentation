@@ -24,9 +24,13 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         }
     }
 
-    var dataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>!
-    var newsViewModel = BaseNewsViewModel.createObject(fromType: NewsViewModelType.self)
-    var identifiersActionSub: AnyCancellable!
+    final var dataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>!
+    final var newsViewModel = BaseNewsViewModel.createObject(fromType: NewsViewModelType.self)
+    final var identifiersActionSub: AnyCancellable? {
+        didSet {
+            self.identifiersActionSubcriberDidSet()
+        }
+    }
     private(set) var cellRegistration: CollectionViewCellRegistration!
 
     deinit {
@@ -39,7 +43,12 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         self.newsFeed.delegate = self
         self.configureDataSource()
         self.newsFeed.collectionViewLayout = self.configureLayout()
+        self.identifiersActionSub = self.configureIdentifiersActionSubcriber()
     }
+
+    func identifiersActionSubcriberDidSet() {}
+
+    func configureIdentifiersActionSubcriber() -> AnyCancellable? { return nil }
 
     func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
         return nil

@@ -41,18 +41,19 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
 
     private var noNewsLabel: UILabel?
 
-    override var identifiersActionSub: AnyCancellable! {
-        didSet {
-            let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
-            self.newsViewModel.requestItems(count: itemsCount)
-            self.activityIndicator.setAction(.start)
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         self.newsFeed.alwaysBounceHorizontal = true
-        self.identifiersActionSub = self.newsViewModel.identifiersActionPub
+    }
+
+    override func identifiersActionSubcriberDidSet() {
+        let itemsCount = UInt(Constants.kNewsItemCount + Constants.kNewsItemReserve)
+        self.newsViewModel.requestItems(count: itemsCount)
+        self.activityIndicator.setAction(.start)
+    }
+
+    override func configureIdentifiersActionSubcriber() -> AnyCancellable? {
+        return self.newsViewModel.identifiersActionPub
             .sink { [weak self] action in
                 guard let self = self else { return }
                 var identifiers = self.transformedIdentifiers()

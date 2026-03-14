@@ -57,14 +57,8 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
         return nil
     }
 
-    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let id = self.dataSource.itemIdentifier(for: indexPath),
-              let newsItem = self.newsViewModel.newsItem(at: id),
-              let url = newsItem.titleImageUrl else {
-            return
-        }
-
-        ImageLoader.shared.suspendTasks(for: [url])
+    override func newsItemIdentifier(for indexPath: IndexPath) -> UInt? {
+        return self.dataSource.itemIdentifier(for: indexPath)
     }
 
     override func shouldHandleCellSelection() -> Bool {

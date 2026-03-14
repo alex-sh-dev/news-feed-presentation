@@ -8,12 +8,22 @@
 import UIKit
 
 extension URLCache {
+    static func existImage(for url: URL) -> Bool {
+        let urlReq = URLRequest(url: url)
+        guard let cachedResponse = URLCache.shared.cachedResponse(for: urlReq),
+              cachedResponse.data.count > 0 else {
+            return false
+        }
+
+        return true
+    }
+
     static func image(for url: URL) -> UIImage? {
         let urlReq = URLRequest(url: url)
         guard let cachedResponse = URLCache.shared.cachedResponse(for: urlReq) else {
             return nil
         }
-        
+
         return UIImage(data: cachedResponse.data) ?? nil
     }
 

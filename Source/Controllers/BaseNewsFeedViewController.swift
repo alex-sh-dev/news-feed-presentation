@@ -10,7 +10,7 @@ import Combine
 
 typealias CollectionViewCellDefault = UICollectionViewCell
 
-class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType>: UIViewController, NewsFeedInterface where SectionIdentifierType: Hashable, SectionIdentifierType: Sendable, ItemIdentifierType: Hashable, ItemIdentifierType: Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: UICollectionViewCell {
+class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType>: UIViewController, UICollectionViewDataSourcePrefetching, NewsFeedInterface where SectionIdentifierType: Hashable, SectionIdentifierType: Sendable, ItemIdentifierType: Hashable, ItemIdentifierType: Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: UICollectionViewCell {
     typealias NewsFeedViewDiffableDataSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
     typealias NewsFeedDiffableDataSourceSnapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
     typealias CollectionViewCellRegistration = UICollectionView.CellRegistration<CollectionViewCellType, NewsItem>
@@ -41,6 +41,7 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
     override func viewDidLoad() {
         super.viewDidLoad()
         self.newsFeed.delegate = self
+        self.newsFeed.prefetchDataSource = self
         self.configureDataSource()
         self.newsFeed.collectionViewLayout = self.configureLayout()
         self.identifiersActionSub = self.configureIdentifiersActionSubcriber()
@@ -76,7 +77,40 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         self.performSegue(withIdentifier: kNewsSegueIdentifier, sender: cell)
     }
 
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {}
+    func newsItemIdentifier(for indexPath: IndexPath) -> UInt? { return nil }
+
+    private func newsItem(for indexPath: IndexPath) -> NewsItem? {
+        guard let id = self.newsItemIdentifier(for: indexPath) else {
+            return nil
+        }
+        return self.newsViewModel.newsItem(at: id)
+    }
+
+    private func imageUrls(for indexPaths: [IndexPath]) -> [URL] {
+        var urls: [URL] = []
+        for indexPath in indexPaths {
+            if let newsItem = self.newsItem(for: indexPath),
+               let url = newsItem.titleImageUrl {
+                urls.append(url)
+            }
+        }
+        return urls
+    }
+
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        let urls = self.imageUrls(for: indexPaths)
+        urls.forEach { url in
+            ImageLoader.shared.loadIfNeeded(url: url)
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+        ImageLoader.shared.suspendTasks(for: self.imageUrls(for: indexPaths))
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        self.collectionView(collectionView, cancelPrefetchingForItemsAt: [indexPath])
+    }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {}
 

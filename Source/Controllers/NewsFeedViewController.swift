@@ -124,12 +124,27 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         self.dataSource.apply(snapshot, animatingDifferences: true)
     }
 
-    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let imagesCell = cell as? NewsItemImagesCell else {
-            return
+    override func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+        indexPaths.forEach { indexPath in
+            if let id = self.newsItemIdentifier(for: indexPath) {
+                let imageUrls = self.newsViewModel.imageUrls(for: id)
+                ImageLoader.shared.suspendTasks(for: imageUrls)
+            }
         }
+    }
 
-        ImageLoader.shared.suspendTasks(for: imagesCell.visibleImageUrls)
+    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        self.collectionView(collectionView, cancelPrefetchingForItemsAt: [indexPath])
+    }
+
+    override func newsItemIdentifier(for indexPath: IndexPath) -> UInt? {
+        let identifier = self.dataSource.itemIdentifier(for: indexPath)
+        switch identifier {
+        case .image(let id):
+            return id
+        default:
+            return nil
+        }
     }
 
     func showInFullTapped(cell: NewsItemCell) {

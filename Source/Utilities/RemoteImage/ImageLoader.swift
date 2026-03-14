@@ -18,8 +18,9 @@ public class ImageLoader {
     private init() {}
 
     final func suspendTasks(for urls: [URL]) {
+        let surls = Set(urls)
         for (url, task) in self.tasks {
-            if urls.contains(url) {
+            if surls.contains(url) {
                 task.suspend()
                 continue
             }
@@ -31,8 +32,9 @@ public class ImageLoader {
     }
 
     final func resumeTasksIfNeeded(for urls: [URL]) {
+        let surls = Set(urls)
         for (url, task) in self.tasks {
-            if urls.contains(url) && task.state == .suspended {
+            if surls.contains(url) && task.state == .suspended {
                 task.resume()
             }
         }
@@ -59,12 +61,20 @@ public class ImageLoader {
         }
     }
 
+    final func loadIfNeeded(url: URL) {
+        if !URLCache.existImage(for: url) {
+            self.load(url: url)
+        }
+    }
+
     final func load(url: URL, beforeLoad: @escaping () -> Void = {},
-                    completion: @escaping LoadCompletion) {
+                    completion: @escaping LoadCompletion = { _,_,_ in }) {
         if let cachedImage = URLCache.image(for: url) {
             completion(url, cachedImage, true)
             return
         }
+
+        beforeLoad()
 
         if self.loadingResponses[url] != nil {
             self.loadingResponses[url]?.append(completion)
@@ -73,8 +83,6 @@ public class ImageLoader {
         } else {
             self.loadingResponses[url] = [completion]
         }
-
-        beforeLoad()
 
         let task = URLSession.shared.dataTask(with: url) {
             (data, response, error) in

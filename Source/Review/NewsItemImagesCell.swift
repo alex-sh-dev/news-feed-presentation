@@ -27,19 +27,6 @@ class NewsItemImagesCell: UICollectionViewCell {
         }
     }
 
-    var visibleImageUrls: [URL] {
-        get {
-            let visibleIndexPaths = self.imageCollection.indexPathsForVisibleItems
-            var urls: [URL] = []
-            for indexPath in visibleIndexPaths {
-                if let url = self.dataSource.itemIdentifier(for: indexPath) {
-                    urls.append(url)
-                }
-            }
-            return urls
-        }
-    }
-
     private var dataSource: UICollectionViewDiffableDataSource<Section, URL>!
     
     @IBOutlet weak var imageCollection: UICollectionView! {
@@ -65,7 +52,7 @@ class NewsItemImagesCell: UICollectionViewCell {
             
             var snapshot = NSDiffableDataSourceSnapshot<Section, URL>()
             snapshot.appendSections([.main])
-            dataSource.apply(snapshot, animatingDifferences: false)
+            self.dataSource.apply(snapshot, animatingDifferences: false)
         }
     }
 }

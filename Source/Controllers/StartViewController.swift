@@ -118,6 +118,10 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
             .compactMap{ PreviewNewsItemIdentifier.value($0) }
     }
 
+    override func newsItemIdentifier(for indexPath: IndexPath) -> UInt? {
+        return self.dataSource.itemIdentifier(for: indexPath)?.rawValue
+    }
+
     override func cellRegistrationHandler(cell: PreviewNewsItemCell, indexPath: IndexPath, item: NewsItem) {
         cell.configure(with: item.title, and: item.titleImageUrl)
         cell.itemIdentifier = .value(item.id)

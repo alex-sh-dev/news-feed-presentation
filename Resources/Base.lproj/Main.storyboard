@@ -286,7 +286,7 @@
                             <constraint firstItem="Lob-xS-Obq" firstAttribute="bottom" secondItem="UUz-Ew-idt" secondAttribute="bottom" id="whD-3z-6TV"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="News" id="JF2-AQ-B0G">
+                    <navigationItem key="navigationItem" title="News" largeTitleDisplayMode="always" id="JF2-AQ-B0G">
                         <barButtonItem key="leftBarButtonItem" systemItem="stop" id="lCN-6m-kI8">
                             <connections>
                                 <action selector="closeTapped:" destination="zWh-op-k4n" id="mgv-OW-TTD"/>
@@ -352,8 +352,8 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="BDn-me-K7O" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="ifp-Id-wje"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="M9m-xX-x0D">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="M9m-xX-x0D">
+                        <rect key="frame" x="0.0" y="59" width="393" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -385,7 +385,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="foY-nb-VHE"/>
+        <segue reference="J7U-2e-syY"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.right.circle.fill" catalog="system" width="128" height="123"/>

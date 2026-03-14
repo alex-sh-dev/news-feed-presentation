@@ -108,7 +108,7 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         ImageLoader.shared.suspendTasks(for: self.imageUrls(for: indexPaths))
     }
 
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    final func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         self.collectionView(collectionView, cancelPrefetchingForItemsAt: [indexPath])
     }
 

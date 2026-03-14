@@ -133,10 +133,6 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         }
     }
 
-    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.collectionView(collectionView, cancelPrefetchingForItemsAt: [indexPath])
-    }
-
     override func newsItemIdentifier(for indexPath: IndexPath) -> UInt? {
         let identifier = self.dataSource.itemIdentifier(for: indexPath)
         switch identifier {

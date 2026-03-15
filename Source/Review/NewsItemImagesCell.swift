@@ -28,7 +28,20 @@ class NewsItemImagesCell: UICollectionViewCell {
     }
 
     private var dataSource: UICollectionViewDiffableDataSource<Section, URL>!
-    
+
+    var visibleImageUrls: [URL] {
+        get {
+            let visibleIndexPaths = self.imageCollection.indexPathsForVisibleItems
+            var urls: [URL] = []
+            for indexPath in visibleIndexPaths {
+                if let url = self.dataSource.itemIdentifier(for: indexPath) {
+                    urls.append(url)
+                }
+            }
+            return urls
+        }
+    }
+
     @IBOutlet weak var imageCollection: UICollectionView! {
         didSet {
             self.imageCollection.collectionViewLayout = ImagesCompositionalLayout {

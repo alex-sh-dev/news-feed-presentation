@@ -32,10 +32,8 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
     class NewsFeedImagesPrefetcher : NewsImagesPrefetcher {
         override func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
             indexPaths.forEach { indexPath in
-                if let id = self.itemIdProvider?(indexPath),
-                   let model = self.model as? NewsFeedViewModel {
-                    let imageUrls = model.imageUrls(for: id)
-                    ImageLoader.shared.cancelTasks(for: imageUrls)
+                if let cell = collectionView.cellForItem(at: indexPath) as? NewsItemImagesCell {
+                    ImageLoader.shared.cancelTasks(for: cell.visibleImageUrls)
                 }
             }
         }
@@ -64,12 +62,14 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.imagesPrefetcher = NewsFeedImagesPrefetcher(model: self.newsViewModel) {
+        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
+    }
+
+    override func configurePrefetchDataSource() -> NewsImagesPrefetcher? {
+        return NewsFeedImagesPrefetcher(model: self.newsViewModel) {
             [weak self] indexPath in
             return self?.newsItemId(for: indexPath)
         }
-        self.newsFeed.prefetchDataSource = self.imagesPrefetcher
-        self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
 
     override func identifiersActionSubcriberDidSet() {

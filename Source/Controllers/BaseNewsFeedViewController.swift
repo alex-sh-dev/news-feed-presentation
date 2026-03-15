@@ -31,15 +31,13 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
             self.identifiersActionSubcriberDidSet()
         }
     }
+
     private(set) var cellRegistration: CollectionViewCellRegistration!
-    var imagesPrefetcher: NewsImagesPrefetcher!
+    private(set) var imagesPrefetcher: NewsImagesPrefetcher!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.imagesPrefetcher = NewsImagesPrefetcher(model: self.newsViewModel) {
-            [weak self] indexPath in
-            return self?.newsItemId(for: indexPath)
-        }
+        self.imagesPrefetcher = self.configurePrefetchDataSource()
         self.newsFeed.prefetchDataSource = self.imagesPrefetcher
         self.newsFeed.delegate = self
         self.configureDataSource()
@@ -49,6 +47,13 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
 
     deinit {
         easyLog(String(describing: self))
+    }
+
+    func configurePrefetchDataSource() -> NewsImagesPrefetcher? {
+        return NewsImagesPrefetcher(model: self.newsViewModel) {
+            [weak self] indexPath in
+            return self?.newsItemId(for: indexPath)
+        }
     }
 
     func identifiersActionSubcriberDidSet() {}

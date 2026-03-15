@@ -8,34 +8,24 @@
 import UIKit
 
 public class ImageLoader {
+    private struct Constants {
+        static let kRequestTimeoutSec: TimeInterval = 5
+    }
+
     static let shared = ImageLoader()
 
-    typealias LoadCompletion = (_ url: URL, _ image: UIImage?, _ cached: Bool) -> Void
+    typealias LoadCompletion = (_ url: URL, _ image: UIImage?) -> Void
 
     private var loadingResponses: [URL: [LoadCompletion]] = [:]
     private var tasks: [URL: URLSessionDataTask] = [:]
 
     private init() {}
 
-    final func suspendTasks(for urls: [URL]) {
+    final func cancelTasks(for urls: [URL]) {
         let surls = Set(urls)
         for (url, task) in self.tasks {
             if surls.contains(url) {
-                task.suspend()
-                continue
-            }
-
-            if task.state == .suspended {
-                task.resume()
-            }
-        }
-    }
-
-    final func resumeTasksIfNeeded(for urls: [URL]) {
-        let surls = Set(urls)
-        for (url, task) in self.tasks {
-            if surls.contains(url) && task.state == .suspended {
-                task.resume()
+                task.cancel()
             }
         }
     }
@@ -49,28 +39,33 @@ public class ImageLoader {
     private func iterateLoadCompletions(image: UIImage?, url: URL) {
         DispatchQueue.main.async {
             if let loadCompletions = self.loadingResponses[url] {
+                self.loadingResponses.removeValue(forKey: url)
+                self.tasks.removeValue(forKey: url)
+
                 if let image = image {
                     URLCache.storeImage(image, for: url)
                 }
                 for completion in loadCompletions {
-                    completion(url, image, false)
+                    completion(url, image)
                 }
-                self.loadingResponses.removeValue(forKey: url)
-                self.tasks.removeValue(forKey: url)
             }
         }
     }
 
-    final func loadIfNeeded(url: URL) {
-        if !URLCache.existImage(for: url) {
-            self.load(url: url)
+    final func needLoad(url: URL) -> Bool {
+        return !URLCache.existImage(for: url)
+    }
+
+    final func loadIfNeeded(url: URL, completion: @escaping LoadCompletion = { _,_ in }) {
+        if self.needLoad(url: url) {
+            self.load(url: url, completion: completion)
         }
     }
 
     final func load(url: URL, beforeLoad: @escaping () -> Void = {},
-                    completion: @escaping LoadCompletion = { _,_,_ in }) {
+                    completion: @escaping LoadCompletion = { _,_ in }) {
         if let cachedImage = URLCache.image(for: url) {
-            completion(url, cachedImage, true)
+            completion(url, cachedImage)
             return
         }
 
@@ -78,13 +73,14 @@ public class ImageLoader {
 
         if self.loadingResponses[url] != nil {
             self.loadingResponses[url]?.append(completion)
-            self.resumeTasksIfNeeded(for: [url])
             return
         } else {
             self.loadingResponses[url] = [completion]
         }
 
-        let task = URLSession.shared.dataTask(with: url) {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = Constants.kRequestTimeoutSec
+        let task = URLSession.shared.dataTask(with: request) {
             (data, response, error) in
             guard let responseData = data,
                   let image = UIImage(data: responseData), error == nil else {

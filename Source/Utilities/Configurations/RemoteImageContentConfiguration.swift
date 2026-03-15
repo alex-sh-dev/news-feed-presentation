@@ -8,6 +8,10 @@
 import UIKit
 
 class RemoteImageContentView: UIView, UIContentView {
+    private struct Constants {
+        static let kTryLoadAfterDelaySec = 1.0
+    }
+
     private(set) var imageView: UIImageView! {
         didSet {
             imageView.contentMode = .scaleAspectFill
@@ -64,11 +68,48 @@ class RemoteImageContentView: UIView, UIContentView {
         self.imageView.backgroundColor = UIColor.lightGray
     }
 
+    private func tryLoadAfterDelay(url: URL) {
+        let time: DispatchTime = .now() + Constants.kTryLoadAfterDelaySec
+        DispatchQueue.main.asyncAfter(deadline: time) {
+            [weak self] in
+            if let config = self?.currentConfiguration,
+               config.load == .canceled {
+                self?.loadImage(url: url)
+            }
+        }
+    }
+
+    private func loadImage(url: URL) {
+        self.currentConfiguration.load = .loadRequested
+        ImageLoader.shared.load(url: url, beforeLoad: {
+            [weak self] in
+            self?.setDefaultImage()
+        }) {
+            [weak self] (fetchedUrl, image) in
+            guard let self = self else { return }
+            if fetchedUrl != self.currentConfiguration.imageUrl {
+                return
+            }
+
+            if image != nil {
+                self.imageView.image = image
+                self.currentConfiguration.load = .loaded
+            } else {
+                self.currentConfiguration.load = .canceled
+                self.tryLoadAfterDelay(url: fetchedUrl)
+            }
+        }
+    }
+
     @discardableResult
     func apply(configuration: any RemoteImageContentInterface) -> Bool {
-        if configuration.equalTo(value: self.currentConfiguration) {
-            return false
+        let equalConfigs = configuration.equalTo(value: self.currentConfiguration)
+        if equalConfigs, configuration.load == .canceled,
+            let url = configuration.imageUrl {
+            self.loadImage(url: url)
         }
+
+        if equalConfigs { return false }
 
         self.currentConfiguration = configuration
         guard let url = configuration.imageUrl else {
@@ -76,29 +117,27 @@ class RemoteImageContentView: UIView, UIContentView {
             return true
         }
 
-        ImageLoader.shared.load(url: url, beforeLoad: {
-            [weak self] in
-            self?.setDefaultImage()
-        }) {
-            [weak self] (fetchedUrl, image, cached) in
-            guard let self = self else { return }
-            let equalUrls = fetchedUrl == self.currentConfiguration.imageUrl
-            if (cached || equalUrls) && image != nil {
-                self.imageView.image = image
-            }
-        }
-
+        self.loadImage(url: url)
         return true
     }
 }
 
+enum ImageLoadState {
+    case none
+    case loadRequested
+    case loaded
+    case canceled
+}
+
 protocol RemoteImageContentInterface: UIContentConfiguration, Hashable {
     var imageUrl: URL? { get set }
+    var load: ImageLoadState { get set }
     func equalTo(value: (any RemoteImageContentInterface)?) -> Bool
 }
 
 struct RemoteImageContentConfiguration: RemoteImageContentInterface {
     var imageUrl: URL?
+    var load: ImageLoadState = .none
 
     func makeContentView() -> UIView & UIContentView {
         return RemoteImageContentView(configuration: self)

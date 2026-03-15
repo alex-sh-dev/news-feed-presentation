@@ -57,7 +57,7 @@ class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, News
         return nil
     }
 
-    override func newsItemIdentifier(for indexPath: IndexPath) -> UInt? {
+    override func newsItemId(for indexPath: IndexPath) -> UInt? {
         return self.dataSource.itemIdentifier(for: indexPath)
     }
 

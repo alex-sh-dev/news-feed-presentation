@@ -65,6 +65,7 @@ class TitledImageContentView: RemoteImageContentView {
 
 struct TitledImageContentConfiguration: RemoteImageContentInterface {
     var imageUrl: URL?
+    var load: ImageLoadState = .none
     var title: String?
 
     func makeContentView() -> UIView & UIContentView {

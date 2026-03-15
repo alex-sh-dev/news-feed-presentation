@@ -119,6 +119,7 @@ class GridItemContentView: RemoteImageContentView {
 
 struct GridItemContentConfiguration: RemoteImageContentInterface {
     var imageUrl: URL?
+    var load: ImageLoadState = .none
     var title: String?
     var subtitle: String?
     var date: Date?

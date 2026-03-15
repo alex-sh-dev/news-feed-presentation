@@ -29,6 +29,18 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         static let kItemCountPerPage: UInt = 10
     }
 
+    class NewsFeedImagesPrefetcher : NewsImagesPrefetcher {
+        override func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+            indexPaths.forEach { indexPath in
+                if let id = self.itemIdProvider?(indexPath),
+                   let model = self.model as? NewsFeedViewModel {
+                    let imageUrls = model.imageUrls(for: id)
+                    ImageLoader.shared.cancelTasks(for: imageUrls)
+                }
+            }
+        }
+    }
+
     private var startIdentifierRaw: NewsItemIdentifier = .notValid
     var startIdentifier: NewsItemIdentifier {
         set { startIdentifierRaw = newValue }
@@ -52,6 +64,11 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.imagesPrefetcher = NewsFeedImagesPrefetcher(model: self.newsViewModel) {
+            [weak self] indexPath in
+            return self?.newsItemId(for: indexPath)
+        }
+        self.newsFeed.prefetchDataSource = self.imagesPrefetcher
         self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
 
@@ -124,16 +141,7 @@ class NewsFeedViewController: BaseNewsFeedViewController<NewsItemIdentifier, New
         self.dataSource.apply(snapshot, animatingDifferences: true)
     }
 
-    override func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach { indexPath in
-            if let id = self.newsItemIdentifier(for: indexPath) {
-                let imageUrls = self.newsViewModel.imageUrls(for: id)
-                ImageLoader.shared.suspendTasks(for: imageUrls)
-            }
-        }
-    }
-
-    override func newsItemIdentifier(for indexPath: IndexPath) -> UInt? {
+    override func newsItemId(for indexPath: IndexPath) -> UInt? {
         let identifier = self.dataSource.itemIdentifier(for: indexPath)
         switch identifier {
         case .image(let id):

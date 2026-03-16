@@ -133,6 +133,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D72E9A2A2F681617008BB8F3 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				D73CAF252F4360A700ABB035 /* NewsItemIdentifier.swift */,
+				D72E9A202F66E157008BB8F3 /* NewsImagesPrefetcher.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		D73CAF272F43690D00ABB035 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -243,15 +252,14 @@
 		D794E2832F3C63190076DFAA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				D72E9A2A2F681617008BB8F3 /* Common */,
 				D73CAF272F43690D00ABB035 /* ViewModels */,
 				D780AC562F62CEC000C0222C /* NewsFeedInterface.swift */,
-				D73CAF252F4360A700ABB035 /* NewsItemIdentifier.swift */,
 				D780AC632F63D1DB00C0222C /* BaseNewsFeedViewController.swift */,
 				D72E9A282F67FC7B008BB8F3 /* NewsFeedViewController.swift */,
 				D7E5AF8C2F38689900B82167 /* StartViewController.swift */,
 				D72493AE2F39B9AC00B04CD6 /* NewsFeedDetailsViewController.swift */,
 				D780AC542F62AA3500C0222C /* NewsFeedGridViewController.swift */,
-				D72E9A202F66E157008BB8F3 /* NewsImagesPrefetcher.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";

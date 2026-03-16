@@ -43,7 +43,7 @@ class NewsItemCell: UICollectionViewCell {
         self.showInFullHeightConstraint.constant = hidden ? 0 : self.savedHeightConstant
     }
 
-    func configure(with id: UInt, from model: NewsFeedViewModel) {
+    func configure(with id: UInt, from model: NewsViewModel) {
         let newsItem = model.newsItem(at: id)!
         self.newsItemId = id
         self.titleLabel.text = newsItem.title

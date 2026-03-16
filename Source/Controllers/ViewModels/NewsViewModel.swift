@@ -1,5 +1,5 @@
 //
-//  NewsFeedViewModel.swift
+//  NewsViewModel.swift
 //  NewsFeedPresentation
 //
 //  Created by dev on 2/16/26.
@@ -13,7 +13,7 @@ enum NewsItemPart {
     case onlyText
 }
 
-enum NewsFeedIdentifiersAction {
+enum NewsIdentifiersAction {
     case reloadImages(UInt)
     case fill([UInt], [NewsItemPart])
     case appendItems([UInt], [NewsItemPart])
@@ -31,7 +31,7 @@ enum NewsFeedIdentifiersAction {
     }
 }
 
-class NewsFeedViewModel: BaseActingNewsViewModel<NewsFeedIdentifiersAction> {
+class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
     private var newsItemUpdatedSub: AnyCancellable!
     final var showInFullPressed: Set<UInt> = []
 
@@ -60,7 +60,7 @@ class NewsFeedViewModel: BaseActingNewsViewModel<NewsFeedIdentifiersAction> {
             return
         }
         
-        let action: NewsFeedIdentifiersAction = append ?
+        let action: NewsIdentifiersAction = append ?
             .appendItems(identifiersToSend, newsItemParts) :
             .fill(identifiersToSend, newsItemParts)
         

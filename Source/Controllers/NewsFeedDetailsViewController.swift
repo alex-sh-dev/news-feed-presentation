@@ -24,7 +24,7 @@ enum NewsItemPartIdentifier: Hashable {
     }
 }
 
-class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsFeedViewModel, ImageCollectionViewCellDefault>, NewsItemCellDelegate {
+class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsViewModel, ImageCollectionViewCellDefault>, NewsItemCellDelegate {
     private struct Constants {
         static let kItemCountPerPage: UInt = 10
     }

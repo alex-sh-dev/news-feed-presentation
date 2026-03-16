@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PreviewNewsItemCell: UICollectionViewCell {
+class PreviewNewsItemCell: ImageCollectionViewCell {
     private struct Constants {
         static let kDefDuration = 0.2
         static let kMinTfScale = 0.9

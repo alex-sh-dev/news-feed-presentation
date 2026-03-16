@@ -15,8 +15,6 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
     typealias NewsFeedDiffableDataSourceSnapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
     typealias CollectionViewCellRegistration = UICollectionView.CellRegistration<CollectionViewCellType, NewsItem>
 
-    let kNewsSegueIdentifier = "NewsSegueIdentifier"
-
     @IBOutlet weak var newsFeed: UICollectionView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView! {
         didSet {
@@ -33,12 +31,9 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
     }
 
     private(set) var cellRegistration: CollectionViewCellRegistration!
-    private(set) var imagesPrefetcher: NewsImagesPrefetcher!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.imagesPrefetcher = self.configurePrefetchDataSource()
-        self.newsFeed.prefetchDataSource = self.imagesPrefetcher
         self.newsFeed.delegate = self
         self.configureDataSource()
         self.newsFeed.collectionViewLayout = self.configureLayout()
@@ -49,48 +44,15 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         easyLog(String(describing: self))
     }
 
-    func configurePrefetchDataSource() -> NewsImagesPrefetcher? {
-        return NewsImagesPrefetcher(model: self.newsViewModel) {
-            [weak self] indexPath in
-            return self?.newsItemId(for: indexPath)
-        }
-    }
-
     func identifiersActionSubcriberDidSet() {}
 
     func configureIdentifiersActionSubcriber() -> AnyCancellable? { return nil }
 
-    func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
-        return nil
-    }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {}
 
-    func newsItemId(for indexPath: IndexPath) -> UInt? { return nil }
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {}
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let newsFeedVC = segue.destination.children.first as? NewsFeedViewController else {
-            return
-        }
-
-        if let identifier = startIdentifierToScrollItem(sender: sender) {
-            newsFeedVC.startIdentifier = identifier
-        }
-    }
-
-    func shouldHandleCellSelection() -> Bool {
-        return false
-    }
-
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if !self.shouldHandleCellSelection() {
-            return
-        }
-        let cell = collectionView.cellForItem(at: indexPath)
-        self.performSegue(withIdentifier: kNewsSegueIdentifier, sender: cell)
-    }
-
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.imagesPrefetcher.collectionView(collectionView, cancelPrefetchingForItemsAt: [indexPath])
-    }
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {}
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {}
 

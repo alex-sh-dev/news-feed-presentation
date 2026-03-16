@@ -8,10 +8,6 @@
 import UIKit
 
 class RemoteImageContentView: UIView, UIContentView {
-    private struct Constants {
-        static let kTryLoadAfterDelaySec = 1.0
-    }
-
     private(set) var imageView: UIImageView! {
         didSet {
             imageView.contentMode = .scaleAspectFill
@@ -68,17 +64,6 @@ class RemoteImageContentView: UIView, UIContentView {
         self.imageView.backgroundColor = UIColor.lightGray
     }
 
-    private func tryLoadAfterDelay(url: URL) {
-        let time: DispatchTime = .now() + Constants.kTryLoadAfterDelaySec
-        DispatchQueue.main.asyncAfter(deadline: time) {
-            [weak self] in
-            if let config = self?.currentConfiguration,
-               config.load == .canceled {
-                self?.loadImage(url: url)
-            }
-        }
-    }
-
     private func loadImage(url: URL) {
         self.currentConfiguration.load = .loadRequested
         ImageLoader.shared.load(url: url, beforeLoad: {
@@ -88,6 +73,7 @@ class RemoteImageContentView: UIView, UIContentView {
             [weak self] (fetchedUrl, image) in
             guard let self = self else { return }
             if fetchedUrl != self.currentConfiguration.imageUrl {
+                self.currentConfiguration.load = .canceled
                 return
             }
 
@@ -96,7 +82,6 @@ class RemoteImageContentView: UIView, UIContentView {
                 self.currentConfiguration.load = .loaded
             } else {
                 self.currentConfiguration.load = .canceled
-                self.tryLoadAfterDelay(url: fetchedUrl)
             }
         }
     }

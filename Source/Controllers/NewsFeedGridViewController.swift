@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class NewsFeedGridViewController: BaseNewsFeedViewController<Section, UInt, NewsFeedViewModel, GridItemCell> {
+class NewsFeedGridViewController: NewsFeedViewController<Section, UInt, NewsFeedViewModel, GridItemCell> {
     private struct Constants {
         static let kItemCountPerPage: UInt = 20
     }

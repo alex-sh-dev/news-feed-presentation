@@ -7,7 +7,7 @@
 
 import UIKit
 
-class NewsItemImageCell: UICollectionViewCell {
+class NewsItemImageCell: ImageCollectionViewCell {
     func configure(with url: URL) {
         var config = RemoteImageContentConfiguration()
         config.imageUrl = url

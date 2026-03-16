@@ -24,7 +24,7 @@ enum PreviewNewsItemIdentifier: Hashable {
     }
 }
 
-class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel, PreviewNewsItemCell> {
+class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel, PreviewNewsItemCell> {
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5
@@ -35,7 +35,7 @@ class StartViewController: BaseNewsFeedViewController<Section, PreviewNewsItemId
         if self.newsViewModel.isEmpty() {
             return
         }
-        let idfr = UIDevice.isPad ? Constants.kNewsGridSegueIdentifier : self.kNewsSegueIdentifier
+        let idfr = UIDevice.isPad ? Constants.kNewsGridSegueIdentifier : self.kNewsDetailsSegueIdentifier
         self.performSegue(withIdentifier: idfr, sender: sender)
     }
 

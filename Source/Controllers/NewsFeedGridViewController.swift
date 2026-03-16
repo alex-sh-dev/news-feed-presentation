@@ -71,7 +71,6 @@ class NewsFeedGridViewController: NewsFeedViewController<Section, UInt, NewsView
     }
 
     override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? {
-        self.newsViewModel.requestNewsIfNeeded(currentItemRow: UInt(indexPath.row))
         let newsItem = self.newsViewModel.newsItem(at: identifier)!
         return collectionView.dequeueConfiguredReusableCell(
             using: self.cellRegistration,

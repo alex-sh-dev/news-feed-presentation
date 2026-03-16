@@ -16,18 +16,12 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
     private(set) var imagesPrefetcher: NewsImagesPrefetcher!
     private var visibleCellsWorkItem: DispatchWorkItem?
 
+    var isPageLoadingEnabled = true
+
     override func viewDidLoad() {
         self.imagesPrefetcher = self.configurePrefetchDataSource()
         self.newsFeed.prefetchDataSource = self.imagesPrefetcher
         super.viewDidLoad()
-    }
-
-    func shouldHandleCellSelection() -> Bool {
-        return false
-    }
-
-    func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
-        return nil
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -41,15 +35,19 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
         }
     }
 
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if !self.shouldHandleCellSelection() {
-            return
-        }
-        let cell = collectionView.cellForItem(at: indexPath)
-        self.performSegue(withIdentifier: kNewsDetailsSegueIdentifier, sender: cell)
+    func shouldHandleCellSelection() -> Bool {
+        return false
+    }
+
+    func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
+        return nil
     }
 
     func newsItemId(for indexPath: IndexPath) -> UInt? { return nil }
+
+    func newsItemRow(for indexPath: IndexPath) -> Int {
+        return indexPath.row
+    }
 
     func configurePrefetchDataSource() -> NewsImagesPrefetcher? {
         return NewsImagesPrefetcher(model: self.newsViewModel) {
@@ -80,8 +78,28 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
         DispatchQueue.main.asyncAfter(deadline: time, execute: self.visibleCellsWorkItem!)
     }
 
+    override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        super.scrollViewDidEndDragging(scrollView, willDecelerate: decelerate)
+        if self.isPageLoadingEnabled,
+           scrollView.contentOffset.y > 0,
+           scrollView.reachedBottom() {
+            self.newsViewModel.requestNews()
+        }
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if !self.shouldHandleCellSelection() {
+            return
+        }
+        let cell = collectionView.cellForItem(at: indexPath)
+        self.performSegue(withIdentifier: kNewsDetailsSegueIdentifier, sender: cell)
+    }
+
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         self.updateImagesForVisibleCells(collectionView: collectionView, cell: cell)
+        if self.isPageLoadingEnabled {
+            self.newsViewModel.requestNewsIfNeeded(currentItemRow: UInt(self.newsItemRow(for: indexPath)))
+        }
     }
 
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {

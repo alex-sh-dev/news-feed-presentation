@@ -151,6 +151,10 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         }
     }
 
+    override func newsItemRow(for indexPath: IndexPath) -> Int {
+        return indexPath.section
+    }
+
     func onShowInFull(for cell: NewsItemCell) {
         let id = cell.newsItemId
         guard let text = self.newsViewModel.newsItemText(for: id) else {
@@ -188,7 +192,6 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         let model = self.newsViewModel
         switch identifier {
         case .main(let id):
-            model.requestNewsIfNeeded(currentItemRow: UInt(indexPath.section))
             let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
             cell.delegate = self
             cell.configure(with: id, from: model)

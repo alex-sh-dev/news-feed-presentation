@@ -56,11 +56,7 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {}
 
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if scrollView.contentOffset.y > 0 && scrollView.reachedBottom() {
-            self.newsViewModel.requestNews()
-        }
-    }
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {}
 
     private func configureDataSource() {
         self.cellRegistration = CollectionViewCellRegistration() {

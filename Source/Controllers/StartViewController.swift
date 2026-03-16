@@ -44,6 +44,7 @@ class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdenti
     override func viewDidLoad() {
         super.viewDidLoad()
         self.newsFeed.alwaysBounceHorizontal = true
+        self.isPageLoadingEnabled = false
     }
 
     override func identifiersActionSubcriberDidSet() {
@@ -108,10 +109,6 @@ class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdenti
         return true
     }
 
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        scrollView.contentOffset.y = 0
-    }
-
     private func transformedIdentifiers() -> [PreviewNewsItemIdentifier] {
         return self.newsViewModel.identifiers
             .prefix(Int(Constants.kNewsItemCount))
@@ -120,6 +117,11 @@ class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdenti
 
     override func newsItemId(for indexPath: IndexPath) -> UInt? {
         return self.dataSource.itemIdentifier(for: indexPath)?.rawValue
+    }
+
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        super.scrollViewDidScroll(scrollView)
+        scrollView.contentOffset.y = 0
     }
 
     override func cellRegistrationHandler(cell: PreviewNewsItemCell, indexPath: IndexPath, item: NewsItem) {

@@ -59,15 +59,15 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
     }
 
     // TODO: need refactor, workaround to revive 'frozen' cells (using configuration) to load images after canceling
-    private func updateImagesForVisibleCells() {
+    func updateImagesForVisibleCells(collectionView: UICollectionView, cell: UICollectionViewCell?) {
         self.visibleCellsWorkItem?.cancel()
         self.visibleCellsWorkItem = DispatchWorkItem {
-            [weak self] in
+            [weak self, weak collectionView] in
             guard let self = self else { return }
             if self.visibleCellsWorkItem?.isCancelled ?? true {
                 return
             }
-            let cells = self.newsFeed.visibleCells
+            let cells = collectionView?.visibleCells ?? []
             cells.forEach { cell in
                 if let imageCell = cell as? CollectionViewCellType {
                     var state = imageCell.imageConfigurationState
@@ -81,7 +81,7 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
     }
 
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.updateImagesForVisibleCells()
+        self.updateImagesForVisibleCells(collectionView: collectionView, cell: cell)
     }
 
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {

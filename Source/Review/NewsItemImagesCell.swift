@@ -8,6 +8,12 @@
 import UIKit
 
 class NewsItemImagesCell: UICollectionViewCell {
+    @IBOutlet weak var imageCollection: UICollectionView! {
+        didSet {
+            self.configure()
+        }
+    }
+
     var imageUrls: [URL] = [] {
         didSet {
             var snapshot = self.dataSource.snapshot()
@@ -27,8 +33,6 @@ class NewsItemImagesCell: UICollectionViewCell {
         }
     }
 
-    private var dataSource: UICollectionViewDiffableDataSource<Section, URL>!
-
     var visibleImageUrls: [URL] {
         get {
             let visibleIndexPaths = self.imageCollection.indexPathsForVisibleItems
@@ -42,30 +46,30 @@ class NewsItemImagesCell: UICollectionViewCell {
         }
     }
 
-    @IBOutlet weak var imageCollection: UICollectionView! {
-        didSet {
-            self.imageCollection.collectionViewLayout = ImagesCompositionalLayout {
-                [unowned self] in
-                return self.imageUrls.count > 1
-            }
+    private var dataSource: UICollectionViewDiffableDataSource<Section, URL>!
 
-            let newsItemImageCellRegistration = UICollectionView.CellRegistration<NewsItemImageCell, URL> {
-                cell, _, url in
-                cell.configure(with: url)
-            }
-
-            self.dataSource = UICollectionViewDiffableDataSource<Section, URL>(collectionView: self.imageCollection) {
-                (collectionView: UICollectionView, indexPath: IndexPath, item: URL) -> UICollectionViewCell? in
-                return collectionView.dequeueConfiguredReusableCell(
-                    using: newsItemImageCellRegistration,
-                    for: indexPath,
-                    item: item
-                )
-            }
-            
-            var snapshot = NSDiffableDataSourceSnapshot<Section, URL>()
-            snapshot.appendSections([.main])
-            self.dataSource.apply(snapshot, animatingDifferences: false)
+    private func configure() {
+        self.imageCollection.collectionViewLayout = ImagesCompositionalLayout {
+            [unowned self] in
+            return self.imageUrls.count > 1
         }
+
+        let newsItemImageCellRegistration = UICollectionView.CellRegistration<NewsItemImageCell, URL> {
+            cell, _, url in
+            cell.configure(with: url)
+        }
+
+        self.dataSource = UICollectionViewDiffableDataSource<Section, URL>(collectionView: self.imageCollection) {
+            (collectionView: UICollectionView, indexPath: IndexPath, item: URL) -> UICollectionViewCell? in
+            return collectionView.dequeueConfiguredReusableCell(
+                using: newsItemImageCellRegistration,
+                for: indexPath,
+                item: item
+            )
+        }
+
+        var snapshot = NSDiffableDataSourceSnapshot<Section, URL>()
+        snapshot.appendSections([.main])
+        self.dataSource.apply(snapshot, animatingDifferences: false)
     }
 }

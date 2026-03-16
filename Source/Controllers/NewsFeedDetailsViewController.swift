@@ -178,6 +178,12 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         self.present(activityVC, animated: true)
     }
 
+    override func updateImagesForVisibleCells(collectionView: UICollectionView, cell: UICollectionViewCell?) {
+        if let imagesCell = cell as? NewsItemImagesCell {
+            super.updateImagesForVisibleCells(collectionView: imagesCell.imageCollection, cell: nil)
+        }
+    }
+
     override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? {
         let model = self.newsViewModel
         switch identifier {

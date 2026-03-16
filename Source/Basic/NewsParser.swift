@@ -66,6 +66,7 @@ class NewsParser {
                     }
                     ids.append(newsItem.id)
                     if let subUrl = newsItem.url {
+                        // TODO: revision, request only for visibile cells (similar to uploading images)
                         self.newsItemParser.requestNewsItem(subUrl: subUrl, for: newsItem.id)
                     }
                 }

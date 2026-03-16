@@ -33,6 +33,7 @@ enum NewsIdentifiersAction {
 
 class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
     private var newsItemUpdatedSub: AnyCancellable!
+    // TODO: revision, make part of the NewsItem?
     final var showInFullPressed: Set<UInt> = []
 
     required init() {
@@ -69,17 +70,14 @@ class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
     
     override func newsUpdatedSubHandler() -> ([UInt]) -> Void {
         { [weak self] ids in
-            if ids.isEmpty {
-                return
-            }
+            if ids.isEmpty { return }
             guard let self = self else { return }
-            
+
             let newIdentifiers = Set(ids).subtracting(Set(self.identifiers)).sorted(by: >)
-            
             if newIdentifiers.isEmpty {
                 return
             }
-            
+
             self.sendIdentifiers(newIdentifiers)
         }
     }

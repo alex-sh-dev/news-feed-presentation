@@ -80,6 +80,8 @@ public class ImageLoader {
 
         var request = URLRequest(url: url)
         request.timeoutInterval = Constants.kRequestTimeoutSec
+
+        // TODO: refactor using serial queue (improves load efficiency, simplifies cancellation)
         let task = URLSession.shared.dataTask(with: request) {
             (data, response, error) in
             guard let responseData = data,

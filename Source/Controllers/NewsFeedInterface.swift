@@ -15,8 +15,8 @@ protocol NewsFeedInterface: UICollectionViewDelegate {
     var newsFeed: UICollectionView! { get set }
     var activityIndicator: UIActivityIndicatorView! { get set }
 
-    associatedtype SectionIdentifierType: Hashable
-    associatedtype ItemIdentifierType: Hashable
+    associatedtype SectionIdentifierType: Hashable & Sendable
+    associatedtype ItemIdentifierType: Hashable & Sendable
     var dataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>! { get set }
     var identifiersActionSub: AnyCancellable? { get set }
 

@@ -56,7 +56,7 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         }
     }
 
-    @IBAction func closeTapped(_ sender: Any) {
+    @IBAction func onClose(_ sender: Any) {
         self.dismiss(animated: true)
     }
 
@@ -151,7 +151,7 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         }
     }
 
-    func showInFullTapped(cell: NewsItemCell) {
+    func onShowInFull(for cell: NewsItemCell) {
         let id = cell.newsItemId
         guard let text = self.newsViewModel.newsItemText(for: id) else {
             return
@@ -169,7 +169,7 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         self.newsFeed.collectionViewLayout.invalidateLayout(with: ctx)
     }
 
-    func shareTapped(cell: NewsItemCell) {
+    func onShare(for cell: NewsItemCell) {
         guard let newsItem = self.newsViewModel.newsItem(at: cell.newsItemId),
               let fullUrl = newsItem.fullUrl else {
             return

@@ -31,7 +31,7 @@ class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdenti
         static let kNewsGridSegueIdentifier = "NewsGridSegueIdentifier"
     }
 
-    @IBAction func newsButtonTapped(_ sender: Any) {
+    @IBAction func onNews(_ sender: Any) {
         if self.newsViewModel.isEmpty() {
             return
         }

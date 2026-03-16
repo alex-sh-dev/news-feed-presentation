@@ -8,8 +8,8 @@
 import UIKit
 
 protocol NewsItemCellDelegate: AnyObject {
-    func showInFullTapped(cell: NewsItemCell)
-    func shareTapped(cell: NewsItemCell)
+    func onShowInFull(for cell: NewsItemCell)
+    func onShare(for cell: NewsItemCell)
 }
 
 class NewsItemCell: UICollectionViewCell {
@@ -30,12 +30,12 @@ class NewsItemCell: UICollectionViewCell {
     var newsItemId: UInt = 0
     weak var delegate: NewsItemCellDelegate?
 
-    @IBAction func showInFullTapped(_ sender: Any) {
-        self.delegate?.showInFullTapped(cell: self)
+    @IBAction func onShowInFull(_ sender: Any) {
+        self.delegate?.onShowInFull(for: self)
     }
     
-    @IBAction func shareTapped(_ sender: Any) {
-        self.delegate?.shareTapped(cell: self)
+    @IBAction func onShare(_ sender: Any) {
+        self.delegate?.onShare(for: self)
     }
     
     func hideShowInFullButton(_ hidden: Bool) {

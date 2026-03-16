@@ -68,7 +68,7 @@
                                     <fontDescription key="titleFontDescription" style="UICTFontTextStyleTitle2"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="newsButtonTapped:" destination="iNO-Nh-f9t" eventType="touchUpInside" id="t2P-FN-bRu"/>
+                                    <action selector="onNews:" destination="iNO-Nh-f9t" eventType="touchUpInside" id="M69-eF-azo"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -94,10 +94,10 @@
             </objects>
             <point key="canvasLocation" x="1513.7404580152672" y="-75.352112676056336"/>
         </scene>
-        <!--News-->
+        <!--NewsDetails-->
         <scene sceneID="2nN-Df-zyP">
             <objects>
-                <viewController id="zWh-op-k4n" customClass="NewsFeedDetailsViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="zWh-op-k4n" userLabel="NewsDetails" customClass="NewsFeedDetailsViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="suG-GD-2ns">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -188,7 +188,7 @@
                                                         <color key="baseForegroundColor" name="compColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
-                                                        <action selector="showInFullTapped:" destination="Wf0-MY-ut5" eventType="touchUpInside" id="Wqa-j8-Vvu"/>
+                                                        <action selector="onShowInFull:" destination="Wf0-MY-ut5" eventType="touchUpInside" id="ha3-fJ-S3j"/>
                                                     </connections>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="top" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jqw-kE-JRs" userLabel="shareButton">
@@ -204,7 +204,7 @@
                                                         <color key="baseForegroundColor" name="compColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
-                                                        <action selector="shareTapped:" destination="Wf0-MY-ut5" eventType="touchUpInside" id="EZ1-O7-p37"/>
+                                                        <action selector="onShare:" destination="Wf0-MY-ut5" eventType="touchUpInside" id="Q8X-yp-YxK"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -289,7 +289,7 @@
                     <navigationItem key="navigationItem" title="News" largeTitleDisplayMode="always" id="JF2-AQ-B0G">
                         <barButtonItem key="leftBarButtonItem" systemItem="stop" id="lCN-6m-kI8">
                             <connections>
-                                <action selector="closeTapped:" destination="zWh-op-k4n" id="mgv-OW-TTD"/>
+                                <action selector="onClose:" destination="zWh-op-k4n" id="hpw-Pv-LbP"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -302,10 +302,10 @@
             </objects>
             <point key="canvasLocation" x="3309.1603053435115" y="-75.352112676056336"/>
         </scene>
-        <!--News-->
+        <!--NewsGrid-->
         <scene sceneID="8t7-PR-ymR">
             <objects>
-                <viewController id="POT-LV-qhn" customClass="NewsFeedGridViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="POT-LV-qhn" userLabel="NewsGrid" customClass="NewsFeedGridViewController" customModule="NewsFeedPresentation" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="vh0-vX-0eq">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -82,6 +82,12 @@ class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemId
             }
     }
 
+    private func transformedIdentifiers() -> [PreviewNewsItemIdentifier] {
+        return self.newsViewModel.identifiers
+            .prefix(Int(Constants.kNewsItemCount))
+            .compactMap{ PreviewNewsItemIdentifier.value($0) }
+    }
+
     private func showNoNews() {
         if self.noNewsLabel == nil {
             self.noNewsLabel = CenteredLabel(text: "No news", parent: self.newsFeed)
@@ -106,12 +112,6 @@ class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemId
 
     override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
         return ControllerConstants.kNewsDetailsSegueIdentifier
-    }
-
-    private func transformedIdentifiers() -> [PreviewNewsItemIdentifier] {
-        return self.newsViewModel.identifiers
-            .prefix(Int(Constants.kNewsItemCount))
-            .compactMap{ PreviewNewsItemIdentifier.value($0) }
     }
 
     override func newsItemId(for indexPath: IndexPath) -> UInt? {

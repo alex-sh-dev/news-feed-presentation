@@ -8,7 +8,6 @@
 import UIKit
 
 typealias ImageCollectionViewCellDefault = ImageCollectionViewCell
-typealias SegueIdentifier = String
 
 class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: ImageCollectionViewCell>: BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType> {
     let kOperationDelaySec: TimeInterval = 0.5

@@ -8,10 +8,10 @@
 import UIKit
 
 typealias ImageCollectionViewCellDefault = ImageCollectionViewCell
+typealias SegueIdentifier = String
 
 class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: ImageCollectionViewCell>: BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType> {
     let kOperationDelaySec: TimeInterval = 0.5
-    let kNewsDetailsSegueIdentifier = "NewsDetailsSegueIdentifier"
 
     private(set) var imagesPrefetcher: NewsImagesPrefetcher!
     private var visibleCellsWorkItem: DispatchWorkItem?
@@ -35,10 +35,6 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
         }
     }
 
-    func shouldHandleCellSelection() -> Bool {
-        return false
-    }
-
     func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
         return nil
     }
@@ -54,6 +50,10 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
             [weak self] indexPath in
             return self?.newsItemId(for: indexPath)
         }
+    }
+
+    func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
+        return nil
     }
 
     // TODO: need refactor, workaround to revive 'frozen' cells (using configuration) to load images after canceling
@@ -88,11 +88,10 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
     }
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if !self.shouldHandleCellSelection() {
-            return
+        if let cell = collectionView.cellForItem(at: indexPath),
+           let segueIdfr = self.presentViewController(forSelected: cell) {
+            self.performSegue(withIdentifier: segueIdfr, sender: cell)
         }
-        let cell = collectionView.cellForItem(at: indexPath)
-        self.performSegue(withIdentifier: kNewsDetailsSegueIdentifier, sender: cell)
     }
 
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {

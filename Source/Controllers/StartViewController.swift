@@ -28,14 +28,13 @@ class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdenti
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5
-        static let kNewsGridSegueIdentifier = "NewsGridSegueIdentifier"
     }
 
     @IBAction func onNews(_ sender: Any) {
         if self.newsViewModel.isEmpty() {
             return
         }
-        let idfr = UIDevice.isPad ? Constants.kNewsGridSegueIdentifier : self.kNewsDetailsSegueIdentifier
+        let idfr = UIDevice.isPad ? ControllerConstants.kNewsGridSegueIdentifier : ControllerConstants.kNewsDetailsSegueIdentifier
         self.performSegue(withIdentifier: idfr, sender: sender)
     }
 
@@ -105,8 +104,8 @@ class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdenti
         return nil
     }
 
-    override func shouldHandleCellSelection() -> Bool {
-        return true
+    override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
+        return ControllerConstants.kNewsDetailsSegueIdentifier
     }
 
     private func transformedIdentifiers() -> [PreviewNewsItemIdentifier] {

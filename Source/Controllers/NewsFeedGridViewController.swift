@@ -61,8 +61,8 @@ class NewsFeedGridViewController: NewsFeedViewController<Section, UInt, NewsView
         return self.dataSource.itemIdentifier(for: indexPath)
     }
 
-    override func shouldHandleCellSelection() -> Bool {
-        return true
+    override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
+        return ControllerConstants.kNewsDetailsSegueIdentifier
     }
 
     override func cellRegistrationHandler(cell: GridItemCell, indexPath: IndexPath, item: NewsItem) {

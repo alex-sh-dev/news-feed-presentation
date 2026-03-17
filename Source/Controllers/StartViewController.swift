@@ -24,7 +24,7 @@ enum PreviewNewsItemIdentifier: Hashable {
     }
 }
 
-class StartViewController: NewsFeedViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel, PreviewNewsItemCell> {
+class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel, PreviewNewsItemCell> {
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5

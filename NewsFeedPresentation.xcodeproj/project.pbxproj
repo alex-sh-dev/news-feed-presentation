@@ -26,6 +26,7 @@
 		D73CAF292F43693900ABB035 /* BaseNewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73CAF282F43693900ABB035 /* BaseNewsViewModel.swift */; };
 		D73CAF2B2F437A2100ABB035 /* NewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73CAF2A2F437A2100ABB035 /* NewsViewModel.swift */; };
 		D770BA8E2F69244500418C6E /* ControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770BA8D2F69244500418C6E /* ControllerConstants.swift */; };
+		D770BA902F692A2200418C6E /* NewsFeedListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770BA8F2F692A2200418C6E /* NewsFeedListViewController.swift */; };
 		D780AC482F6012BC00C0222C /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC472F6012BC00C0222C /* Queue.swift */; };
 		D780AC4A2F6147D900C0222C /* TitledImageContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC492F6147D900C0222C /* TitledImageContentConfiguration.swift */; };
 		D780AC4C2F615D9C00C0222C /* RemoteImageContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D780AC4B2F615D9C00C0222C /* RemoteImageContentConfiguration.swift */; };
@@ -85,6 +86,7 @@
 		D73CAF282F43693900ABB035 /* BaseNewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseNewsViewModel.swift; sourceTree = "<group>"; };
 		D73CAF2A2F437A2100ABB035 /* NewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewModel.swift; sourceTree = "<group>"; };
 		D770BA8D2F69244500418C6E /* ControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerConstants.swift; sourceTree = "<group>"; };
+		D770BA8F2F692A2200418C6E /* NewsFeedListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedListViewController.swift; sourceTree = "<group>"; };
 		D780AC472F6012BC00C0222C /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		D780AC492F6147D900C0222C /* TitledImageContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitledImageContentConfiguration.swift; sourceTree = "<group>"; };
 		D780AC4B2F615D9C00C0222C /* RemoteImageContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageContentConfiguration.swift; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 				D780AC562F62CEC000C0222C /* NewsFeedInterface.swift */,
 				D780AC632F63D1DB00C0222C /* BaseNewsFeedViewController.swift */,
 				D72E9A282F67FC7B008BB8F3 /* NewsFeedViewController.swift */,
+				D770BA8F2F692A2200418C6E /* NewsFeedListViewController.swift */,
 				D7E5AF8C2F38689900B82167 /* StartViewController.swift */,
 				D72493AE2F39B9AC00B04CD6 /* NewsFeedDetailsViewController.swift */,
 				D780AC542F62AA3500C0222C /* NewsFeedGridViewController.swift */,
@@ -445,6 +448,7 @@
 				D711C5DB2F3F2476005D1971 /* Date.swift in Sources */,
 				D711C61A2F425611005D1971 /* CollectionCell.swift in Sources */,
 				D780AC4A2F6147D900C0222C /* TitledImageContentConfiguration.swift in Sources */,
+				D770BA902F692A2200418C6E /* NewsFeedListViewController.swift in Sources */,
 				D72E9A232F67EEBF008BB8F3 /* ImageCellConfigurationState.swift in Sources */,
 				D7F0C9902F4C4C76007ACFE7 /* ActivityViewController.swift in Sources */,
 				D7F0C9762F4C3C9A007ACFE7 /* SafariActivity.swift in Sources */,

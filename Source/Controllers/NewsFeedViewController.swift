@@ -24,21 +24,6 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
         super.viewDidLoad()
     }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let child = segue.destination.children.first
-        guard let newsFeedVC = child as? NewsFeedDetailsViewController else {
-            return
-        }
-
-        if let identifier = self.startIdentifierToScrollItem(sender: sender) {
-            newsFeedVC.startIdentifier = identifier
-        }
-    }
-
-    func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
-        return nil
-    }
-
     func newsItemId(for indexPath: IndexPath) -> UInt? { return nil }
 
     func newsItemRow(for indexPath: IndexPath) -> Int {

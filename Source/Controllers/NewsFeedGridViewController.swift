@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class NewsFeedGridViewController: NewsFeedListViewController<Section, UInt, NewsViewModel, GridItemCell> {
+class NewsFeedGridViewController: NewsFeedListViewController<Section, UInt, NewsViewModel, GridItemCell, NewsFeedDetailsViewController> {
     private struct Constants {
         static let kItemCountPerPage: UInt = 20
     }
@@ -49,12 +49,12 @@ class NewsFeedGridViewController: NewsFeedListViewController<Section, UInt, News
             }
     }
 
-    override func startIdentifierToScrollItem(for vc: UIViewController, sender: Any?) -> NewsItemIdentifier? {
+    override func startIdentifierToScrollItem(for details: NewsFeedDetailsViewController, sender: Any?) -> NewsItemIdentifier {
         if let previewItem = sender as? GridItemCell {
             return previewItem.itemIdentifier
         }
 
-        return nil
+        return .notValid
     }
 
     override func newsItemId(for indexPath: IndexPath) -> UInt? {

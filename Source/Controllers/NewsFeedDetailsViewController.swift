@@ -24,7 +24,7 @@ enum NewsItemPartIdentifier: Hashable {
     }
 }
 
-class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsViewModel, ImageCollectionViewCellDefault>, NewsItemCellDelegate {
+class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsViewModel, ImageCollectionViewCellDefault>, NewsFeedDetailsInterface, NewsItemCellDelegate {
     private struct Constants {
         static let kItemCountPerPage: UInt = 10
     }
@@ -115,7 +115,17 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         self.dataSource.apply(snapshot, animatingDifferences: animate)
     }
 
-    private func scrollToStartItem() {
+    private func reloadItems(_ identifiers: [NewsItemPartIdentifier], animate: Bool = false) {
+        var snapshot = self.dataSource.snapshot()
+        for idfr in identifiers {
+            if snapshot.itemIdentifiers.contains(idfr) {
+                snapshot.reconfigureItems([idfr])
+            }
+        }
+        self.dataSource.apply(snapshot, animatingDifferences: true)
+    }
+
+    func scrollToStartItem() {
         let identifier = self.startIdentifier
         if identifier != .notValid,
             let sectionIndex = self.dataSource.snapshot().indexOfSection(identifier) {
@@ -129,16 +139,6 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
                 self.newsFeed.scrollToItem(at: indexPath, at: .top, animated: false)
             }
         }
-    }
-
-    private func reloadItems(_ identifiers: [NewsItemPartIdentifier], animate: Bool = false) {
-        var snapshot = self.dataSource.snapshot()
-        for idfr in identifiers {
-            if snapshot.itemIdentifiers.contains(idfr) {
-                snapshot.reconfigureItems([idfr])
-            }
-        }
-        self.dataSource.apply(snapshot, animatingDifferences: true)
     }
 
     override func newsItemId(for indexPath: IndexPath) -> UInt? {

@@ -7,19 +7,18 @@
 
 import UIKit
 
-class NewsFeedListViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: ImageCollectionViewCell>: NewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType> {
+class NewsFeedListViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: ImageCollectionViewCell, NewsFeedDetailsType: NewsFeedDetailsInterface>: NewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType>, NewsFeedListInterface {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let child = segue.destination.children.first
-        guard let vc = child as? NewsFeedDetailsViewController else {
+        guard var details = child as? NewsFeedDetailsType else {
             return
         }
 
-        if let identifier = self.startIdentifierToScrollItem(for: vc, sender: sender) {
-            vc.startIdentifier = identifier
-        }
+        let identifier = self.startIdentifierToScrollItem(for: details, sender: sender)
+        details.startIdentifier = identifier
     }
 
-    func startIdentifierToScrollItem(for vc: UIViewController, sender: Any?) -> NewsItemIdentifier? {
-        return nil
+    func startIdentifierToScrollItem(for details: NewsFeedDetailsType, sender: Any?) -> NewsFeedDetailsType.NewsItemIdentifierType {
+        return .notValid
     }
 }

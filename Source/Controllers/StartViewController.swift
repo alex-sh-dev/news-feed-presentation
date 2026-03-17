@@ -24,7 +24,7 @@ enum PreviewNewsItemIdentifier: Hashable {
     }
 }
 
-class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel, PreviewNewsItemCell> {
+class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemIdentifier, PreviewNewsViewModel, PreviewNewsItemCell, NewsFeedDetailsViewController> {
     private struct Constants {
         static let kNewsItemCount: UInt = 10
         static let kNewsItemReserve: UInt = 5
@@ -101,13 +101,13 @@ class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemId
         }
     }
 
-    override func startIdentifierToScrollItem(for vc: UIViewController, sender: Any?) -> NewsItemIdentifier? {
+    override func startIdentifierToScrollItem(for details: NewsFeedDetailsViewController, sender: Any?) -> NewsItemIdentifier {
         if let previewItem = sender as? PreviewNewsItemCell {
             return previewItem.itemIdentifier
         } else if sender is PreviewNewsSupplementaryCellButton {
-           return .index(Constants.kNewsItemCount)
+            return .index(Constants.kNewsItemCount)
         }
-        return nil
+        return .notValid
     }
 
     override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {

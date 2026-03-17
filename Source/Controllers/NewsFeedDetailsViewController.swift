@@ -27,6 +27,7 @@ enum NewsItemPartIdentifier: Hashable {
 class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsViewModel, ImageCollectionViewCellDefault>, NewsFeedDetailsInterface, NewsItemCellDelegate {
     private struct Constants {
         static let kItemCountPerPage: UInt = 10
+        static let kNewsDetailsSegueIdentifier = "NewsDetailsSegueIdentifier"
     }
 
     class NewsFeedImagesPrefetcher : NewsImagesPrefetcher {
@@ -54,6 +55,10 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
                 return startIdentifierRaw
             }
         }
+    }
+
+    static var segueIdentifier: SegueIdentifier {
+        Constants.kNewsDetailsSegueIdentifier
     }
 
     @IBAction func onClose(_ sender: Any) {

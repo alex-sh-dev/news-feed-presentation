@@ -13,6 +13,8 @@ class NewsFeedGridViewController: NewsFeedListViewController<Section, UInt, News
         static let kItemCountPerPage: UInt = 20
     }
 
+    static let kNewsGridSegueIdentifier = "NewsGridSegueIdentifier"
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
@@ -59,10 +61,6 @@ class NewsFeedGridViewController: NewsFeedListViewController<Section, UInt, News
 
     override func newsItemId(for indexPath: IndexPath) -> UInt? {
         return self.dataSource.itemIdentifier(for: indexPath)
-    }
-
-    override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
-        return ControllerConstants.kNewsDetailsSegueIdentifier
     }
 
     override func cellRegistrationHandler(cell: GridItemCell, indexPath: IndexPath, item: NewsItem) {

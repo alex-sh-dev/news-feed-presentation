@@ -21,4 +21,8 @@ class NewsFeedListViewController<SectionIdentifierType: Hashable & Sendable, Ite
     func startIdentifierToScrollItem(for details: NewsFeedDetailsType, sender: Any?) -> NewsFeedDetailsType.NewsItemIdentifierType {
         return .notValid
     }
+
+    override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
+        return NewsFeedDetailsType.segueIdentifier
+    }
 }

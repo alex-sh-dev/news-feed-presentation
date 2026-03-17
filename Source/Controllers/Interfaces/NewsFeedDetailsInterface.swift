@@ -11,4 +11,6 @@ protocol NewsFeedDetailsInterface {
     func scrollToStartItem()
     typealias NewsItemIdentifierType = NewsItemIdentifier
     var startIdentifier: NewsItemIdentifierType { get set }
+    typealias SegueIdentifier = String
+    static var segueIdentifier: SegueIdentifier { get }
 }

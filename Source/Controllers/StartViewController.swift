@@ -34,8 +34,11 @@ class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemId
         if self.newsViewModel.isEmpty() {
             return
         }
-        let idfr = UIDevice.isPad ? ControllerConstants.kNewsGridSegueIdentifier : ControllerConstants.kNewsDetailsSegueIdentifier
-        self.performSegue(withIdentifier: idfr, sender: sender)
+        var identifier = NewsFeedDetailsViewController.segueIdentifier
+        if UIDevice.isPad {
+            identifier = NewsFeedGridViewController.kNewsGridSegueIdentifier
+        }
+        self.performSegue(withIdentifier: identifier, sender: sender)
     }
 
     private var noNewsLabel: UILabel?
@@ -108,10 +111,6 @@ class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemId
             return .index(Constants.kNewsItemCount)
         }
         return .notValid
-    }
-
-    override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
-        return ControllerConstants.kNewsDetailsSegueIdentifier
     }
 
     override func newsItemId(for indexPath: IndexPath) -> UInt? {

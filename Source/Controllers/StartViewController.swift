@@ -95,7 +95,7 @@ class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemId
         }
     }
 
-    override func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
+    override func startIdentifierToScrollItem(for vc: UIViewController, sender: Any?) -> NewsItemIdentifier? {
         if let previewItem = sender as? PreviewNewsItemCell {
             return previewItem.itemIdentifier
         } else if sender is PreviewNewsSupplementaryCellButton {

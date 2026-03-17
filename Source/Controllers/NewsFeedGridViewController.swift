@@ -49,7 +49,7 @@ class NewsFeedGridViewController: NewsFeedListViewController<Section, UInt, News
             }
     }
 
-    override func startIdentifierToScrollItem(sender: Any?) -> NewsItemIdentifier? {
+    override func startIdentifierToScrollItem(for vc: UIViewController, sender: Any?) -> NewsItemIdentifier? {
         if let previewItem = sender as? GridItemCell {
             return previewItem.itemIdentifier
         }

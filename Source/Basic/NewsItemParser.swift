@@ -27,11 +27,13 @@ class NewsItemParser {
 
         let id = parseTask.id!
         let storage = NewsStorage.shared
-        storage.setText(parseTask.finalText, id: id)
-        if let urls = parseTask.finalImageUrls {
-            storage.setImageUrls(urls, id: id)
+        storage.news.updateValue(forKey: id) {
+            item in
+            item.text = parseTask.finalText
+            if let urls = parseTask.finalImageUrls {
+                item.imageUrls = urls
+            }
         }
-
         self.newsItemUpdatedPub.send(id)
         easyLog("news item with id = \(id) parsed")
     }

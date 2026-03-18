@@ -30,8 +30,8 @@ class PreviewNewsViewModel: BaseActingNewsViewModel<PreviewNewsIdentifiersAction
                 }
                 return
             }
-            let storage = NewsStorage.shared
-            let identifiers = Array(storage.news.keys.sorted(by: >)
+            let identifiers = Array(NewsStorage.shared.news.keys
+                .sorted(by: >)
                 .prefix(self.requestItemsCount))
             
             let oldIdentifiers = self.identifiers

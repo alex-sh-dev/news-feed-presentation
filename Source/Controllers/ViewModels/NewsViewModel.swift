@@ -81,8 +81,7 @@ class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
     }
     
     final func fillIdentifiersFromStorage() {
-        let storage = NewsStorage.shared
-        let identifiers = storage.news.keys.sorted(by: >)
+        let identifiers = NewsStorage.shared.news.keys.sorted(by: >)
         self.sendIdentifiers(identifiers, append: false)
     }
     

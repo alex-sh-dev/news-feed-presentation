@@ -41,7 +41,6 @@ public class ImageLoader {
             if let loadCompletions = self.loadingResponses[url] {
                 self.loadingResponses.removeValue(forKey: url)
                 self.tasks.removeValue(forKey: url)
-                
                 if let image = image {
                     URLCache.storeImage(image, for: url)
                 }

@@ -12,22 +12,8 @@ class NewsStorage {
 
     private(set) var news = ThreadSafeMap<UInt, NewsItem>()
 
-    func addNewsItem(_ item: NewsItemNode) {
-        self.news.setValue(NewsItem(with: item), forKey: item.id)
-    }
-
-    func setText(_ text: String, id: UInt) {
-        self.news.updateValue(forKey: id) {
-            item in
-            item.text = text
-        }
-    }
-
-    func setImageUrls(_ urls: [URL], id: UInt) {
-        self.news.updateValue(forKey: id) {
-            item in
-            item.imageUrls = urls
-        }
+    func setNewsItem(_ item: NewsItemNode, forId id: UInt) {
+        self.news.setValue(NewsItem(with: item), forKey: id)
     }
 
     private init() {}

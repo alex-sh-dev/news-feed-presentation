@@ -82,13 +82,18 @@ class NewsItemParseTask: NSObject, XMLParserDelegate {
         return nil
     }
     
-    func start() {
-        self.xmlParser.parse()
+    func start() -> Bool {
+        return self.xmlParser.parse()
     }
     
     func parser(_ parser: XMLParser, didStartElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?,
                 attributes attributeDict: [String : String] = [:]) {
+        if Task.isCancelled {
+            parser.abortParsing()
+            return
+        }
+
         self.curNode = elementName
         if elementName == Constants.kImageNode {
             if let src = attributeDict[Constants.kImageSourceAttrName],

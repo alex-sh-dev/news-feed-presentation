@@ -65,9 +65,15 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         }
         self.dataSource = NewsFeedViewDiffableDataSource(collectionView: self.newsFeed) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: ItemIdentifierType) -> UICollectionViewCell? in
-            return self.dataSourceCellProvider(collectionView: collectionView, indexPath: indexPath, identifier: identifier)
+            guard let cell = self.dataSourceCellProvider(collectionView: collectionView, indexPath: indexPath, identifier: identifier) else {
+                return nil
+            }
+            self.cellConfiguredHandler(cell, collectionView: collectionView, indexPath: indexPath)
+            return cell
         }
     }
+
+    func cellConfiguredHandler(_ cell: UICollectionViewCell, collectionView: UICollectionView, indexPath: IndexPath) {}
 
     func cellRegistrationHandler(cell: CollectionViewCellType, indexPath: IndexPath, item: NewsItem) {}
 

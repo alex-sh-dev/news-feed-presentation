@@ -79,6 +79,22 @@ class BaseNewsViewModel {
         }
     }
 
+    func requestFullNewsItemIfNeeded(with id: UInt) {
+        if let newsItem = self.newsItem(at: id),
+           newsItem.text?.isEmpty ?? true,
+           let subUrl = newsItem.value.url {
+            NewsParser.shared.newsItemParser.request(subUrl: subUrl, for: id)
+        }
+    }
+
+    func cancelFullNewsItemRequest(for id: UInt) {
+        NewsParser.shared.newsItemParser.cancelTask(id: id)
+    }
+
+    func cancelAllFullNewsItemRequests() {
+        NewsParser.shared.newsItemParser.cancelAllTasks()
+    }
+
     func isEmpty() -> Bool {
         return self.identifiers.isEmpty
     }

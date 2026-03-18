@@ -65,10 +65,6 @@ class NewsParser {
                         storage.addNewsItem(newsItem)
                     }
                     ids.append(newsItem.id)
-                    if let subUrl = newsItem.url {
-                        // TODO: revision, request only for visibile cells (similar to uploading images)
-                        self.newsItemParser.requestNewsItem(subUrl: subUrl, for: newsItem.id)
-                    }
                 }
                 easyLog("data received")
                 self.newsUpdatedPub.send(ids)

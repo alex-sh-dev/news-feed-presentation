@@ -30,8 +30,9 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         static let kNewsDetailsSegueIdentifier = "NewsDetailsSegueIdentifier"
     }
 
-    class NewsFeedImagesPrefetcher : NewsImagesPrefetcher {
+    class NewsFeedImagesPrefetcher : LoadableNewsDataPrefetcher {
         override func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+            super.collectionView(collectionView, cancelPrefetchingForItemsAt: indexPaths)
             indexPaths.forEach { indexPath in
                 if let cell = collectionView.cellForItem(at: indexPath) as? NewsItemImagesCell {
                     ImageLoader.shared.cancelTasks(for: cell.visibleImageUrls)
@@ -74,7 +75,7 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
     }
 
-    override func configurePrefetchDataSource() -> NewsImagesPrefetcher? {
+    override func configurePrefetchDataSource() -> LoadableNewsDataPrefetcher? {
         return NewsFeedImagesPrefetcher(model: self.newsViewModel) {
             [weak self] indexPath in
             return self?.newsItemId(for: indexPath)

@@ -12,14 +12,14 @@ typealias ImageCollectionViewCellDefault = ImageCollectionViewCell
 class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: ImageCollectionViewCell>: BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType> {
     let kOperationDelaySec: TimeInterval = 0.5
 
-    private(set) var imagesPrefetcher: NewsImagesPrefetcher!
+    private(set) var loadableDataPrefetcher: LoadableNewsDataPrefetcher!
     private var visibleCellsWorkItem: DispatchWorkItem?
 
     var isPageLoadingEnabled = true
 
     override func viewDidLoad() {
-        self.imagesPrefetcher = self.configurePrefetchDataSource()
-        self.newsFeed.prefetchDataSource = self.imagesPrefetcher
+        self.loadableDataPrefetcher = self.configurePrefetchDataSource()
+        self.newsFeed.prefetchDataSource = self.loadableDataPrefetcher
         super.viewDidLoad()
     }
 
@@ -29,8 +29,14 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
         return indexPath.row
     }
 
-    func configurePrefetchDataSource() -> NewsImagesPrefetcher? {
-        return NewsImagesPrefetcher(model: self.newsViewModel) {
+    override func cellConfiguredHandler(_ cell: UICollectionViewCell, collectionView: UICollectionView, indexPath: IndexPath) {
+        if let id = self.newsItemId(for: indexPath) {
+            self.newsViewModel.requestFullNewsItemIfNeeded(with: id)
+        }
+    }
+
+    func configurePrefetchDataSource() -> LoadableNewsDataPrefetcher? {
+        return LoadableNewsDataPrefetcher(model: self.newsViewModel) {
             [weak self] indexPath in
             return self?.newsItemId(for: indexPath)
         }
@@ -86,6 +92,6 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
     }
 
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.imagesPrefetcher.collectionView(collectionView, cancelPrefetchingForItemsAt: [indexPath])
+        self.loadableDataPrefetcher.collectionView(collectionView, cancelPrefetchingForItemsAt: [indexPath])
     }
 }

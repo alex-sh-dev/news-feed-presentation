@@ -38,6 +38,8 @@ class NewsItemNode: Decodable {
         case categoryType
     }
 
+    init() {}
+
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(UInt.self, forKey: .id)
@@ -65,6 +67,12 @@ class TextNewsItemNode: NewsItemNode {
     enum CodingKeys: String, CodingKey {
         case text
     }
+
+    static var zero: TextNewsItemNode {
+        TextNewsItemNode()
+    }
+
+    override init() { super.init() }
 
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)

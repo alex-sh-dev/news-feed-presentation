@@ -11,7 +11,6 @@ struct WebConfig {
     var newsEndpoint: URL?
     var newsItemEndpoint: URL?
     let requestAttemptsCount = 3
-    let sendRequestDelayMs: UInt64 = 500
     let requestTimeoutSec: TimeInterval = 3
     
     init() {}

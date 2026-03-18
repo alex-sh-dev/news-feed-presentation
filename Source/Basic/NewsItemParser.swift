@@ -27,12 +27,9 @@ class NewsItemParser {
 
         let storage = NewsStorage.shared
         storage.lock.with {
-            storage.newsTexts[id] = parseTask.finalText
-        }
-
-        storage.lock.with {
+            storage.setText(parseTask.finalText, id: id)
             if let urls = parseTask.finalImageUrls {
-                storage.imageUrls[id] = urls
+                storage.setImageUrls(urls, id: id)
             }
         }
 
@@ -46,7 +43,7 @@ class NewsItemParser {
             return
         }
         
-        let result = try JSONDecoder().decode(TextNewsItem.self, from: data)
+        let result = try JSONDecoder().decode(TextNewsItemNode.self, from: data)
         guard let text = result.text else {
             return
         }

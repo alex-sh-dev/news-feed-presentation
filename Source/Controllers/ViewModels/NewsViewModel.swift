@@ -33,8 +33,6 @@ enum NewsIdentifiersAction {
 
 class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
     private var newsItemUpdatedSub: AnyCancellable!
-    // TODO: revision, make part of the NewsItem?
-    final var showInFullPressed: Set<UInt> = []
 
     required init() {
         super.init()
@@ -50,7 +48,7 @@ class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
             self.identifiers.append(identifier)
             identifiersToSend.append(identifier)
             
-            if newsItem.titleImageUrl == nil {
+            if newsItem.value.titleImageUrl == nil {
                 newsItemParts.append(.onlyText)
             } else {
                 newsItemParts.append(.textImage)
@@ -98,41 +96,6 @@ class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
             .sink { [weak self] id in
                 self?.identifiersActionPub.send(.reloadImages(id))
             }
-    }
-
-    final func newsItemText(for id: UInt) -> String? {
-        let storage = NewsStorage.shared
-        storage.lock.lock()
-        defer {
-            storage.lock.unlock()
-        }
-
-        guard let text = storage.newsTexts[id] else {
-            return nil
-        }
-
-        self.showInFullPressed.insert(id)
-        return text
-    }
-    
-    final func imageUrls(for id: UInt) -> [URL] {
-        guard let newsItem = self.newsItem(at: id) else {
-            return []
-        }
-        
-        var imageUrls: [URL] = []
-        if let url = newsItem.titleImageUrl {
-            imageUrls.append(url)
-        }
-        
-        let storage = NewsStorage.shared
-        storage.lock.with {
-            if let additionalUrls = storage.imageUrls[id] {
-                imageUrls.append(contentsOf: additionalUrls)
-            }
-        }
-        
-        return imageUrls
     }
 
     override func requestNews() -> Bool {

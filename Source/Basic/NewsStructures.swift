@@ -8,9 +8,9 @@
 import Foundation
 
 struct NewsNode: Decodable {
-    let news: [NewsItem]?
+    let news: [NewsItemNode]?
     let totalCount: UInt?
-    
+
     static var zero: NewsNode {
         NewsNode(news: [], totalCount: 0)
     }
@@ -21,7 +21,7 @@ struct NewsNode: Decodable {
     }
 }
 
-class NewsItem: Decodable {
+class NewsItemNode: Decodable {
     var id: UInt!
     var title: String?
     var description: String?
@@ -30,14 +30,14 @@ class NewsItem: Decodable {
     var fullUrl: URL?
     var titleImageUrl: URL?
     var categoryType: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case id, title, description
         case publishedDate
         case url, fullUrl, titleImageUrl
         case categoryType
     }
-    
+
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(UInt.self, forKey: .id)
@@ -59,13 +59,13 @@ class NewsItem: Decodable {
     }
 }
 
-class TextNewsItem: NewsItem {
+class TextNewsItemNode: NewsItemNode {
     var text: String?
     
     enum CodingKeys: String, CodingKey {
         case text
     }
-    
+
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)

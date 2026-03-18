@@ -83,6 +83,15 @@ class BaseNewsViewModel {
         return self.identifiers.isEmpty
     }
 
+    func clearExpandedStates() {
+        let storage = NewsStorage.shared
+        storage.lock.withLock {
+            storage.news.forEach { _, item in
+                item.expanded = false
+            }
+        }
+    }
+
     static func createObject<T: BaseNewsViewModel>(fromType type: T.Type) -> T {
         return T.init()
     }

@@ -65,6 +65,10 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         self.dismiss(animated: true)
     }
 
+    deinit {
+        self.newsViewModel.clearExpandedStates()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.newsViewModel.desiredRequestedItemCount = Constants.kItemCountPerPage
@@ -136,7 +140,9 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
             let sectionIndex = self.dataSource.snapshot().indexOfSection(identifier) {
             let indexPath = IndexPath(row: 0, section: sectionIndex)
             let id = identifier.rawValue
-            if self.newsViewModel.newsItemText(for: id) != nil {
+            if let newsItem = self.newsViewModel.newsItem(at: id),
+               newsItem.text != nil {
+                newsItem.expanded = true
                 self.reloadItems([.main(id)], animate: true)
             }
 
@@ -162,10 +168,12 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
 
     func onShowInFull(for cell: NewsItemCell) {
         let id = cell.newsItemId
-        guard let text = self.newsViewModel.newsItemText(for: id) else {
+        guard let newsItem = self.newsViewModel.newsItem(at: id),
+              let text = newsItem.text else {
             return
         }
 
+        newsItem.expanded = true
         cell.descriptionLabel.text = text
         cell.hideShowInFullButton(true)
 
@@ -180,7 +188,7 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
 
     func onShare(for cell: NewsItemCell) {
         guard let newsItem = self.newsViewModel.newsItem(at: cell.newsItemId),
-              let fullUrl = newsItem.fullUrl else {
+              let fullUrl = newsItem.value.fullUrl else {
             return
         }
         let activityVC = UIActivityViewController.linkOpener(url: fullUrl, sourceView: cell.shareButton)
@@ -194,16 +202,17 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
     }
 
     override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? {
-        let model = self.newsViewModel
         switch identifier {
         case .main(let id):
+            let newsItem = self.newsViewModel.newsItem(at: id)!
             let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
             cell.delegate = self
-            cell.configure(with: id, from: model)
+            cell.configure(with: newsItem)
             return cell
         case .image(let id):
+            let newsItem = self.newsViewModel.newsItem(at: id)!
             let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
-            cell.imageUrls = model.imageUrls(for: id)
+            cell.imageUrls = newsItem.jointImageUrls()
             return cell
         }
     }

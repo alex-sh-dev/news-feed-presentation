@@ -62,7 +62,7 @@ class NewsParser {
                 for newsItem in news {
                     let storage = NewsStorage.shared
                     storage.lock.with {
-                        storage.news[newsItem.id] = newsItem
+                        storage.addNewsItem(newsItem)
                     }
                     ids.append(newsItem.id)
                     if let subUrl = newsItem.url {

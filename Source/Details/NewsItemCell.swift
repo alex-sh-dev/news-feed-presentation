@@ -43,19 +43,18 @@ class NewsItemCell: UICollectionViewCell {
         self.showInFullHeightConstraint.constant = hidden ? 0 : self.savedHeightConstant
     }
 
-    func configure(with id: UInt, from model: NewsViewModel) {
-        let newsItem = model.newsItem(at: id)!
-        self.newsItemId = id
-        self.titleLabel.text = newsItem.title
-        self.dateLabel.text = newsItem.publishedDate?.relativeDate()
-        self.categoryLabel.text = newsItem.categoryType
-        self.descriptionLabel.text = newsItem.description
+    func configure(with newsItem: NewsItem) {
+        self.newsItemId = newsItem.value.id
+        self.titleLabel.text = newsItem.value.title
+        self.dateLabel.text = newsItem.value.publishedDate?.relativeDate()
+        self.categoryLabel.text = newsItem.value.categoryType
+        self.descriptionLabel.text = newsItem.value.description
 
-        if model.showInFullPressed.contains(id) {
-            self.descriptionLabel.text = model.newsItemText(for: id)
+        if newsItem.expanded {
+            self.descriptionLabel.text = newsItem.text
             self.hideShowInFullButton(true)
         } else {
-            let hidden = newsItem.fullUrl == nil
+            let hidden = newsItem.value.fullUrl == nil
             self.hideShowInFullButton(hidden)
             self.shareButton.isHidden = hidden
         }

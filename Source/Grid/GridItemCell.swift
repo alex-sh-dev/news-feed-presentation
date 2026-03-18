@@ -10,10 +10,10 @@ import UIKit
 class GridItemCell: PreviewNewsItemCell {
     func configure(item: NewsItem) {
         var config = GridItemContentConfiguration()
-        config.title = item.title
-        config.subtitle = item.description
-        config.imageUrl = item.titleImageUrl
-        config.date = item.publishedDate
+        config.title = item.value.title
+        config.subtitle = item.value.description
+        config.imageUrl = item.value.titleImageUrl
+        config.date = item.value.publishedDate
         self.contentConfiguration = config
     }
 }

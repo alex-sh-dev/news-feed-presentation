@@ -31,7 +31,7 @@ class NewsImagesPrefetcher: NSObject, UICollectionViewDataSourcePrefetching {
 
     private func imageUrl(for indexPath: IndexPath) -> URL? {
         if let newsItem = self.newsItem(for: indexPath),
-           let url = newsItem.titleImageUrl {
+           let url = newsItem.value.titleImageUrl {
             return url
         }
         return nil

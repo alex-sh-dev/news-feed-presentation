@@ -37,26 +37,22 @@ class NewsItemParser {
     }
 
     final func cancelTask(id: UInt) {
-        if let stask = self.sessionDataTasks.value(forKey: id) {
-            stask.cancel()
+        self.sessionDataTasks.updateValue(forKey: id) {
+            task in task.cancel()
         }
-        if let ptask = self.parseTasks.value(forKey: id) {
-            ptask.cancel()
+        self.parseTasks.updateValue(forKey: id) {
+            task in task.cancel()
         }
     }
 
     final func cancelAllTasks() {
-        self.sessionDataTasks.forEach { _, task in
-            task.cancel()
-        }
-        self.parseTasks.forEach { _, task in
-            task.cancel()
-        }
+        self.sessionDataTasks.updateForEach { _, task in task.cancel() }
+        self.parseTasks.updateForEach { _, task in task.cancel() }
     }
 
     func request(subUrl: URL, for id: UInt) {
         if self.sessionDataTasks.containsKey(id)
-            || self.sessionDataTasks.containsKey(id) {
+            || self.parseTasks.containsKey(id) {
             return
         }
 
@@ -65,7 +61,11 @@ class NewsItemParser {
         var request = URLRequest(url: endpoint)
         request.timeoutInterval = self.config.requestTimeoutSec
 
-        let task = URLSession.shared.dataTaskPublisher(for: request)
+        let stask = URLSession.shared.dataTaskPublisher(for: request)
+            .handleEvents(receiveCancel: {
+                [unowned self] in
+                self.sessionDataTasks.removeValue(forKey: id)
+            })
             .map { $0.data }
             .retry(self.config.requestAttemptsCount)
             .decode(type: TextNewsItemNode.self, decoder: JSONDecoder())
@@ -83,12 +83,12 @@ class NewsItemParser {
                 }
 
                 let parseTask = NewsItemParseTask(text: text, titleImageUrl: item.titleImageUrl, for: itemId)
-                let task = Task() {
+                let ptask = Task() {
                     await self.startParseTask(parseTask)
                     self.parseTasks.removeValue(forKey: id)
                 }
-                self.parseTasks.setValue(task, forKey: itemId)
+                self.parseTasks.setValue(ptask, forKey: itemId)
             })
-        self.sessionDataTasks.setValue(task, forKey: id)
+        self.sessionDataTasks.setValue(stask, forKey: id)
     }
 }

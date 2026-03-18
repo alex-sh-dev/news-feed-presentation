@@ -171,6 +171,7 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         let id = cell.newsItemId
         guard let newsItem = self.newsViewModel.newsItem(at: id),
               let text = newsItem.text else {
+            self.newsViewModel.requestFullNewsItemIfNeeded(with: id)
             return
         }
 

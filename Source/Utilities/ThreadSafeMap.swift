@@ -45,6 +45,12 @@ class ThreadSafeMap<Key: Hashable, Value> {
         }
     }
 
+    func updateForEach(_ body: @escaping (Key, Value) -> Void) {
+        self.queue.async(flags: .barrier) {
+            self.map.forEach(body)
+        }
+    }
+
     func updateValue(forKey key: Key, _ block: @escaping (Value) -> Void) {
         self.queue.async(flags: .barrier) {
             if let value = self.map[key] {

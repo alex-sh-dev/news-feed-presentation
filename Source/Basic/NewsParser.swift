@@ -60,10 +60,7 @@ class NewsParser {
                 
                 var ids = [UInt]()
                 for newsItem in news {
-                    let storage = NewsStorage.shared
-                    storage.lock.with {
-                        storage.addNewsItem(newsItem)
-                    }
+                    NewsStorage.shared.addNewsItem(newsItem)
                     ids.append(newsItem.id)
                 }
                 easyLog("data received")

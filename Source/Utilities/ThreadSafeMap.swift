@@ -45,12 +45,28 @@ class ThreadSafeMap<Key: Hashable, Value> {
         }
     }
 
-    var count: Int {
-        var result = 0
-        self.queue.sync {
-            result = self.map.count
+    func updateValue(forKey key: Key, _ block: @escaping (Value) -> Void) {
+        self.queue.async(flags: .barrier) {
+            if let value = self.map[key] {
+                block(value)
+            }
         }
-        return result
+    }
+
+    var keys: [Key] {
+        var keys: [Key]!
+        self.queue.sync {
+            keys = Array(self.map.keys)
+        }
+        return keys
+    }
+
+    var count: Int {
+        var count = 0
+        self.queue.sync {
+            count = self.map.count
+        }
+        return count
     }
 
     var isEmpty: Bool {

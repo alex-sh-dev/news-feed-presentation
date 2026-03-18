@@ -10,19 +10,24 @@ import Foundation
 class NewsStorage {
     static let shared = NewsStorage()
 
-    let lock = NSLock()
-    private(set) var news = [UInt: NewsItem]()
+    private(set) var news = ThreadSafeMap<UInt, NewsItem>()
 
     func addNewsItem(_ item: NewsItemNode) {
-        self.news[item.id] = NewsItem(with: item)
+        self.news.setValue(NewsItem(with: item), forKey: item.id)
     }
 
     func setText(_ text: String, id: UInt) {
-        self.news[id]?.text = text
+        self.news.updateValue(forKey: id) {
+            item in
+            item.text = text
+        }
     }
 
     func setImageUrls(_ urls: [URL], id: UInt) {
-        self.news[id]?.imageUrls = urls
+        self.news.updateValue(forKey: id) {
+            item in
+            item.imageUrls = urls
+        }
     }
 
     private init() {}

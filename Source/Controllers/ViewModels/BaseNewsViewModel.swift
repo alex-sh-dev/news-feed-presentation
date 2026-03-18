@@ -35,12 +35,7 @@ class BaseNewsViewModel {
     }
 
     func newsItem(at id: UInt) -> NewsItem? {
-        var newsItem: NewsItem?
-        NewsStorage.shared.lock.with {
-            newsItem = NewsStorage.shared.news[id]
-        }
-
-        return newsItem
+        return NewsStorage.shared.news.value(forKey: id)
     }
 
     func id(at index: UInt) -> UInt? {
@@ -100,11 +95,8 @@ class BaseNewsViewModel {
     }
 
     func clearExpandedStates() {
-        let storage = NewsStorage.shared
-        storage.lock.withLock {
-            storage.news.forEach { _, item in
-                item.expanded = false
-            }
+        NewsStorage.shared.news.forEach { _, item in
+            item.expanded = false
         }
     }
 

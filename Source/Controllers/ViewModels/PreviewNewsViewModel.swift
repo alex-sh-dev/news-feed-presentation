@@ -30,12 +30,9 @@ class PreviewNewsViewModel: BaseActingNewsViewModel<PreviewNewsIdentifiersAction
                 }
                 return
             }
-            var identifiers: [UInt]!
             let storage = NewsStorage.shared
-            storage.lock.with {
-                identifiers = Array(storage.news.keys.sorted(by: >)
-                    .prefix(self.requestItemsCount))
-            }
+            let identifiers = Array(storage.news.keys.sorted(by: >)
+                .prefix(self.requestItemsCount))
             
             let oldIdentifiers = self.identifiers
             self.identifiers = identifiers

@@ -27,11 +27,9 @@ class NewsItemParser {
 
         let id = parseTask.id!
         let storage = NewsStorage.shared
-        storage.lock.with {
-            storage.setText(parseTask.finalText, id: id)
-            if let urls = parseTask.finalImageUrls {
-                storage.setImageUrls(urls, id: id)
-            }
+        storage.setText(parseTask.finalText, id: id)
+        if let urls = parseTask.finalImageUrls {
+            storage.setImageUrls(urls, id: id)
         }
 
         self.newsItemUpdatedPub.send(id)

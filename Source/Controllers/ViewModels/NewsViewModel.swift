@@ -82,16 +82,13 @@ class NewsViewModel: BaseActingNewsViewModel<NewsIdentifiersAction> {
     
     final func fillIdentifiersFromStorage() {
         let storage = NewsStorage.shared
-        var identifiers: [UInt]!
-        storage.lock.with {
-            identifiers = Array(storage.news.keys).sorted(by: >)
-        }
-        sendIdentifiers(identifiers, append: false)
+        let identifiers = storage.news.keys.sorted(by: >)
+        self.sendIdentifiers(identifiers, append: false)
     }
     
     override func bindToPublishers() {
         super.bindToPublishers()
-        newsItemUpdatedSub = NewsParser.shared.newsItemParser.newsItemUpdatedPub
+        self.newsItemUpdatedSub = NewsParser.shared.newsItemParser.newsItemUpdatedPub
             .receive(on: DispatchQueue.main)
             .sink { [weak self] id in
                 self?.identifiersActionPub.send(.reloadImages(id))

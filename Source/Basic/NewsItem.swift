@@ -13,6 +13,8 @@ class NewsItem {
     var expanded: Bool = false
     var imageUrls: [URL] = []
 
+    var id: UInt { value.id }
+
     init(with item: NewsItemNode) {
         self.value = item
     }

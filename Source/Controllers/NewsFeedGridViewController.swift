@@ -65,7 +65,7 @@ class NewsFeedGridViewController: NewsFeedListViewController<Section, UInt, News
 
     override func cellRegistrationHandler(cell: GridItemCell, indexPath: IndexPath, item: NewsItem) {
         cell.configure(item: item)
-        cell.itemIdentifier = .value(item.value.id)
+        cell.itemIdentifier = .value(item.id)
     }
 
     override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: UInt) -> UICollectionViewCell? {

@@ -124,7 +124,7 @@ class StartViewController: NewsFeedListViewController<Section, PreviewNewsItemId
 
     override func cellRegistrationHandler(cell: PreviewNewsItemCell, indexPath: IndexPath, item: NewsItem) {
         cell.configure(with: item.value.title, and: item.value.titleImageUrl)
-        cell.itemIdentifier = .value(item.value.id)
+        cell.itemIdentifier = .value(item.id)
     }
 
     override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: PreviewNewsItemIdentifier) -> UICollectionViewCell? {

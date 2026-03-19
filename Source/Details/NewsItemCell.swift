@@ -44,7 +44,7 @@ class NewsItemCell: UICollectionViewCell {
     }
 
     func configure(with newsItem: NewsItem) {
-        self.newsItemId = newsItem.value.id
+        self.newsItemId = newsItem.id
         self.titleLabel.text = newsItem.value.title
         self.dateLabel.text = newsItem.value.publishedDate?.relativeDate()
         self.categoryLabel.text = newsItem.value.categoryType

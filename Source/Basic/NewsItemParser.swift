@@ -26,8 +26,7 @@ class NewsItemParser {
         }
 
         let id = parseTask.id!
-        let storage = NewsStorage.shared
-        storage.news.updateValue(forKey: id) {
+        NewsStorage.shared.news.updateValue(forKey: id) {
             item in
             item.text = parseTask.finalText
             if let urls = parseTask.finalImageUrls {

@@ -33,6 +33,7 @@ class NewsItemParser {
                 item.imageUrls = urls
             }
         }
+
         self.newsItemUpdatedPub.send(id)
         easyLog("news item with id = \(id) parsed")
     }

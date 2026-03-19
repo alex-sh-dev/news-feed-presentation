@@ -13,7 +13,16 @@ class NewsStorage {
     private(set) var news = ThreadSafeMap<UInt, NewsItem>()
 
     func setNewsItem(_ item: NewsItemNode, forId id: UInt) {
-        self.news.setValue(NewsItem(with: item), forKey: id)
+        if self.news.containsKey(id) {
+            self.news.updateValue(forKey: id) {
+                newsItem in
+                if newsItem.value != item {
+                    newsItem.value = item
+                }
+            }
+        } else {
+            self.news.setValue(NewsItem(with: item), forKey: id)
+        }
     }
 
     private init() {}

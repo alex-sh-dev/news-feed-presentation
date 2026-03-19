@@ -21,7 +21,7 @@ struct NewsNode: Decodable {
     }
 }
 
-class NewsItemNode: Decodable {
+class NewsItemNode: Decodable, Equatable {
     var id: UInt!
     var title: String?
     var description: String?
@@ -58,6 +58,15 @@ class NewsItemNode: Decodable {
         let titleImageUrlStr = try container.decodeIfPresent(String.self, forKey: .titleImageUrl) ?? ""
         self.titleImageUrl = URL(string: titleImageUrlStr)
         self.categoryType = try container.decodeIfPresent(String.self, forKey: .categoryType)
+    }
+
+    static func == (lhs: NewsItemNode, rhs: NewsItemNode) -> Bool {
+        return lhs.id == rhs.id && lhs.title == rhs.title &&
+               lhs.description == rhs.description &&
+               lhs.publishedDate == rhs.publishedDate &&
+               lhs.url == rhs.url && lhs.fullUrl == rhs.fullUrl &&
+               lhs.titleImageUrl == rhs.titleImageUrl &&
+               lhs.categoryType == rhs.categoryType
     }
 }
 

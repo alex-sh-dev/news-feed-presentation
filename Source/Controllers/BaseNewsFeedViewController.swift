@@ -10,7 +10,7 @@ import Combine
 
 typealias CollectionViewCellDefault = UICollectionViewCell
 
-class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, NewsViewModelType, CollectionViewCellType>: UIViewController, NewsFeedInterface where SectionIdentifierType: Hashable, SectionIdentifierType: Sendable, ItemIdentifierType: Hashable, ItemIdentifierType: Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: UICollectionViewCell {
+class BaseNewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: UICollectionViewCell>: UIViewController, NewsFeedInterface {
     typealias NewsFeedViewDiffableDataSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
     typealias NewsFeedDiffableDataSourceSnapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
     typealias CollectionViewCellRegistration = UICollectionView.CellRegistration<CollectionViewCellType, NewsItem>
@@ -48,15 +48,13 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
 
     func configureIdentifiersActionSubcriber() -> AnyCancellable? { return nil }
 
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {}
+    func cellConfiguredHandler(_ cell: UICollectionViewCell, collectionView: UICollectionView, indexPath: IndexPath) {}
 
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {}
+    func cellRegistrationHandler(cell: CollectionViewCellType, indexPath: IndexPath, item: NewsItem) {}
 
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {}
-
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {}
-
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {}
+    func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: ItemIdentifierType) -> UICollectionViewCell? {
+        return nil
+    }
 
     private func configureDataSource() {
         self.cellRegistration = CollectionViewCellRegistration() {
@@ -73,15 +71,17 @@ class BaseNewsFeedViewController<SectionIdentifierType, ItemIdentifierType, News
         }
     }
 
-    func cellConfiguredHandler(_ cell: UICollectionViewCell, collectionView: UICollectionView, indexPath: IndexPath) {}
-
-    func cellRegistrationHandler(cell: CollectionViewCellType, indexPath: IndexPath, item: NewsItem) {}
-
-    func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: ItemIdentifierType) -> UICollectionViewCell? {
-        return nil
-    }
-
     func configureLayout() -> UICollectionViewLayout {
         return UICollectionViewFlowLayout()
     }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {}
+
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {}
+
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {}
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {}
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {}
 }

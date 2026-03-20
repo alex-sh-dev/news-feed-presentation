@@ -22,7 +22,7 @@ class NewsFeedListViewController<SectionIdentifierType: Hashable & Sendable, Ite
         return .notValid
     }
 
-    override func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
+    override func presentViewController(for selectedCell: UICollectionViewCell) -> SegueIdentifier? {
         return NewsFeedDetailsType.segueIdentifier
     }
 }

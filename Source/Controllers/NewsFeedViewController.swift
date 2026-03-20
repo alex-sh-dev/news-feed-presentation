@@ -25,9 +25,7 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
 
     func newsItemId(for indexPath: IndexPath) -> UInt? { return nil }
 
-    func newsItemRow(for indexPath: IndexPath) -> Int {
-        return indexPath.row
-    }
+    func newsItemRow(for indexPath: IndexPath) -> Int { return indexPath.row }
 
     override func cellConfiguredHandler(_ cell: UICollectionViewCell, collectionView: UICollectionView, indexPath: IndexPath) {
         if let id = self.newsItemId(for: indexPath) {
@@ -42,7 +40,7 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
         }
     }
 
-    func presentViewController(forSelected cell: UICollectionViewCell) -> SegueIdentifier? {
+    func presentViewController(for selectedCell: UICollectionViewCell) -> SegueIdentifier? {
         return nil
     }
 
@@ -79,7 +77,7 @@ class NewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIde
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath),
-           let segueIdfr = self.presentViewController(forSelected: cell) {
+           let segueIdfr = self.presentViewController(for: cell) {
             self.performSegue(withIdentifier: segueIdfr, sender: cell)
         }
     }

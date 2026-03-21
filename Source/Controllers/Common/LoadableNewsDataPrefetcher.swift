@@ -7,7 +7,7 @@
 
 import UIKit
 
-class LoadableNewsDataPrefetcher: NSObject, UICollectionViewDataSourcePrefetching {
+class LoadableNewsDataPrefetcher: NSObject {
     typealias ItemIdProvider = (_ indexPath: IndexPath) -> UInt?
 
     private(set) var model: BaseNewsViewModel!
@@ -72,7 +72,9 @@ class LoadableNewsDataPrefetcher: NSObject, UICollectionViewDataSourcePrefetchin
             self.model.cancelFullNewsItemRequest(for: id)
         }
     }
+}
 
+extension LoadableNewsDataPrefetcher: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         indexPaths.forEach { indexPath in
             self.loadImage(for: indexPath)

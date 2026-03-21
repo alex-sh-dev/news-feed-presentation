@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-protocol NewsFeedInterface: UICollectionViewDelegate {
+protocol NewsFeedInterface {
     associatedtype NewsViewModelType: BaseNewsViewModel
     var newsViewModel: NewsViewModelType { get set }
 

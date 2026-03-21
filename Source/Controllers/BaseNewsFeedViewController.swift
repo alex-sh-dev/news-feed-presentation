@@ -10,7 +10,7 @@ import Combine
 
 typealias CollectionViewCellDefault = UICollectionViewCell
 
-class BaseNewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: UICollectionViewCell>: UIViewController, NewsFeedInterface {
+class BaseNewsFeedViewController<SectionIdentifierType: Hashable & Sendable, ItemIdentifierType: Hashable & Sendable, NewsViewModelType: BaseNewsViewModel, CollectionViewCellType: UICollectionViewCell>: UIViewController, NewsFeedInterface, UICollectionViewDelegate {
     typealias NewsFeedViewDiffableDataSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
     typealias NewsFeedDiffableDataSourceSnapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
     typealias CollectionViewCellRegistration = UICollectionView.CellRegistration<CollectionViewCellType, NewsItem>

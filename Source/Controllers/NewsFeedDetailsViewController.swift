@@ -24,11 +24,12 @@ enum NewsItemPartIdentifier: Hashable {
     }
 }
 
-class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsViewModel, ImageCollectionViewCellDefault>, NewsFeedDetailsInterface, NewsItemCellDelegate {
+class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, NewsItemPartIdentifier, NewsViewModel, ImageCollectionViewCellDefault> {
     private struct Constants {
         static let kItemCountPerPage: UInt = 10
-        static let kNewsDetailsSegueIdentifier = "NewsDetailsSegueIdentifier"
     }
+
+    private var startIdentifierRaw: NewsItemIdentifier = .notValid
 
     class NewsFeedImagesPrefetcher : LoadableNewsDataPrefetcher {
         override func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
@@ -39,27 +40,6 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
                 }
             }
         }
-    }
-
-    private var startIdentifierRaw: NewsItemIdentifier = .notValid
-    var startIdentifier: NewsItemIdentifier {
-        set { startIdentifierRaw = newValue }
-        get {
-            switch (startIdentifierRaw) {
-            case .index(let index):
-                if let identifier = self.newsViewModel.id(at: index) {
-                    return .value(identifier)
-                } else {
-                    return .notValid
-                }
-            default:
-                return startIdentifierRaw
-            }
-        }
-    }
-
-    static var segueIdentifier: SegueIdentifier {
-        Constants.kNewsDetailsSegueIdentifier
     }
 
     @IBAction func onClose(_ sender: Any) {
@@ -135,6 +115,66 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         self.dataSource.apply(snapshot, animatingDifferences: true)
     }
 
+    override func newsItemId(for indexPath: IndexPath) -> UInt? {
+        let identifier = self.dataSource.itemIdentifier(for: indexPath)
+        switch identifier {
+        case .image(let id):
+            return id
+        default:
+            return nil
+        }
+    }
+
+    override func newsItemRow(for indexPath: IndexPath) -> Int {
+        return indexPath.section
+    }
+
+    override func updateImagesForVisibleCells(collectionView: UICollectionView, cell: UICollectionViewCell?) {
+        if let imagesCell = cell as? NewsItemImagesCell {
+            super.updateImagesForVisibleCells(collectionView: imagesCell.imageCollection, cell: nil)
+        }
+    }
+
+    override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? {
+        switch identifier {
+        case .main(let id):
+            let newsItem = self.newsViewModel.newsItem(at: id)!
+            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
+            cell.delegate = self
+            cell.configure(with: newsItem)
+            return cell
+        case .image(let id):
+            let newsItem = self.newsViewModel.newsItem(at: id)!
+            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
+            cell.imageUrls = newsItem.jointImageUrls()
+            return cell
+        }
+    }
+
+    override func configureLayout() -> UICollectionViewLayout {
+        return NewsCompositionalLayout()
+    }
+}
+
+extension NewsFeedDetailsViewController: NewsFeedDetailsInterface {
+    static var segueIdentifier: SegueIdentifier { "NewsDetailsSegueIdentifier" }
+
+    var startIdentifier: NewsItemIdentifier {
+        set { startIdentifierRaw = newValue }
+        get {
+            switch (startIdentifierRaw) {
+            case .index(let index):
+                if let identifier = self.newsViewModel.id(at: index) {
+                    return .value(identifier)
+                } else {
+                    return .notValid
+                }
+            default:
+                return startIdentifierRaw
+            }
+        }
+    }
+
     func scrollToStartItem() {
         let identifier = self.startIdentifier
         if identifier != .notValid,
@@ -152,21 +192,9 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
             }
         }
     }
+}
 
-    override func newsItemId(for indexPath: IndexPath) -> UInt? {
-        let identifier = self.dataSource.itemIdentifier(for: indexPath)
-        switch identifier {
-        case .image(let id):
-            return id
-        default:
-            return nil
-        }
-    }
-
-    override func newsItemRow(for indexPath: IndexPath) -> Int {
-        return indexPath.section
-    }
-
+extension NewsFeedDetailsViewController: NewsItemCellDelegate {
     func onShowInFull(for cell: NewsItemCell) {
         let id = cell.newsItemId
         guard let newsItem = self.newsViewModel.newsItem(at: id),
@@ -195,31 +223,5 @@ class NewsFeedDetailsViewController: NewsFeedViewController<NewsItemIdentifier, 
         }
         let activityVC = UIActivityViewController.linkOpener(url: fullUrl, sourceView: cell.shareButton)
         self.present(activityVC, animated: true)
-    }
-
-    override func updateImagesForVisibleCells(collectionView: UICollectionView, cell: UICollectionViewCell?) {
-        if let imagesCell = cell as? NewsItemImagesCell {
-            super.updateImagesForVisibleCells(collectionView: imagesCell.imageCollection, cell: nil)
-        }
-    }
-
-    override func dataSourceCellProvider(collectionView: UICollectionView, indexPath: IndexPath, identifier: NewsItemPartIdentifier) -> UICollectionViewCell? {
-        switch identifier {
-        case .main(let id):
-            let newsItem = self.newsViewModel.newsItem(at: id)!
-            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemCell.self)
-            cell.delegate = self
-            cell.configure(with: newsItem)
-            return cell
-        case .image(let id):
-            let newsItem = self.newsViewModel.newsItem(at: id)!
-            let cell = UICollectionViewCell.dequeueReusableCell(from: collectionView, for: indexPath, cast: NewsItemImagesCell.self)
-            cell.imageUrls = newsItem.jointImageUrls()
-            return cell
-        }
-    }
-
-    override func configureLayout() -> UICollectionViewLayout {
-        return NewsCompositionalLayout()
     }
 }
